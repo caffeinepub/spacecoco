@@ -1,0 +1,272 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 7,
+  "summary": "Build a decentralized web game on Internet Computer named \"Spacecoco\": a fast, absurd, addictive multiplayer (up to 8 players) Snake-style game with multi-input controls, ICP wallet-based cosmetic skins, dynamic planet modifiers, bosses, power-ups, and an on-chain leaderboard.",
+  "architectural_notes": [
+    "Project pivot: replace used-items marketplace with a Snake-style multiplayer web game on Internet Computer called \"Spacecoco\".",
+    "Multiplayer target: up to 8 players with real-time state synchronization.",
+    "Use ICP wallet integration for cosmetic skin selection/switching.",
+    "Leaderboard should be stored/validated on-chain.",
+    "User confirmed changes should be additive only and must not alter the existing Spacecoco theme/mechanics beyond the specified tweaks."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-create-the-product-s-overall-visual-theme-and-apply-it-consistently-across-the-ui-for-the-gatos-use-items-used-items-marketplace-theme-must-be-a-coherent-distinct-style-colors-typography-spacing-components-suitable-for-a-trusted-second-hand-marketplace-and-must-avoid-default-generic-styling",
+      "title": "Create the product’s overall visual theme and apply it consistently across the UI for the “Gatos Use Items” used-items marketplace. Theme must be a coherent, distinct style (colors, typography, spacing, components) suitable for a trusted second-hand marketplace, and must avoid default/generic styling.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-internet-identity-sign-in-and-session-aware-navigation-so-users-can-create-and-manage-their-own-used-item-listings",
+      "title": "Implement Internet Identity sign-in and session-aware navigation so users can create and manage their own used-item listings.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-core-marketplace-pages-home-landing-browse-listings-listing-details-create-listing-sell-and-my-listings-wired-to-backend-apis-using-react-query",
+      "title": "Build the core marketplace pages: Home/Landing, Browse Listings, Listing Details, Create Listing (“Sell”), and My Listings, wired to backend APIs using React Query.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-support-listing-images-via-user-provided-image-urls-no-file-uploads-including-multi-image-previews-and-safe-validation",
+      "title": "Support listing images via user-provided image URLs (no file uploads), including multi-image previews and safe validation.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-basic-brand-marketing-static-images-for-the-app-and-render-them-in-the-ui-from-frontend-static-assets-not-through-the-backend",
+      "title": "Generate and include basic brand/marketing static images for the app, and render them in the UI from frontend static assets (not through the backend).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rebrand-the-existing-app-as-spacecoco-and-replace-the-marketplace-navigation-pages-with-a-game-focused-ui-that-includes-a-home-screen-a-lobby-matchmaking-screen-the-in-game-play-screen-a-skins-screen-and-a-leaderboard-screen-all-user-facing-text-must-be-in-english",
+      "title": "Rebrand the existing app as “Spacecoco” and replace the marketplace navigation/pages with a game-focused UI that includes: a Home screen, a Lobby/Matchmaking screen, the in-game Play screen, a Skins screen, and a Leaderboard screen. All user-facing text must be in English.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-core-spacecoco-snake-style-gameplay-loop-on-the-play-screen-with-fast-responsive-movement-scoring-rounds-and-lose-win-conditions-the-game-must-support-level-progression-and-include-rotating-planet-modifiers-mars-craters-slow-movement-titan-fog-reduces-visibility-europa-slippery-ice-variable-gravity-low-high-effects-on-movement-obstacles-ufos-dropping-flying-cows-and-randomized-power-up-spawns",
+      "title": "Implement the core Spacecoco Snake-style gameplay loop on the Play screen with fast, responsive movement, scoring, rounds, and lose/win conditions. The game must support level progression and include: rotating planet modifiers (Mars craters slow movement; Titan fog reduces visibility; Europa slippery ice), variable gravity (low/high effects on movement), obstacles (UFOs dropping flying cows), and randomized power-up spawns.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-cross-platform-controls-for-steering-the-snake-mobile-swipe-gestures-keyboard-arrow-keys-and-wasd-and-optional-mouse-follow-steering-provide-an-in-game-control-hint-overlay-that-adapts-to-the-current-input-method-english-text",
+      "title": "Add cross-platform controls for steering the snake: mobile swipe gestures, keyboard (arrow keys and WASD), and optional mouse-follow steering. Provide an in-game control hint overlay that adapts to the current input method (English text).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-multiplayer-matches-for-up-to-8-players-including-a-lobby-matchmaking-flow-match-creation-joining-and-synchronized-gameplay-state-suitable-for-the-internet-computer-environment",
+      "title": "Implement multiplayer matches for up to 8 players, including a lobby/matchmaking flow, match creation/joining, and synchronized gameplay state suitable for the Internet Computer environment.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-boss-encounters-spawn-a-penguin-boss-every-five-levels-players-must-circle-the-boss-three-times-to-win-advance-add-the-supreme-cow-unlock-at-1000-points-a-silent-floating-boss-with-red-eyes-that-launches-ufos-and-exploding-cow-missiles-causes-map-shake-and-makes-everything-extremely-slippery",
+      "title": "Add boss encounters: spawn a penguin boss every five levels; players must circle the boss three times to win/advance. Add the “Supreme Cow” unlock at 1000 points: a silent floating boss with red eyes that launches UFOs and exploding cow missiles, causes map shake, and makes everything extremely slippery.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-cosmetic-skin-system-with-10-selectable-snake-skins-reticulated-python-king-cobra-black-mamba-anaconda-rattlesnake-krait-taipan-boa-constrictor-gaboon-viper-and-feathered-quetzalcoatl-players-can-change-their-active-skin-using-their-icp-wallet-on-chain-action-and-the-selected-skin-persists-per-user",
+      "title": "Add a cosmetic skin system with 10 selectable snake skins: Reticulated Python, King Cobra, Black Mamba, Anaconda, Rattlesnake, Krait, Taipan, Boa Constrictor, Gaboon Viper, and Feathered Quetzalcoatl. Players can change their active skin using their ICP wallet (on-chain action), and the selected skin persists per user.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-on-chain-leaderboard-that-records-high-scores-and-exposes-read-apis-for-global-top-scores-and-a-player-s-personal-best-the-frontend-leaderboard-screen-must-display-the-global-leaderboard-and-the-current-user-s-best-score",
+      "title": "Implement an on-chain leaderboard that records high scores and exposes read APIs for global top scores and a player’s personal best. The frontend Leaderboard screen must display the global leaderboard and the current user’s best score.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-in-game-audio-system-with-chiptune-style-space-music-a-base-track-that-gradually-intensifies-when-the-player-is-close-to-losing-planet-specific-remixes-for-mars-titan-europa-silence-before-the-supreme-cow-encounter-and-an-epic-chord-sting-when-it-begins-provide-basic-audio-settings-mute-volume-in-the-ui",
+      "title": "Add an in-game audio system with chiptune-style space music: a base track that gradually intensifies when the player is close to losing, planet-specific remixes for Mars/Titan/Europa, silence before the Supreme Cow encounter, and an epic chord sting when it begins. Provide basic audio settings (mute/volume) in the UI.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-the-required-spacecoco-static-art-assets-sprites-illustrations-under-frontend-public-assets-generated-and-render-them-in-the-ui-game-no-backend-image-serving",
+      "title": "Generate and include the required Spacecoco static art assets (sprites/illustrations) under frontend/public/assets/generated and render them in the UI/game (no backend image serving).",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-render-a-black-starfield-background-with-randomly-placed-stars-on-the-play-screen-canvas-as-an-additive-visual-layer-do-not-change-the-existing-spacecoco-theme-the-starfield-should-be-subtly-animated-e-g-gentle-drift-or-twinkle-while-keeping-gameplay-visuals-readable",
+      "title": "Render a black starfield background with randomly placed stars on the Play screen canvas as an additive visual layer (do not change the existing Spacecoco theme). The starfield should be subtly animated (e.g., gentle drift or twinkle) while keeping gameplay visuals readable.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-game-initialization-so-the-snake-spawns-centered-on-the-grid-with-green-color-and-an-initial-length-of-5-blocks-while-keeping-the-rest-of-the-existing-game-theme-and-mechanics-intact",
+      "title": "Update game initialization so the snake spawns centered on the grid with green color and an initial length of 5 blocks, while keeping the rest of the existing game theme and mechanics intact.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-obstacle-spawning-rules-so-that-every-2-seconds-a-ufo-descends-from-the-top-of-the-playfield-carrying-a-cow-inside-as-an-additive-behavior-do-not-remove-existing-obstacle-power-up-systems-integrate-with-them",
+      "title": "Adjust obstacle spawning rules so that every 2 seconds a UFO descends from the top of the playfield carrying a cow inside, as an additive behavior (do not remove existing obstacle/power-up systems; integrate with them).",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-penguin-boss-spawn-rule-is-enforced-every-5-levels-spawn-a-penguin-boss-in-the-center-of-the-playfield-additive-confirmation-adjustment-that-must-not-break-other-boss-logic-including-existing-circling-mechanics",
+      "title": "Ensure the penguin boss spawn rule is enforced: every 5 levels, spawn a penguin boss in the center of the playfield (additive confirmation/adjustment that must not break other boss logic, including existing circling mechanics).",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-at-the-start-of-each-match-play-a-short-looping-chiptune-background-track-at-low-volume-this-must-be-additive-it-must-not-remove-or-disable-any-existing-dynamic-intensifying-music-behavior-if-present-it-should-coexist-or-transition-without-regressing-existing-audio-features",
+      "title": "At the start of each match, play a short looping chiptune background track at low volume. This must be additive: it must not remove or disable any existing dynamic/intensifying music behavior (if present); it should coexist or transition without regressing existing audio features.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-5",
+      "summary": "Create the core \"Spacecoco\" Snake-style web gameplay loop with fast, responsive movement, scoring, rounds, and win/lose conditions.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Support multiplayer matches for up to 8 players (real-time), including lobby/matchmaking and synchronization suitable for Internet Computer.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Implement simple cross-platform controls: mobile swipe, PC arrow keys/WASD, and optional mouse-follow steering.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add 10 selectable snake skins (reticulated python, king cobra, black mamba, anaconda, rattlesnake, krait, taipan, boa constrictor, Gaboon viper, feathered Quetzalcoatl) and allow switching skins using an ICP wallet.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Add rotating alien planet round modifiers: Mars (craters slow movement), Titan (fog reduces visibility), Europa (slippery ice), plus variable gravity effects (low/high).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add obstacles and power-ups: UFOs that drop flying cows; eating a cow enables colored lasers (red burn, blue freeze, green poison).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Add boss encounters: penguin bosses every five levels; players must circle the boss three times to win/advance.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Add dynamic chiptune audio system: space background music that intensifies near losing, planet-specific remixes, silence before the \"Supreme Cow\", then an epic chord.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Add \"Supreme Cow\" unlock at 1000 points: floating silent boss with red eyes that launches UFOs and exploding cow missiles, causes map shake and extreme slipperiness.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Implement decentralization elements: on-chain leaderboard and randomized power-up distribution.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Extend the backend canister to support Spacecoco game state and multiplayer synchronization: create/join/leave lobbies, start matches, accept player input updates, advance authoritative game ticks, and provide read APIs for current match state. Use canister-based randomness for power-up distribution.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Add a black starfield background with randomly placed stars (preferably subtle animation) without changing the existing Spacecoco theme.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Set the initial snake spawn to start centered on the screen, green color, with initial length of 5 blocks.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Adjust obstacle spawning so a UFO descends from the top every 2 seconds carrying a cow inside (additive change).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Ensure a penguin boss appears in the center every 5 levels (additive rule/confirmation).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "At the start of a match, play a short looping chiptune background track at low volume (without removing existing dynamic/intensifying music behavior).",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "2d",
+  "projectName": "Spacecoco",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
