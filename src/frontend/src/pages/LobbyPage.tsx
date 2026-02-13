@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Gamepad2, Users, Play } from 'lucide-react';
+import { NeonStartScene } from '@/components/start/NeonStartScene';
 
 export default function LobbyPage() {
   const navigate = useNavigate();
@@ -28,9 +29,15 @@ export default function LobbyPage() {
   return (
     <div className="container-custom py-12">
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-accent">Game Lobby</h1>
-          <p className="text-lg text-muted-foreground">Choose your game mode and start playing!</p>
+        {/* Animated Banner */}
+        <div className="relative h-48 rounded-2xl overflow-hidden border-2 border-accent/30 shadow-neon-strong">
+          <NeonStartScene />
+          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-black/20">
+            <div className="text-center space-y-2">
+              <h1 className="text-4xl md:text-5xl font-display font-bold text-accent neon-text-glow">Game Lobby</h1>
+              <p className="text-lg text-foreground">Choose your game mode and start playing!</p>
+            </div>
+          </div>
         </div>
 
         <Tabs defaultValue="local" className="w-full">
@@ -40,7 +47,7 @@ export default function LobbyPage() {
           </TabsList>
 
           <TabsContent value="local" className="space-y-4">
-            <Card className="border-accent/30">
+            <Card className="border-accent/30 neon-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Gamepad2 className="h-5 w-5 text-accent" />
@@ -59,12 +66,15 @@ export default function LobbyPage() {
                     • Battle penguin bosses every 5 levels
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    • Unlock the Supreme Cow at 1000 points
+                    • Compete against AI opponents
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    • Eliminate rivals and collect their points
                   </p>
                 </div>
                 <Button 
                   size="lg" 
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold"
+                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-bold neon-button"
                   onClick={handleLocalPlay}
                 >
                   <Play className="mr-2 h-5 w-5" />
@@ -76,7 +86,7 @@ export default function LobbyPage() {
 
           <TabsContent value="multiplayer" className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
-              <Card className="border-accent/30">
+              <Card className="border-accent/30 neon-card">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-accent" />
@@ -101,7 +111,7 @@ export default function LobbyPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-accent/30">
+              <Card className="border-accent/30 neon-card">
                 <CardHeader>
                   <CardTitle>Join Lobby</CardTitle>
                   <CardDescription>
@@ -133,16 +143,16 @@ export default function LobbyPage() {
           </TabsContent>
         </Tabs>
 
-        <Card className="border-primary/30 bg-card/50">
+        <Card className="border-primary/30 bg-card/50 neon-card">
           <CardHeader>
             <CardTitle>Quick Tips</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>• Use arrow keys, WASD, or swipe on mobile to control your snake</p>
             <p>• Collect flying cows dropped by UFOs to gain laser powers</p>
-            <p>• Red lasers burn, blue lasers freeze, green lasers poison</p>
+            <p>• Hit opponent heads with your body to eliminate them</p>
+            <p>• Collect dropped points to grow and increase your score</p>
             <p>• Each planet has unique hazards - adapt your strategy!</p>
-            <p>• Circle penguin bosses 3 times to defeat them</p>
           </CardContent>
         </Card>
       </div>

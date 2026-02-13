@@ -1,79 +1,178 @@
 {
   "kind": "build_request",
-  "title": "Fix Spacecoco blank Play screen by starting the game loop correctly after sprite load",
-  "priority": "high",
+  "title": "Spacecoco: Retro-cartoon neon visual/audio upgrade, animated start/menu presentation, and competitive scoring/elimination revamp",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-29",
-      "text": "Fix the Play screen blank/no-render issue by ensuring the requestAnimationFrame game loop actually starts after sprites finish loading (avoid stale React hook closures). In particular, `startGame()` and `resumeGame()` must invoke a `gameLoop` function that sees the latest `spritesLoaded` value and does not early-return incorrectly.",
+      "id": "REQ-32",
+      "text": "Upgrade the Spacecoco start experience (Home screen + Lobby screen) to a high-motion, retro-cartoon neon presentation: add an animated hero/splash scene with UFOs/aliens flying across the screen and bright cows firing eye-lasers, while keeping the game name and core navigation intact.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-10"
+          "msg-1"
         ],
         "quotes": [
-          "ni siquiera aparece nada",
-          "solo as lo que tengas que hacer para que el juego funcione al 100%"
+          "ensure the start screen has lots of movement ,the main menu should be bright Aliens and ufos flying all over the screen ,cows shooting laser from their eyes very bright ,retro cartoon 4k high quality"
         ]
       },
       "acceptanceCriteria": [
-        "When navigating to /play from the Lobby, the canvas renders the starfield + snake within 1 second after assets load.",
-        "The snake is always moving without requiring any user input.",
-        "Pausing and resuming reliably restarts the animation loop and rendering (no freeze/blank screen after resume).",
-        "There are no React console warnings about missing hook dependencies for the game loop start/resume logic."
+        "Home screen and/or Lobby screen includes a clearly animated scene (not just a static image) featuring moving UFO/alien elements and cow eye-laser effects.",
+        "All user-facing text remains in English (existing headings/buttons remain understandable and consistent).",
+        "Navigation to Lobby/Play/Skins/Leaderboard continues to work as before."
       ]
     },
     {
-      "id": "REQ-30",
-      "text": "Add a robust runtime fallback so the Play screen is never fully blank if sprite loading fails: surface a user-visible error overlay with an actionable message and ensure at least a minimal canvas render (e.g., clear + starfield) still occurs even when `loadAllSprites()` rejects.",
+      "id": "REQ-33",
+      "text": "Revamp the in-game scoring UI (HUD) to a modern arcade retro-neon style with large digits, bright neon color accents (purple/red/blue/green as primary palette), and high-clarity readability over gameplay.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6",
-          "msg-7"
+          "msg-1"
         ],
         "quotes": [
-          "nada se mueve sabes porque?",
-          "ni siquiera aparece nada"
+          "for the scoring system, big numbers neon retro that when you open the game you say wow",
+          "change the scoring system ... more modern and entertaining with bright colors and numerations that make sense with the game mechanics"
         ]
       },
       "acceptanceCriteria": [
-        "If any sprite fails to load, the UI shows an overlay on the Play screen indicating that assets failed to load (English text) rather than leaving a blank screen.",
-        "The failure state is logged to console with the underlying error.",
-        "The user can still navigate back to the Lobby from the Play screen in the failure state."
+        "Score and Level are displayed with larger, more prominent typography than the current HUD.",
+        "HUD styling is neon/retro and uses the requested bright palette (including purple/red/blue/green).",
+        "HUD remains readable against the playfield (no low-contrast text over bright effects)."
       ]
     },
     {
-      "id": "REQ-31",
-      "text": "Verify and correct the runtime sprite asset paths used by the sprite loader so they resolve in production (IC canister hosting) and allow `spritesLoaded` to become true when the assets exist under `frontend/public/assets/generated`.",
+      "id": "REQ-34",
+      "text": "Implement an updated competitive scoring model that awards points when the snake eats objects and when it successfully eliminates an opponent, with on-screen score feedback (e.g., floating neon number popups) that clearly communicates how many points were gained.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6",
-          "msg-10"
+          "msg-1"
         ],
         "quotes": [
-          "nada se mueve sabes porque?",
-          "ni siquiera aparece nada"
+          "improve the scoring structure so the snake increases score when it eats objects or kills one of its opponents",
+          "more modern and entertaining ... with bright colors and numerations that have sense with the mechanics"
         ]
       },
       "acceptanceCriteria": [
-        "In production build, `loadAllSprites()` resolves successfully and `spritesLoaded` becomes true when the expected files exist under `/assets/generated/`.",
-        "The “Loading Game Assets…” overlay disappears once sprites are loaded, and gameplay starts automatically.",
-        "No 404s are emitted in the browser network panel for the sprite asset URLs referenced by the sprite loader."
+        "Eating at least cows and penguins changes the score in a clearly visible way (HUD updates and an on-canvas or overlay popup appears).",
+        "When an elimination event occurs (see competitive rule requirement), the winner receives a clear points reward and an on-screen popup indicates the gain.",
+        "Score feedback animations do not block gameplay visibility (brief duration, positioned sensibly)."
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "text": "Add the competitive elimination rule: when a snake hits an opponent's head with its body, the opponent resets back to the normal starting size, and the winner can collect dropped point items to gain score and grow.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "the main theme should be competition ... the one who hits with the body on the head of their opponent eliminates it and can eat its points and grow more",
+          "when that happens the losing snake starts at its normal size while the remaining one eats the points that were left"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A head-vs-body collision between two snakes triggers an elimination event for the head owner (not a full match reset).",
+        "The eliminated snake respawns/resets to the normal starting size as defined by the game initialization rules.",
+        "The elimination produces collectible point items on the playfield, and collecting them increases the winner's score and causes additional growth."
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "text": "Increase perceived visual quality during gameplay using web-feasible rendering techniques without changing the core rules: add a brighter, more 'expensive' neon look via post-processing-like effects (e.g., glow/bloom styling, laser trails, subtle motion blur/trailing) while preserving gameplay readability and performance.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "just improve it ... make the game very bright and the best visible possible",
+          "use option one only improve it",
+          "make it look like it was made by the best game company"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Lasers have a visible trailing/glow effect compared to the current thin beam rendering.",
+        "Overall gameplay presentation is noticeably brighter/neon without obscuring hazards, snake, or collectibles.",
+        "Game remains responsive (no obvious stutter introduced by the new effects) and core mechanics remain intact."
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "text": "Upgrade audio polish using web-feasible techniques: replace or improve SFX to higher-quality versions and add stronger gameplay feedback (e.g., stereo/spatial feel, filters/ducking where appropriate), while keeping mute behavior working on the Play screen.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "add better sounds ... as technical and playable as possible",
+          "laser that whistles behind, explosions with low-pass ... strong bass",
+          "put better sounds"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The existing mute toggle on PlayPage continues to mute both music and SFX.",
+        "Laser firing and cow-eating SFX are upgraded in quality and remain clearly audible with appropriate mixing.",
+        "At least one additional cinematic-feel audio enhancement is present (e.g., positional panning on laser, filtered explosion tail, or dynamic volume shaping) without breaking browser autoplay constraints."
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "text": "Generate and include new high-quality retro-cartoon neon static art assets and sprite sheets needed for the updated start/menu presentation and brighter in-game VFX, placed under frontend/public/assets/generated and loaded directly by the frontend (no backend image serving).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "also change the presentation so the image is cooler and more detailed with ufos and bright cows being attacked by laser",
+          "retro cartoon 4k high quality"
+        ]
+      },
+      "acceptanceCriteria": [
+        "New images/sprite sheets are present under frontend/public/assets/generated and referenced via correct absolute paths (e.g., /assets/generated/...).",
+        "The start/menu presentation uses the newly generated assets (not placeholders).",
+        "No backend endpoints are introduced for serving images."
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under the immutable frontend paths listed in SYSTEM_CONTEXT (e.g., `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useActor.ts`, `frontend/src/components/ui`).",
-    "Keep all user-facing text in English."
+    "Do not change the game name (“Spacecoco”).",
+    "Do not remove existing gameplay systems (planets/modifiers, bosses, UFO/cow spawning, crocodiles, power-ups); changes must be additive or compatible with current loop.",
+    "Keep all user-facing UI text in English.",
+    "Use only web-feasible rendering/audio approaches (no Vulkan, native ray tracing, HDR10, or other non-browser tech).",
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or anything under frontend/src/components/ui (compose instead)."
   ],
   "nonGoals": [
-    "Adding new gameplay features (boss logic changes, new power-ups, multiplayer sync) beyond what is required to make rendering/movement work again.",
-    "Backend/canister changes in Motoko unless a frontend fix cannot resolve the blank screen issue."
+    "Implement Vulkan-based particles or native GPU ray tracing.",
+    "Implement true HDR10 output.",
+    "Introduce external databases or non-Internet-Computer backend services.",
+    "Add third-party authentication beyond Internet Identity."
   ],
   "imageRequirements": {
-    "required": [],
-    "edits": []
+    "required": [
+      "Retro-cartoon neon splash/hero illustration with UFOs, aliens, bright cows, and eye-laser action (spacecoco-splash-neon.dim_3840x2160.png)",
+      "Wide retro-cartoon neon banner scene with UFO flyovers and laser chaos (spacecoco-menu-banner-neon.dim_2560x900.png)",
+      "Sprite sheet of multiple UFO/alien fly-by frames for menu animation (spacecoco-menu-ufo-sprites.dim_1024x256.png)",
+      "Sprite sheet of bright cow eye-laser firing frames for menu animation (spacecoco-menu-cow-laser-sprites.dim_1024x256.png)",
+      "Neon glow particle/spark spritesheet for UI/VFX accents (spacecoco-neon-sparks-sprites.dim_512x512.png)"
+    ],
+    "edits": [
+      "Increase detail/contrast and shift to high-quality retro-cartoon neon look with brighter UFO/cow/laser elements (spacecoco-hero.dim_1600x600.png > spacecoco-hero-neon-cartoon.dim_1600x600.png)"
+    ]
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [
+      "Prefer a very bright, retro-cartoon neon visual style with purple/red/blue/green accents and high-motion animated start/menu screens."
+    ],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

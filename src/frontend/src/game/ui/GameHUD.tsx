@@ -17,23 +17,27 @@ export function GameHUD({ gameState }: GameHUDProps) {
   };
 
   return (
-    <Card className="p-4 bg-card/50 backdrop-blur border-accent/30">
-      <div className="flex flex-wrap gap-4 justify-between items-center">
-        <div className="flex gap-6">
+    <Card className="p-6 bg-card/50 backdrop-blur border-accent/30 neon-card">
+      <div className="flex flex-wrap gap-6 justify-between items-center">
+        <div className="flex gap-8">
           <div>
-            <p className="text-xs text-muted-foreground">Score</p>
-            <p className="text-2xl font-bold text-accent">{gameState.score}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Score</p>
+            <p className="text-5xl font-bold text-accent neon-text-glow font-display">{gameState.score}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Level</p>
-            <p className="text-2xl font-bold">{gameState.level}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Level</p>
+            <p className="text-5xl font-bold text-secondary neon-text-glow-secondary font-display">{gameState.level}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Eliminations</p>
+            <p className="text-5xl font-bold text-destructive neon-text-glow-red font-display">{gameState.eliminations || 0}</p>
           </div>
         </div>
         <div className="flex gap-2">
-          <Badge className={getPlanetColor(gameState.planet)}>
+          <Badge className={`${getPlanetColor(gameState.planet)} text-base px-4 py-2`}>
             {gameState.planet}
           </Badge>
-          <Badge variant="outline">
+          <Badge variant="outline" className="text-base px-4 py-2">
             Gravity: {gameState.gravityMode}
           </Badge>
         </div>

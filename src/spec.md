@@ -1,12 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the Spacecoco Play screen blank/no-render issue by reliably starting (and restarting) the requestAnimationFrame game loop after sprites finish loading, and prevent a fully blank screen if sprite loading fails.
+**Goal:** Upgrade Spacecoco’s visual/audio presentation and competitive scoring to a brighter retro-cartoon neon style, with an animated start/menu experience and clearer, more exciting score feedback.
 
 **Planned changes:**
-- Update Play screen game loop start/resume logic so `startGame()` and `resumeGame()` invoke a `gameLoop` that always sees the latest `spritesLoaded` value (avoid stale React hook closures) and does not incorrectly early-return.
-- Ensure pausing and resuming reliably restarts the animation loop and rendering without freezing or showing a blank screen.
-- Add a runtime failure fallback: if sprite loading fails, show an English error overlay with an actionable message, log the underlying error to the console, and still perform a minimal canvas render (e.g., clear + starfield) while allowing navigation back to the Lobby.
-- Verify and correct sprite asset URL/path resolution so `loadAllSprites()` succeeds in production hosting with assets under `/assets/generated/`, and remove any missing-hook-dependency console warnings related to loop start/resume logic.
+- Update Home + Lobby screens with a clearly animated retro-cartoon neon hero/splash presentation (moving UFO/alien elements and bright cow eye-laser effects) while keeping the game name and existing navigation intact.
+- Redesign the in-game HUD scoring UI to a modern arcade retro-neon style with larger, highly readable digits and neon accents (purple/red/blue/green).
+- Implement competitive scoring updates: award points for eating objects and for opponent eliminations, with brief on-screen score gain feedback (e.g., floating neon number popups).
+- Add elimination rule: head-vs-body collision eliminates the head owner (respawns/resets to starting size), spawns collectible point items, and lets the winner collect them for score + extra growth.
+- Improve gameplay visual quality with brighter neon/glow/trailing effects (e.g., laser glow/trails) while preserving readability and responsiveness.
+- Upgrade audio polish with higher-quality SFX and stronger gameplay feedback (e.g., panning/filters/ducking), keeping the existing mute toggle working.
+- Add new generated neon retro-cartoon art/sprite assets under `frontend/public/assets/generated` and reference them via `/assets/generated/...` paths (no backend image serving).
 
-**User-visible outcome:** When entering /play from the Lobby, the canvas renders (starfield + snake) and the snake moves automatically shortly after assets load; pausing/resuming works reliably; if assets fail to load, an error overlay appears instead of a blank screen and the user can return to the Lobby.
+**User-visible outcome:** The start/menu screens feel more animated and neon-bright, gameplay looks and sounds more “arcade premium,” the HUD is bolder and clearer, and competitive play now includes elimination resets with collectible drops plus clear scoring feedback for eats and eliminations.

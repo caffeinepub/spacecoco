@@ -38,12 +38,13 @@ export interface PowerUp {
 
 export interface Obstacle {
   id: string;
-  type: 'UFO' | 'FLYING_COW' | 'CRATER' | 'ICE_PATCH' | 'UFO_WITH_COW' | 'CROCODILE';
+  type: 'UFO' | 'FLYING_COW' | 'CRATER' | 'ICE_PATCH' | 'UFO_WITH_COW' | 'CROCODILE' | 'POINT_DROP';
   position: Position;
   active: boolean;
   velocity?: { x: number; y: number };
   linkedCowId?: string;
   animationFrame?: number;
+  pointValue?: number;
 }
 
 export interface Boss {
@@ -54,10 +55,29 @@ export interface Boss {
   active: boolean;
 }
 
+export interface OpponentSnake {
+  id: string;
+  segments: SnakeSegment[];
+  direction: Direction;
+  isAlive: boolean;
+}
+
+export interface ScorePopup {
+  id: string;
+  x: number;
+  y: number;
+  amount: number;
+  createdAt: number;
+  duration: number;
+  color: string;
+}
+
 export interface GameState {
   snake: Snake;
+  opponents: OpponentSnake[];
   score: number;
   level: number;
+  eliminations: number;
   planet: Planet;
   gravityMode: GravityMode;
   powerUps: PowerUp[];
@@ -67,4 +87,5 @@ export interface GameState {
   isPaused: boolean;
   lasers: Array<{ id: string; startX: number; startY: number; endX: number; endY: number; createdAt: number; duration: number }>;
   explosions: Array<{ id: string; x: number; y: number; createdAt: number; duration: number }>;
+  scorePopups: ScorePopup[];
 }

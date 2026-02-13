@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
-import type { GameState, Direction, Obstacle, Boss, SnakeSegment } from '../types';
+import type { GameState, Direction, Obstacle, Boss, SnakeSegment, OpponentSnake, ScorePopup } from '../types';
 import { 
   GRID_WIDTH, 
   GRID_HEIGHT, 
@@ -13,12 +13,16 @@ import {
   POINTS_PER_COW,
   POINTS_PER_PENGUIN,
   POINTS_PER_CROCODILE,
+  POINTS_PER_ELIMINATION,
+  POINTS_PER_POINT_DROP,
+  POINT_DROP_GROWTH_AMOUNT,
+  ELIMINATION_POINT_DROPS,
   TONGUE_CADENCE,
 } from '../constants';
 import { StarfieldRenderer } from '../render/starfield';
-import { renderUFO, renderCow, renderPenguinBoss } from '../render/obstacles';
-import { renderSnake, renderCrocodile } from '../render/entities';
-import { renderLaser, renderExplosion } from '../render/vfx';
+import { renderUFO, renderCow, renderPenguinBoss, renderPointDrop } from '../render/obstacles';
+import { renderSnake, renderCrocodile, renderOpponentSnake } from '../render/entities';
+import { renderLaser, renderExplosion, renderScorePopup } from '../render/vfx';
 import { loadAllSprites } from '../render/sprites';
 
 export function useGameLoop(
@@ -26,7 +30,8 @@ export function useGameLoop(
   mode: string,
   isMuted: boolean = false,
   onLaserFired?: () => void,
-  onCowEaten?: () => void
+  onCowEaten?: () => void,
+  onElimination?: () => void
 ) {
   const centerX = Math.floor(GRID_WIDTH / 2);
   const centerY = Math.floor(GRID_HEIGHT / 2);
@@ -39,6 +44,19 @@ export function useGameLoop(
     return segments;
   };
 
+  const createOpponentSnake = (id: string, startX: number, startY: number): OpponentSnake => {
+    const segments: SnakeSegment[] = [];
+    for (let i = 0; i < INITIAL_SNAKE_LENGTH; i++) {
+      segments.push({ x: startX - i, y: startY });
+    }
+    return {
+      id,
+      segments,
+      direction: 'RIGHT',
+      isAlive: true,
+    };
+  };
+
   const [gameState, setGameState] = useState<GameState>({
     snake: {
       segments: createInitialSnake(),
@@ -47,8 +65,13 @@ export function useGameLoop(
       skinId: 0,
       isAlive: true,
     },
+    opponents: [
+      createOpponentSnake('opp1', Math.floor(GRID_WIDTH * 0.25), Math.floor(GRID_HEIGHT * 0.3)),
+      createOpponentSnake('opp2', Math.floor(GRID_WIDTH * 0.75), Math.floor(GRID_HEIGHT * 0.7)),
+    ],
     score: 0,
     level: 1,
+    eliminations: 0,
     planet: 'MARS',
     gravityMode: 'NORMAL',
     powerUps: [],
@@ -58,6 +81,7 @@ export function useGameLoop(
     isPaused: false,
     lasers: [],
     explosions: [],
+    scorePopups: [],
   });
 
   const [isGameOver, setIsGameOver] = useState(false);
@@ -84,7 +108,6 @@ export function useGameLoop(
       .catch(err => {
         console.error('❌ Failed to load sprites:', err);
         setSpriteLoadError(err.message || 'Failed to load game assets');
-        // Still allow minimal rendering
         setSpritesLoaded(false);
         spritesLoadedRef.current = false;
       });
@@ -169,6 +192,102 @@ export function useGameLoop(
     });
   }, [centerX, centerY]);
 
+  const spawnPointDrops = useCallback((x: number, y: number, count: number) => {
+    const drops: Obstacle[] = [];
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count;
+      const distance = 2;
+      drops.push({
+        id: `drop-${Date.now()}-${i}`,
+        type: 'POINT_DROP',
+        position: {
+          x: x + Math.cos(angle) * distance,
+          y: y + Math.sin(angle) * distance,
+        },
+        active: true,
+        pointValue: POINTS_PER_POINT_DROP,
+      });
+    }
+
+    setGameState(prev => {
+      const newState = {
+        ...prev,
+        obstacles: [...prev.obstacles, ...drops],
+      };
+      gameStateRef.current = newState;
+      return newState;
+    });
+  }, []);
+
+  const addScorePopup = useCallback((x: number, y: number, amount: number, color: string) => {
+    const popup: ScorePopup = {
+      id: `popup-${Date.now()}-${Math.random()}`,
+      x,
+      y,
+      amount,
+      createdAt: Date.now(),
+      duration: 1500,
+      color,
+    };
+
+    setGameState(prev => {
+      const newState = {
+        ...prev,
+        scorePopups: [...prev.scorePopups, popup],
+      };
+      gameStateRef.current = newState;
+      return newState;
+    });
+  }, []);
+
+  const updateOpponents = useCallback((opponents: OpponentSnake[]): OpponentSnake[] => {
+    return opponents.map(opp => {
+      if (!opp.isAlive) return opp;
+
+      const head = { ...opp.segments[0] };
+      
+      // Simple AI: move towards nearest food or random direction
+      const directions: Direction[] = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
+      const validDirections = directions.filter(dir => {
+        if (dir === 'UP' && opp.direction === 'DOWN') return false;
+        if (dir === 'DOWN' && opp.direction === 'UP') return false;
+        if (dir === 'LEFT' && opp.direction === 'RIGHT') return false;
+        if (dir === 'RIGHT' && opp.direction === 'LEFT') return false;
+        return true;
+      });
+
+      if (Math.random() < 0.1 && validDirections.length > 0) {
+        opp.direction = validDirections[Math.floor(Math.random() * validDirections.length)];
+      }
+
+      switch (opp.direction) {
+        case 'UP':
+          head.y -= 1;
+          break;
+        case 'DOWN':
+          head.y += 1;
+          break;
+        case 'LEFT':
+          head.x -= 1;
+          break;
+        case 'RIGHT':
+          head.x += 1;
+          break;
+      }
+
+      // Wrap around borders for opponents
+      if (head.x < 0) head.x = GRID_WIDTH - 1;
+      if (head.x >= GRID_WIDTH) head.x = 0;
+      if (head.y < 0) head.y = GRID_HEIGHT - 1;
+      if (head.y >= GRID_HEIGHT) head.y = 0;
+
+      return {
+        ...opp,
+        segments: [head, ...opp.segments.slice(0, -1)],
+      };
+    });
+  }, []);
+
   const updateGame = useCallback(() => {
     setGameState(prev => {
       const newSnake = { ...prev.snake };
@@ -208,6 +327,50 @@ export function useGameLoop(
         return newState;
       }
 
+      // Check collisions with opponents (body-on-head elimination)
+      let eliminationCount = 0;
+      const updatedOpponents = prev.opponents.map(opp => {
+        if (!opp.isAlive) return opp;
+
+        const oppHead = opp.segments[0];
+        
+        // Check if player body hits opponent head
+        const playerBodyHitsOppHead = newSnake.segments.slice(1).some(
+          seg => seg.x === oppHead.x && seg.y === oppHead.y
+        );
+
+        if (playerBodyHitsOppHead) {
+          eliminationCount++;
+          spawnPointDrops(oppHead.x, oppHead.y, ELIMINATION_POINT_DROPS);
+          addScorePopup(oppHead.x * GRID_SIZE, oppHead.y * GRID_SIZE, POINTS_PER_ELIMINATION, '#ff0066');
+          if (onElimination) onElimination();
+          
+          // Respawn opponent
+          return createOpponentSnake(
+            opp.id,
+            Math.floor(Math.random() * (GRID_WIDTH - 10)) + 5,
+            Math.floor(Math.random() * (GRID_HEIGHT - 10)) + 5
+          );
+        }
+
+        // Check if opponent body hits player head
+        const oppBodyHitsPlayerHead = opp.segments.slice(1).some(
+          seg => seg.x === head.x && seg.y === head.y
+        );
+
+        if (oppBodyHitsPlayerHead) {
+          const newState = { ...prev, isGameOver: true };
+          gameStateRef.current = newState;
+          setIsGameOver(true);
+          return opp;
+        }
+
+        return opp;
+      });
+
+      // Update opponent movement
+      const movedOpponents = updateOpponents(updatedOpponents);
+
       // Check collisions with obstacles
       let scoreIncrease = 0;
       let growthAmount = 0;
@@ -218,7 +381,6 @@ export function useGameLoop(
             y: obstacle.position.y + obstacle.velocity.y,
           };
           
-          // Update animation frame for crocodiles
           if (obstacle.type === 'CROCODILE') {
             return {
               ...obstacle,
@@ -231,25 +393,30 @@ export function useGameLoop(
         }
         return obstacle;
       }).filter(obstacle => {
-        // Check collision with snake head
         const gridX = Math.floor(obstacle.position.x);
         const gridY = Math.floor(obstacle.position.y);
         
         if (gridX === head.x && gridY === head.y) {
           if (obstacle.type === 'UFO_WITH_COW') {
             growthAmount += UFO_GROWTH_AMOUNT;
-            return false; // Remove UFO
+            return false;
           } else if (obstacle.type === 'FLYING_COW') {
             scoreIncrease += POINTS_PER_COW;
+            addScorePopup(gridX * GRID_SIZE, gridY * GRID_SIZE, POINTS_PER_COW, '#00ff88');
             if (onCowEaten) onCowEaten();
-            return false; // Remove cow
+            return false;
           } else if (obstacle.type === 'CROCODILE') {
             scoreIncrease += POINTS_PER_CROCODILE;
-            return false; // Remove crocodile
+            addScorePopup(gridX * GRID_SIZE, gridY * GRID_SIZE, POINTS_PER_CROCODILE, '#ffaa00');
+            return false;
+          } else if (obstacle.type === 'POINT_DROP') {
+            scoreIncrease += obstacle.pointValue || POINTS_PER_POINT_DROP;
+            growthAmount += POINT_DROP_GROWTH_AMOUNT;
+            addScorePopup(gridX * GRID_SIZE, gridY * GRID_SIZE, obstacle.pointValue || POINTS_PER_POINT_DROP, '#00ddff');
+            return false;
           }
         }
 
-        // Remove obstacles off screen
         return obstacle.position.y < GRID_HEIGHT + 2 && obstacle.position.y > -3;
       });
 
@@ -261,6 +428,7 @@ export function useGameLoop(
         
         if (bossGridX === head.x && bossGridY === head.y) {
           bossBonus = POINTS_PER_PENGUIN;
+          addScorePopup(bossGridX * GRID_SIZE, bossGridY * GRID_SIZE, POINTS_PER_PENGUIN, '#ff00ff');
         }
       }
 
@@ -279,20 +447,24 @@ export function useGameLoop(
       const now = Date.now();
       const activeLasers = prev.lasers.filter(l => now - l.createdAt < l.duration);
       const activeExplosions = prev.explosions.filter(e => now - e.createdAt < e.duration);
+      const activePopups = prev.scorePopups.filter(p => now - p.createdAt < p.duration);
 
       const newState = {
         ...prev,
         snake: newSnake,
+        opponents: movedOpponents,
         obstacles: updatedObstacles,
-        score: prev.score + scoreIncrease + bossBonus + 1,
+        score: prev.score + scoreIncrease + bossBonus + (eliminationCount * POINTS_PER_ELIMINATION) + 1,
+        eliminations: prev.eliminations + eliminationCount,
         lasers: activeLasers,
         explosions: activeExplosions,
+        scorePopups: activePopups,
       };
       
       gameStateRef.current = newState;
       return newState;
     });
-  }, [onCowEaten]);
+  }, [onCowEaten, onElimination, spawnPointDrops, addScorePopup, updateOpponents, createOpponentSnake]);
 
   const renderGame = useCallback((ctx: CanvasRenderingContext2D, now: number) => {
     ctx.fillStyle = '#000000';
@@ -304,7 +476,6 @@ export function useGameLoop(
 
     const currentState = gameStateRef.current;
 
-    // Only render sprites if they're loaded
     if (spritesLoadedRef.current) {
       // Render obstacles
       currentState.obstacles.forEach(obstacle => {
@@ -317,6 +488,8 @@ export function useGameLoop(
           renderCow(ctx, pixelX + GRID_SIZE / 2, pixelY + GRID_SIZE / 2);
         } else if (obstacle.type === 'CROCODILE') {
           renderCrocodile(ctx, obstacle.position, obstacle.animationFrame || 0);
+        } else if (obstacle.type === 'POINT_DROP') {
+          renderPointDrop(ctx, pixelX + GRID_SIZE / 2, pixelY + GRID_SIZE / 2);
         }
       });
 
@@ -330,12 +503,20 @@ export function useGameLoop(
       // Render VFX
       currentState.lasers.forEach(laser => renderLaser(ctx, laser, now));
       currentState.explosions.forEach(explosion => renderExplosion(ctx, explosion, now));
+      currentState.scorePopups.forEach(popup => renderScorePopup(ctx, popup, now));
 
-      // Render snake with tongue animation
+      // Render opponents
+      currentState.opponents.forEach(opp => {
+        if (opp.isAlive) {
+          renderOpponentSnake(ctx, opp.segments);
+        }
+      });
+
+      // Render player snake with tongue animation
       const showTongue = (now - lastTongueRef.current) % TONGUE_CADENCE < 200;
       renderSnake(ctx, currentState.snake.segments, showTongue);
     } else {
-      // Fallback: render simple colored rectangles if sprites aren't loaded
+      // Fallback rendering
       ctx.fillStyle = '#00ff00';
       currentState.snake.segments.forEach(segment => {
         ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
@@ -355,19 +536,16 @@ export function useGameLoop(
     const currentState = gameStateRef.current;
 
     if (!currentState.isPaused && !currentState.isGameOver) {
-      // Spawn UFOs
       if (now - lastUFOSpawnRef.current >= UFO_SPAWN_INTERVAL) {
         spawnUFOWithCow();
         lastUFOSpawnRef.current = now;
       }
 
-      // Spawn crocodiles
       if (now - lastCrocodileSpawnRef.current >= CROCODILE_SPAWN_INTERVAL) {
         spawnCrocodile();
         lastCrocodileSpawnRef.current = now;
       }
 
-      // Spawn boss
       if (!currentState.boss && currentState.level % BOSS_SPAWN_INTERVAL === 0 && currentState.level > 0) {
         spawnPenguinBoss();
       }
@@ -386,7 +564,6 @@ export function useGameLoop(
   }, [spawnUFOWithCow, spawnCrocodile, spawnPenguinBoss, updateGame, renderGame]);
 
   const startGame = useCallback(() => {
-    // Cancel any existing animation frame
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
     }
@@ -399,8 +576,13 @@ export function useGameLoop(
         skinId: 0,
         isAlive: true,
       },
+      opponents: [
+        createOpponentSnake('opp1', Math.floor(GRID_WIDTH * 0.25), Math.floor(GRID_HEIGHT * 0.3)),
+        createOpponentSnake('opp2', Math.floor(GRID_WIDTH * 0.75), Math.floor(GRID_HEIGHT * 0.7)),
+      ],
       score: 0,
       level: 1,
+      eliminations: 0,
       planet: 'MARS',
       gravityMode: 'NORMAL',
       powerUps: [],
@@ -410,6 +592,7 @@ export function useGameLoop(
       isPaused: false,
       lasers: [],
       explosions: [],
+      scorePopups: [],
     };
     setGameState(newState);
     gameStateRef.current = newState;
@@ -426,9 +609,8 @@ export function useGameLoop(
       );
     }
     
-    // Start the game loop immediately
     gameLoop();
-  }, [gameLoop]);
+  }, [gameLoop, createOpponentSnake]);
 
   const pauseGame = useCallback(() => {
     if (animationFrameRef.current) {

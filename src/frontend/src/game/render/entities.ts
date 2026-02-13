@@ -1,105 +1,76 @@
-import { drawSprite, drawFullSprite } from './sprites';
-import { GRID_SIZE } from '../constants';
+import { drawSprite } from './sprites';
 import type { SnakeSegment, Position } from '../types';
+import { GRID_SIZE } from '../constants';
 
-// Snake rendering with pixel-art sprites
 export function renderSnake(
   ctx: CanvasRenderingContext2D,
   segments: SnakeSegment[],
-  showTongue: boolean
+  showTongue: boolean = false
 ) {
+  if (segments.length === 0) return;
+
   segments.forEach((segment, index) => {
     const pixelX = segment.x * GRID_SIZE;
     const pixelY = segment.y * GRID_SIZE;
 
     if (index === 0) {
-      // Head with eyes and optional tongue
-      // Snake sprite sheet: 256x256, 4 frames (head variations)
-      const headFrame = showTongue ? 1 : 0; // Frame 0: normal, Frame 1: tongue out
-      const frameSize = 64; // 256/4 = 64px per frame
-      drawSprite(
-        ctx,
-        'snake',
-        headFrame * frameSize,
-        0,
-        frameSize,
-        frameSize,
-        pixelX - 2,
-        pixelY - 2,
-        GRID_SIZE + 4,
-        GRID_SIZE + 4
-      );
+      // Head with enhanced glow
+      ctx.save();
+      ctx.shadowColor = '#00ff88';
+      ctx.shadowBlur = 20;
+      // Snake sprite sheet: 256x256, 4x4 grid, 64px per frame
+      // Frame 0 = head
+      drawSprite(ctx, 'snake', 0, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
+      ctx.restore();
+      
+      if (showTongue) {
+        // Frame 3 = tongue
+        drawSprite(ctx, 'snake', 192, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
+      }
     } else {
-      // Body segment - use frame 2 from sprite sheet
-      const frameSize = 64;
-      drawSprite(
-        ctx,
-        'snake',
-        2 * frameSize,
-        0,
-        frameSize,
-        frameSize,
-        pixelX,
-        pixelY,
-        GRID_SIZE,
-        GRID_SIZE
-      );
+      // Body with subtle glow
+      ctx.save();
+      ctx.shadowColor = '#00ff88';
+      ctx.shadowBlur = 10;
+      // Frame 1 = body
+      drawSprite(ctx, 'snake', 64, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
+      ctx.restore();
     }
   });
 }
 
-// UFO rendering with pixel-art sprite
-export function renderUFOSprite(
+export function renderOpponentSnake(
   ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  size: number = 40
+  segments: SnakeSegment[]
 ) {
-  drawFullSprite(
-    ctx,
-    'ufo',
-    x - size / 2,
-    y - size / 2,
-    size,
-    size
-  );
+  if (segments.length === 0) return;
+
+  segments.forEach((segment, index) => {
+    const pixelX = segment.x * GRID_SIZE;
+    const pixelY = segment.y * GRID_SIZE;
+
+    ctx.save();
+    // Red tint for opponents
+    ctx.shadowColor = '#ff0066';
+    ctx.shadowBlur = index === 0 ? 20 : 10;
+    ctx.globalAlpha = 0.9;
+    
+    if (index === 0) {
+      // Frame 0 = head
+      drawSprite(ctx, 'snake', 0, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
+    } else {
+      // Frame 1 = body
+      drawSprite(ctx, 'snake', 64, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
+    }
+    
+    // Add red overlay
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = '#ff3366';
+    ctx.fillRect(pixelX, pixelY, GRID_SIZE, GRID_SIZE);
+    ctx.restore();
+  });
 }
 
-// Cow rendering with pixel-art sprite
-export function renderCowSprite(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  size: number = 30
-) {
-  drawFullSprite(
-    ctx,
-    'cow',
-    x - size / 2,
-    y - size / 2,
-    size,
-    size
-  );
-}
-
-// Penguin boss rendering with pixel-art sprite
-export function renderPenguinBossSprite(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  size: number = 60
-) {
-  drawFullSprite(
-    ctx,
-    'penguin',
-    x - size / 2,
-    y - size / 2,
-    size,
-    size
-  );
-}
-
-// Crocodile rendering with animated sprite sheet
 export function renderCrocodile(
   ctx: CanvasRenderingContext2D,
   position: Position,
@@ -107,21 +78,12 @@ export function renderCrocodile(
 ) {
   const pixelX = position.x * GRID_SIZE;
   const pixelY = position.y * GRID_SIZE;
-  
-  // Crocodile sprite sheet: 256x128, 4 frames horizontally
-  const frameSize = 64; // 256/4 = 64px per frame
-  const frame = Math.floor(animationFrame) % 4;
-  
-  drawSprite(
-    ctx,
-    'crocodile',
-    frame * frameSize,
-    0,
-    frameSize,
-    64,
-    pixelX - 2,
-    pixelY - 2,
-    GRID_SIZE + 4,
-    GRID_SIZE + 4
-  );
+  const frameIndex = Math.floor(animationFrame) % 2;
+
+  ctx.save();
+  ctx.shadowColor = '#88ff00';
+  ctx.shadowBlur = 15;
+  // Crocodile sprite sheet: 256x128, 2 frames horizontally, 128px per frame
+  drawSprite(ctx, 'crocodile', frameIndex * 128, 0, 128, 128, pixelX, pixelY, GRID_SIZE * 2, GRID_SIZE);
+  ctx.restore();
 }

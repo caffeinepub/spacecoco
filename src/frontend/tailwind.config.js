@@ -69,7 +69,8 @@ export default {
             boxShadow: {
                 xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
                 soft: '0 2px 8px -2px rgba(0,0,0,0.1)',
-                neon: '0 0 20px rgba(138, 43, 226, 0.5), 0 0 40px rgba(138, 43, 226, 0.3)'
+                neon: '0 0 20px rgba(138, 43, 226, 0.5), 0 0 40px rgba(138, 43, 226, 0.3)',
+                'neon-strong': '0 0 30px rgba(138, 43, 226, 0.7), 0 0 60px rgba(138, 43, 226, 0.5)'
             },
             keyframes: {
                 'accordion-down': {
@@ -81,8 +82,8 @@ export default {
                     to: { height: '0' }
                 },
                 'pulse-glow': {
-                    '0%, 100%': { opacity: '1', transform: 'scale(1)' },
-                    '50%': { opacity: '0.8', transform: 'scale(1.05)' }
+                    '0%, 100%': { opacity: '1', transform: 'scale(1)', textShadow: '0 0 10px currentColor, 0 0 20px currentColor' },
+                    '50%': { opacity: '0.9', transform: 'scale(1.02)', textShadow: '0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor' }
                 },
                 'shake': {
                     '0%, 100%': { transform: 'translateX(0)' },

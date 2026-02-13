@@ -1,74 +1,257 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Spacecoco Play screen: start game loop after sprite load, add load-failure fallback, and fix production asset paths",
+  "title": "Spacecoco neon start/menu animation, HUD + scoring/elimination revamp, brighter VFX, and audio polish (frontend-only)",
   "requirements": [
     {
-      "id": "REQ-29",
-      "summary": "Ensure the requestAnimationFrame game loop starts reliably after sprites load and on resume, without stale React hook closures or missing-hook-dependency warnings.",
+      "id": "REQ-32",
+      "summary": "Upgrade Home + Lobby start experience to a high-motion retro-cartoon neon animated presentation while keeping Spacecoco name and navigation intact",
       "acceptanceCriteria": [
-        "When navigating to /play from the Lobby, the canvas renders the starfield + snake within 1 second after assets load.",
-        "The snake is always moving without requiring any user input.",
-        "Pausing and resuming reliably restarts the animation loop and rendering (no freeze/blank screen after resume).",
-        "There are no React console warnings about missing hook dependencies for the game loop start/resume logic."
+        "Home screen and/or Lobby screen includes a clearly animated scene (not just a static image) featuring moving UFO/alien elements and cow eye-laser effects.",
+        "All user-facing text remains in English (existing headings/buttons remain understandable and consistent).",
+        "Navigation to Lobby/Play/Skins/Leaderboard continues to work as before."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
-          "operation": "modify",
-          "description": "Refactor the animation loop start/resume flow to avoid stale closures: make the game loop function stable (or stored in a ref) and read sprite-load state from a ref so startGame()/resumeGame() always invoke a loop that sees the latest spritesLoaded value. Also ensure start/resume cancels any previous requestAnimationFrame before starting a new one, and ensure React hooks have correct dependencies to eliminate console warnings."
+          "path": "frontend/src/components/start/NeonStartScene.tsx",
+          "operation": "create",
+          "description": "Create a reusable animated start-scene component (retro-cartoon neon) that renders moving UFO/alien fly-bys and cow eye-laser bursts using the generated splash/banner + sprite-sheet assets; keep the game title and CTA slots available for existing copy. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/PlayPage.tsx",
+          "path": "frontend/src/pages/HomePage.tsx",
           "operation": "modify",
-          "description": "Update PlayPage’s effect that auto-starts the game after sprites load to include all required hook dependencies (e.g., include startGame in the dependency array) and avoid any start/resume logic that can capture stale values. Continue using existing shadcn-ui Button/Card components for UI structure; verify the component's usage instructions before implementing."
+          "description": "Replace the current mostly-static hero section background/hero image usage with the new NeonStartScene (keeping the SPACECOCO title text and existing navigation buttons intact and understandable in English). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/LobbyPage.tsx",
+          "operation": "modify",
+          "description": "Add the NeonStartScene (or a lighter-weight variant/prop configuration) as an animated banner/hero backdrop for the Lobby screen while preserving existing lobby controls and copy in English. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add global utility classes for neon glow overlays and performance-friendly animation helpers used by the animated start/menu presentation (no changes to user-facing text)."
         }
       ]
     },
     {
-      "id": "REQ-30",
-      "summary": "Add a runtime fallback so Play is never fully blank if sprite loading fails: show an English error overlay and still render at least a minimal animated canvas (clear + starfield).",
+      "id": "REQ-33",
+      "summary": "Revamp the in-game HUD to a modern arcade retro-neon style with large readable digits and purple/red/blue/green accents",
       "acceptanceCriteria": [
-        "If any sprite fails to load, the UI shows an overlay on the Play screen indicating that assets failed to load (English text) rather than leaving a blank screen.",
-        "The failure state is logged to console with the underlying error.",
-        "The user can still navigate back to the Lobby from the Play screen in the failure state."
+        "Score and Level are displayed with larger, more prominent typography than the current HUD.",
+        "HUD styling is neon/retro and uses the requested bright palette (including purple/red/blue/green).",
+        "HUD remains readable against the playfield (no low-contrast text over bright effects)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
+          "path": "frontend/src/game/ui/GameHUD.tsx",
           "operation": "modify",
-          "description": "Track sprite-loading failure state (e.g., an error value) when loadAllSprites() rejects, keep logging the underlying error to console, and ensure a minimal render loop still runs even without sprites (at minimum: clear + starfield render) so the canvas is never blank."
+          "description": "Redesign HUD layout and styling: larger score/level digits, stronger neon contrast, and clear grouping; incorporate purple/red/blue/green accents while keeping the same displayed information (Score, Level, Planet, Gravity)."
         },
         {
-          "path": "frontend/src/pages/PlayPage.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Add a user-visible error overlay for sprite load failure with an actionable English message (e.g., suggest refresh and/or checking connection) while preserving access to the existing “Back to Lobby” navigation. Continue using existing shadcn-ui Card/Button components for the overlay UI; verify the component's usage instructions before implementing."
+          "description": "Add neon text styles (e.g., glow/shadow utilities) to ensure large HUD digits remain readable over bright gameplay visuals."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Extend Tailwind theme with additional neon utility tokens/animations (focused on purple/red/blue/green accent usage) needed for the updated HUD styling."
         }
       ]
     },
     {
-      "id": "REQ-31",
-      "summary": "Verify and correct runtime sprite asset paths so sprite loading succeeds in production (IC canister hosting) for files under frontend/public/assets/generated.",
+      "id": "REQ-34",
+      "summary": "Update scoring to award points for eating objects and for eliminations, with clear on-screen point-gain popups that do not obstruct gameplay",
       "acceptanceCriteria": [
-        "In production build, `loadAllSprites()` resolves successfully and `spritesLoaded` becomes true when the expected files exist under `/assets/generated/`.",
-        "The “Loading Game Assets…” overlay disappears once sprites are loaded, and gameplay starts automatically.",
-        "No 404s are emitted in the browser network panel for the sprite asset URLs referenced by the sprite loader."
+        "Eating at least cows and penguins changes the score in a clearly visible way (HUD updates and an on-canvas or overlay popup appears).",
+        "When an elimination event occurs (see competitive rule requirement), the winner receives a clear points reward and an on-screen popup indicates the gain.",
+        "Score feedback animations do not block gameplay visibility (brief duration, positioned sensibly)."
       ],
       "file_operations": [
+        {
+          "path": "frontend/src/game/types.ts",
+          "operation": "modify",
+          "description": "Add/extend types to support score feedback popups (position, amount, color/style, lifetime) and elimination score events while keeping existing game types compatible."
+        },
+        {
+          "path": "frontend/src/game/hooks/useGameLoop.ts",
+          "operation": "modify",
+          "description": "Adjust gameplay scoring logic so points are awarded on eating (at minimum cows and penguins) and on elimination wins; push score feedback popup events into state with brief lifetimes and sensible positioning so gameplay visibility is preserved."
+        },
+        {
+          "path": "frontend/src/game/render/vfx.ts",
+          "operation": "modify",
+          "description": "Implement rendering for floating neon score popups (e.g., +150) with short animation and glow; ensure popups are readable and fade out quickly without covering the playfield."
+        },
+        {
+          "path": "frontend/src/pages/PlayPage.tsx",
+          "operation": "modify",
+          "description": "Ensure HUD + canvas VFX feedback remains visible together (no overlay conflicts) and that mute/pause UI continues to function with the updated scoring feedback."
+        }
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "summary": "Add competitive elimination rule: body-on-opponent-head eliminates the opponent (reset to starting size) and spawns collectible point drops for growth/score",
+      "acceptanceCriteria": [
+        "A head-vs-body collision between two snakes triggers an elimination event for the head owner (not a full match reset).",
+        "The eliminated snake respawns/resets to the normal starting size as defined by the game initialization rules.",
+        "The elimination produces collectible point items on the playfield, and collecting them increases the winner's score and causes additional growth."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/types.ts",
+          "operation": "modify",
+          "description": "Extend game state types to represent at least one opponent snake, elimination events, and dropped collectible point items (including metadata needed for scoring and growth)."
+        },
+        {
+          "path": "frontend/src/game/constants.ts",
+          "operation": "modify",
+          "description": "Add constants for elimination rewards, drop counts/values, and respawn/reset behavior while keeping existing systems (planets/modifiers, bosses, spawning, crocodiles, power-ups) intact."
+        },
+        {
+          "path": "frontend/src/game/hooks/useGameLoop.ts",
+          "operation": "modify",
+          "description": "Implement opponent snake simulation (sufficient to trigger head-vs-body collisions), detect body-on-opponent-head elimination, reset eliminated snake to INITIAL_SNAKE_LENGTH, spawn collectible point drops on the playfield, and apply score+growth when drops are collected."
+        },
+        {
+          "path": "frontend/src/game/render/entities.ts",
+          "operation": "modify",
+          "description": "Update rendering to draw opponent snake(s) distinctly from the player (e.g., tinted/glowing treatment) while preserving readability and performance."
+        },
+        {
+          "path": "frontend/src/game/render/obstacles.ts",
+          "operation": "modify",
+          "description": "Add rendering support for the new dropped point items (collectibles) so they are clearly visible and consistent with the neon style."
+        }
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "summary": "Increase perceived gameplay visual quality with brighter neon post-processing-like effects (glow/trails) while preserving performance and readability",
+      "acceptanceCriteria": [
+        "Lasers have a visible trailing/glow effect compared to the current thin beam rendering.",
+        "Overall gameplay presentation is noticeably brighter/neon without obscuring hazards, snake, or collectibles.",
+        "Game remains responsive (no obvious stutter introduced by the new effects) and core mechanics remain intact."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/render/vfx.ts",
+          "operation": "modify",
+          "description": "Enhance laser rendering with glow/trail treatment (web-feasible canvas techniques such as shadow blur/compositing and brief trail persistence) and incorporate neon spark particles where appropriate."
+        },
         {
           "path": "frontend/src/game/render/sprites.ts",
           "operation": "modify",
-          "description": "Update sprite URL construction to be production-safe under IC canister hosting (e.g., resolve paths via the app base URL rather than assuming a leading-slash absolute path). Ensure the referenced filenames exactly match those in frontend/public/assets/generated (e.g., frontend/public/assets/generated/spacecoco-snake-sprites.dim_256x256.png, frontend/public/assets/generated/spacecoco-ufo.dim_64x64.png, frontend/public/assets/generated/spacecoco-cow.dim_64x64.png, frontend/public/assets/generated/spacecoco-penguin-boss.dim_128x128.png, frontend/public/assets/generated/spacecoco-crocodile-sprites.dim_256x128.png, frontend/public/assets/generated/spacecoco-laser-red.dim_64x16.png, frontend/public/assets/generated/spacecoco-explosion-pink-sprites.dim_256x256.png). Keep error reporting accurate so 404s are diagnosable."
+          "description": "Register/load the neon spark spritesheet asset for UI/VFX accents and ensure it can be drawn efficiently during gameplay."
         },
         {
           "path": "frontend/src/game/hooks/useGameLoop.ts",
           "operation": "modify",
-          "description": "Align sprite-load state transitions with the corrected sprite paths so spritesLoaded reliably becomes true when assets exist, and ensure the game auto-start logic triggers rendering/movement once spritesLoaded flips true."
+          "description": "Adjust render loop to support subtle trailing/motion persistence in a performance-friendly way (without obscuring hazards, snake, or collectibles) and keep core mechanics unchanged."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Tune canvas/container styling (e.g., subtle neon glow around the canvas) to reinforce the brighter 'expensive' look while maintaining contrast and clarity."
+        }
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "summary": "Upgrade audio polish: higher-quality SFX and add cinematic feedback (e.g., stereo feel/filters) while keeping Play mute behavior working",
+      "acceptanceCriteria": [
+        "The existing mute toggle on PlayPage continues to mute both music and SFX.",
+        "Laser firing and cow-eating SFX are upgraded in quality and remain clearly audible with appropriate mixing.",
+        "At least one additional cinematic-feel audio enhancement is present (e.g., positional panning on laser, filtered explosion tail, or dynamic volume shaping) without breaking browser autoplay constraints."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/audio/useSfx.ts",
+          "operation": "modify",
+          "description": "Upgrade SFX playback to support higher-quality assets and at least one cinematic enhancement (e.g., stereo panning for lasers and/or filtered tails on explosions) while preserving throttle behavior and fully respecting the existing isMuted flag."
+        },
+        {
+          "path": "frontend/src/game/hooks/useGameLoop.ts",
+          "operation": "modify",
+          "description": "Trigger additional gameplay feedback SFX events as needed (e.g., elimination, point-drop pickup, explosion moments) and pass enough context to enable spatial/cinematic mixing without impacting gameplay performance."
         },
         {
           "path": "frontend/src/pages/PlayPage.tsx",
           "operation": "modify",
-          "description": "Ensure the “Loading Game Assets…” overlay is driven by the corrected sprite loading lifecycle so it disappears promptly after successful loads and gameplay starts automatically. Continue using existing shadcn-ui Card for the loading overlay; verify the component's usage instructions before implementing."
+          "description": "Keep the current mute toggle behavior intact across music and SFX with the upgraded audio system; ensure no new autoplay-breaking behavior is introduced."
+        },
+        {
+          "path": "frontend/public/assets/audio/spacecoco-pew.wav",
+          "operation": "create",
+          "description": "Add improved high-quality laser firing SFX asset (used by the updated SFX system)."
+        },
+        {
+          "path": "frontend/public/assets/audio/spacecoco-muuuuh.wav",
+          "operation": "create",
+          "description": "Add improved high-quality cow-eating SFX asset (used by the updated SFX system)."
+        },
+        {
+          "path": "frontend/public/assets/audio/spacecoco-boom.wav",
+          "operation": "create",
+          "description": "Add an explosion/elimination-impact SFX asset to support stronger cinematic feedback (used by the updated SFX system)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "summary": "Include new retro-cartoon neon static art assets and sprite sheets under frontend/public/assets/generated and wire them into the start/menu and in-game VFX",
+      "acceptanceCriteria": [
+        "New images/sprite sheets are present under frontend/public/assets/generated and referenced via correct absolute paths (e.g., /assets/generated/...).",
+        "The start/menu presentation uses the newly generated assets (not placeholders).",
+        "No backend endpoints are introduced for serving images."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/spacecoco-splash-neon.dim_3840x2160.png",
+          "operation": "create",
+          "description": "Add generated retro-cartoon neon splash/hero illustration asset for the upgraded start/menu presentation."
+        },
+        {
+          "path": "frontend/public/assets/generated/spacecoco-menu-banner-neon.dim_2560x900.png",
+          "operation": "create",
+          "description": "Add generated wide retro-cartoon neon banner asset for Home/Lobby animated presentation."
+        },
+        {
+          "path": "frontend/public/assets/generated/spacecoco-menu-ufo-sprites.dim_1024x256.png",
+          "operation": "create",
+          "description": "Add generated UFO/alien fly-by sprite sheet for menu/start animation."
+        },
+        {
+          "path": "frontend/public/assets/generated/spacecoco-menu-cow-laser-sprites.dim_1024x256.png",
+          "operation": "create",
+          "description": "Add generated bright cow eye-laser firing sprite sheet for menu/start animation."
+        },
+        {
+          "path": "frontend/public/assets/generated/spacecoco-neon-sparks-sprites.dim_512x512.png",
+          "operation": "create",
+          "description": "Add generated neon glow particle/spark spritesheet for UI/gameplay VFX accents."
+        },
+        {
+          "path": "frontend/public/assets/generated/spacecoco-hero-neon-cartoon.dim_1600x600.png",
+          "operation": "create",
+          "description": "Add edited high-contrast neon-cartoon hero image replacing the previous hero art for compatible use in layouts where a static fallback is needed."
+        },
+        {
+          "path": "frontend/src/components/start/NeonStartScene.tsx",
+          "operation": "modify",
+          "description": "Wire the new generated assets into the animated start scene (splash/banner backgrounds + UFO and cow-laser sprite sheets). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Update Home hero to reference the new generated assets (including the edited hero image as a fallback) so the start/menu presentation uses non-placeholder art. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/game/render/sprites.ts",
+          "operation": "modify",
+          "description": "Ensure the new neon spark spritesheet is loadable via the sprite manager and referenced via the correct absolute path under frontend/public/assets/generated."
         }
       ]
     }

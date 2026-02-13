@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
-  "summary": "Build a decentralized web game on Internet Computer named \"Spacecoco\": a fast, absurd, addictive multiplayer (up to 8 players) Snake-style game with multi-input controls, ICP wallet-based cosmetic skins, dynamic planet modifiers, bosses, power-ups, and an on-chain leaderboard — now with a full replacement of current visuals to arcade pixel-art (neon snake, UFO/cow sprites, starfield) and a replacement of the music with a more modern, high-energy style.",
+  "projectStateVersion": 13,
+  "summary": "Build a decentralized web game on Internet Computer named \"Spacecoco\": a fast, absurd, addictive multiplayer (up to 8 players) Snake-style game with multi-input controls, ICP wallet-based cosmetic skins, dynamic planet modifiers, bosses, power-ups, and an on-chain leaderboard — now targeting a high-quality retro-cartoon neon visual style (very bright, “expensive” look) with an animated, highly dynamic start/menu presentation (UFOs/aliens/vacas with lasers), upgraded modern arcade-neon scoring UI, improved competitive mechanics (head/body elimination with score drop pickup), and upgraded SFX/audio polish using web-feasible rendering/audio techniques (no Vulkan/true RT/HDR10).",
   "architectural_notes": [
     "Project pivot: replace used-items marketplace with a Snake-style multiplayer web game on Internet Computer called \"Spacecoco\".",
     "Multiplayer target: up to 8 players with real-time state synchronization.",
@@ -9,12 +9,16 @@
     "Leaderboard should be stored/validated on-chain.",
     "User-approved scope change: replace (not just add) existing sprite/visual assets with a new arcade pixel-art style (neon snake, UFO/cow, starfield, VFX).",
     "User-approved scope change: replace existing music direction/system content with more modern, high-energy tracks (\"GTA V\" vibe).",
-    "Gameplay tweak requested: snake should always be in motion; growth primarily from eating UFOs; cows/penguins provide bonus points; add animated crocodile entities."
+    "Gameplay tweak requested: snake should always be in motion; growth primarily from eating UFOs; cows/penguins provide bonus points; add animated crocodile entities.",
+    "New art direction request: move from arcade pixel-art replacement to a higher-detail retro-cartoon neon look (very bright/‘expensive’) using web-feasible rendering (WebGL/WebGPU postprocessing; no Vulkan/true ray tracing/HDR10).",
+    "New UX request: highly animated splash/home/menu presentation with UFOs/aliens and cows firing lasers for an immediate ‘wow’ effect.",
+    "New gameplay request: competitive elimination—body hits opponent head => opponent resets to normal size; winner can collect dropped points to grow/score."
   ],
   "known_issues": [
     "Production build (Version 4) shows a blank screen: game does not render anything and there is no movement."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Retro-cartoon neon splash/hero illustration with UFOs, aliens, bright cows, and eye-laser action (spacecoco-splash-neon.dim_3840x2160.png)\n- Wide retro-cartoon neon banner scene with UFO flyovers and laser chaos (spacecoco-menu-banner-neon.dim_2560x900.png)\n- Sprite sheet of multiple UFO/alien fly-by frames for menu animation (spacecoco-menu-ufo-sprites.dim_1024x256.png)\n- Sprite sheet of bright cow eye-laser firing frames for menu animation (spacecoco-menu-cow-laser-sprites.dim_1024x256.png)\n- Neon glow particle/spark spritesheet for UI/VFX accents (spacecoco-neon-sparks-sprites.dim_512x512.png)\n\n## Edit Images\n- Increase detail/contrast and shift to high-quality retro-cartoon neon look with brighter UFO/cow/laser elements (spacecoco-hero.dim_1600x600.png > spacecoco-hero-neon-cartoon.dim_1600x600.png)",
   "existing_features": [
     {
       "id": "feature-create-the-product-s-overall-visual-theme-and-apply-it-consistently-across-the-ui-for-the-gatos-use-items-used-items-marketplace-theme-must-be-a-coherent-distinct-style-colors-typography-spacing-components-suitable-for-a-trusted-second-hand-marketplace-and-must-avoid-default-generic-styling",
@@ -247,6 +251,62 @@
         "REQ-31"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-upgrade-the-spacecoco-start-experience-home-screen-lobby-screen-to-a-high-motion-retro-cartoon-neon-presentation-add-an-animated-hero-splash-scene-with-ufos-aliens-flying-across-the-screen-and-bright-cows-firing-eye-lasers-while-keeping-the-game-name-and-core-navigation-intact",
+      "title": "Upgrade the Spacecoco start experience (Home screen + Lobby screen) to a high-motion, retro-cartoon neon presentation: add an animated hero/splash scene with UFOs/aliens flying across the screen and bright cows firing eye-lasers, while keeping the game name and core navigation intact.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-revamp-the-in-game-scoring-ui-hud-to-a-modern-arcade-retro-neon-style-with-large-digits-bright-neon-color-accents-purple-red-blue-green-as-primary-palette-and-high-clarity-readability-over-gameplay",
+      "title": "Revamp the in-game scoring UI (HUD) to a modern arcade retro-neon style with large digits, bright neon color accents (purple/red/blue/green as primary palette), and high-clarity readability over gameplay.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-updated-competitive-scoring-model-that-awards-points-when-the-snake-eats-objects-and-when-it-successfully-eliminates-an-opponent-with-on-screen-score-feedback-e-g-floating-neon-number-popups-that-clearly-communicates-how-many-points-were-gained",
+      "title": "Implement an updated competitive scoring model that awards points when the snake eats objects and when it successfully eliminates an opponent, with on-screen score feedback (e.g., floating neon number popups) that clearly communicates how many points were gained.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-competitive-elimination-rule-when-a-snake-hits-an-opponent-s-head-with-its-body-the-opponent-resets-back-to-the-normal-starting-size-and-the-winner-can-collect-dropped-point-items-to-gain-score-and-grow",
+      "title": "Add the competitive elimination rule: when a snake hits an opponent's head with its body, the opponent resets back to the normal starting size, and the winner can collect dropped point items to gain score and grow.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-increase-perceived-visual-quality-during-gameplay-using-web-feasible-rendering-techniques-without-changing-the-core-rules-add-a-brighter-more-expensive-neon-look-via-post-processing-like-effects-e-g-glow-bloom-styling-laser-trails-subtle-motion-blur-trailing-while-preserving-gameplay-readability-and-performance",
+      "title": "Increase perceived visual quality during gameplay using web-feasible rendering techniques without changing the core rules: add a brighter, more 'expensive' neon look via post-processing-like effects (e.g., glow/bloom styling, laser trails, subtle motion blur/trailing) while preserving gameplay readability and performance.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-upgrade-audio-polish-using-web-feasible-techniques-replace-or-improve-sfx-to-higher-quality-versions-and-add-stronger-gameplay-feedback-e-g-stereo-spatial-feel-filters-ducking-where-appropriate-while-keeping-mute-behavior-working-on-the-play-screen",
+      "title": "Upgrade audio polish using web-feasible techniques: replace or improve SFX to higher-quality versions and add stronger gameplay feedback (e.g., stereo/spatial feel, filters/ducking where appropriate), while keeping mute behavior working on the Play screen.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-new-high-quality-retro-cartoon-neon-static-art-assets-and-sprite-sheets-needed-for-the-updated-start-menu-presentation-and-brighter-in-game-vfx-placed-under-frontend-public-assets-generated-and-loaded-directly-by-the-frontend-no-backend-image-serving",
+      "title": "Generate and include new high-quality retro-cartoon neon static art assets and sprite sheets needed for the updated start/menu presentation and brighter in-game VFX, placed under frontend/public/assets/generated and loaded directly by the frontend (no backend image serving).",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -369,6 +429,36 @@
     {
       "id": "AR-28",
       "summary": "Add animated, fun crocodile entities as additional targets/obstacles consistent with 'eat and grow' famous game feel (including point behavior to be defined).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-29",
+      "summary": "Upgrade visuals to a high-quality retro-cartoon neon style (bright, cool, ‘expensive’ look) using web-feasible postprocessing (e.g., bloom/motion blur/trails) while keeping the core game intact.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-30",
+      "summary": "Create an animated, highly dynamic splash/home/menu presentation: aliens/UFOs flying across the screen, bright cows firing eye-lasers, lots of motion and ‘wow’ factor.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Revamp the scoring/points system to be modern and entertaining: award points for eating objects and for eliminating opponents; add clear neon number popups/animations that match gameplay mechanics.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Add competitive elimination rule: if a snake hits an opponent’s head with its body, the opponent resets to normal starting size while dropping points/collectibles that the winner can eat to gain points and grow.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Improve SFX/audio polish with higher-quality sounds and stronger gameplay feedback (e.g., spatialization/filters where feasible in web) to increase clarity and addictiveness.",
       "reqIds": [],
       "status": "pending"
     }

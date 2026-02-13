@@ -2,11 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-play-screen-blank-no-render-issue-by-ensuring-the-requestanimationframe-game-loop-actually-starts-after-sprites-finish-loading-avoid-stale-react-hook-closures-in-particular-startgame-and-resumegame-must-invoke-a-gameloop-function-that-sees-the-latest-spritesloaded-value-and-does-not-early-return-incorrectly",
-      "featureTitle": "Fix the Play screen blank/no-render issue by ensuring the requestAnimationFrame game loop actually starts after sprites finish loading (avoid stale React hook closures). In particular, `startGame()` and `resumeGame()` must invoke a `gameLoop` function that sees the latest `spritesLoaded` value and does not early-return incorrectly.",
+      "featureId": "feature-upgrade-the-spacecoco-start-experience-home-screen-lobby-screen-to-a-high-motion-retro-cartoon-neon-presentation-add-an-animated-hero-splash-scene-with-ufos-aliens-flying-across-the-screen-and-bright-cows-firing-eye-lasers-while-keeping-the-game-name-and-core-navigation-intact",
+      "featureTitle": "Upgrade the Spacecoco start experience (Home screen + Lobby screen) to a high-motion, retro-cartoon neon presentation: add an animated hero/splash scene with UFOs/aliens flying across the screen and bright cows firing eye-lasers, while keeping the game name and core navigation intact.",
       "files": [
-        "frontend/src/game/hooks/useGameLoop.ts",
-        "frontend/src/pages/PlayPage.tsx"
+        "frontend/src/components/start/NeonStartScene.tsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/HomePage.tsx",
+        "frontend/src/pages/LobbyPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,16 +19,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-29"
+        "REQ-32"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-robust-runtime-fallback-so-the-play-screen-is-never-fully-blank-if-sprite-loading-fails-surface-a-user-visible-error-overlay-with-an-actionable-message-and-ensure-at-least-a-minimal-canvas-render-e-g-clear-starfield-still-occurs-even-when-loadallsprites-rejects",
-      "featureTitle": "Add a robust runtime fallback so the Play screen is never fully blank if sprite loading fails: surface a user-visible error overlay with an actionable message and ensure at least a minimal canvas render (e.g., clear + starfield) still occurs even when `loadAllSprites()` rejects.",
+      "featureId": "feature-revamp-the-in-game-scoring-ui-hud-to-a-modern-arcade-retro-neon-style-with-large-digits-bright-neon-color-accents-purple-red-blue-green-as-primary-palette-and-high-clarity-readability-over-gameplay",
+      "featureTitle": "Revamp the in-game scoring UI (HUD) to a modern arcade retro-neon style with large digits, bright neon color accents (purple/red/blue/green as primary palette), and high-clarity readability over gameplay.",
       "files": [
-        "frontend/src/game/hooks/useGameLoop.ts",
-        "frontend/src/pages/PlayPage.tsx"
+        "frontend/src/game/ui/GameHUD.tsx",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
       ],
       "components": [
         "authorization@4.0.0",
@@ -37,14 +40,81 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-30"
+        "REQ-33"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-verify-and-correct-the-runtime-sprite-asset-paths-used-by-the-sprite-loader-so-they-resolve-in-production-ic-canister-hosting-and-allow-spritesloaded-to-become-true-when-the-assets-exist-under-frontend-public-assets-generated",
-      "featureTitle": "Verify and correct the runtime sprite asset paths used by the sprite loader so they resolve in production (IC canister hosting) and allow `spritesLoaded` to become true when the assets exist under `frontend/public/assets/generated`.",
+      "featureId": "feature-implement-an-updated-competitive-scoring-model-that-awards-points-when-the-snake-eats-objects-and-when-it-successfully-eliminates-an-opponent-with-on-screen-score-feedback-e-g-floating-neon-number-popups-that-clearly-communicates-how-many-points-were-gained",
+      "featureTitle": "Implement an updated competitive scoring model that awards points when the snake eats objects and when it successfully eliminates an opponent, with on-screen score feedback (e.g., floating neon number popups) that clearly communicates how many points were gained.",
       "files": [
+        "frontend/src/game/hooks/useGameLoop.ts",
+        "frontend/src/game/render/vfx.ts",
+        "frontend/src/game/types.ts",
+        "frontend/src/pages/PlayPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-34"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-the-competitive-elimination-rule-when-a-snake-hits-an-opponent-s-head-with-its-body-the-opponent-resets-back-to-the-normal-starting-size-and-the-winner-can-collect-dropped-point-items-to-gain-score-and-grow",
+      "featureTitle": "Add the competitive elimination rule: when a snake hits an opponent's head with its body, the opponent resets back to the normal starting size, and the winner can collect dropped point items to gain score and grow.",
+      "files": [
+        "frontend/src/game/constants.ts",
+        "frontend/src/game/hooks/useGameLoop.ts",
+        "frontend/src/game/render/entities.ts",
+        "frontend/src/game/render/obstacles.ts",
+        "frontend/src/game/types.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-35"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-increase-perceived-visual-quality-during-gameplay-using-web-feasible-rendering-techniques-without-changing-the-core-rules-add-a-brighter-more-expensive-neon-look-via-post-processing-like-effects-e-g-glow-bloom-styling-laser-trails-subtle-motion-blur-trailing-while-preserving-gameplay-readability-and-performance",
+      "featureTitle": "Increase perceived visual quality during gameplay using web-feasible rendering techniques without changing the core rules: add a brighter, more 'expensive' neon look via post-processing-like effects (e.g., glow/bloom styling, laser trails, subtle motion blur/trailing) while preserving gameplay readability and performance.",
+      "files": [
+        "frontend/src/game/hooks/useGameLoop.ts",
+        "frontend/src/game/render/vfx.ts",
+        "frontend/src/index.css"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-36"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-upgrade-audio-polish-using-web-feasible-techniques-replace-or-improve-sfx-to-higher-quality-versions-and-add-stronger-gameplay-feedback-e-g-stereo-spatial-feel-filters-ducking-where-appropriate-while-keeping-mute-behavior-working-on-the-play-screen",
+      "featureTitle": "Upgrade audio polish using web-feasible techniques: replace or improve SFX to higher-quality versions and add stronger gameplay feedback (e.g., stereo/spatial feel, filters/ducking where appropriate), while keeping mute behavior working on the Play screen.",
+      "files": [
+        "frontend/src/game/audio/useSfx.ts",
         "frontend/src/game/hooks/useGameLoop.ts",
         "frontend/src/pages/PlayPage.tsx"
       ],
@@ -57,7 +127,27 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-31"
+        "REQ-37"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-generate-and-include-new-high-quality-retro-cartoon-neon-static-art-assets-and-sprite-sheets-needed-for-the-updated-start-menu-presentation-and-brighter-in-game-vfx-placed-under-frontend-public-assets-generated-and-loaded-directly-by-the-frontend-no-backend-image-serving",
+      "featureTitle": "Generate and include new high-quality retro-cartoon neon static art assets and sprite sheets needed for the updated start/menu presentation and brighter in-game VFX, placed under frontend/public/assets/generated and loaded directly by the frontend (no backend image serving).",
+      "files": [
+        "frontend/src/components/start/NeonStartScene.tsx",
+        "frontend/src/pages/HomePage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-38"
       ],
       "confidence": "high"
     }

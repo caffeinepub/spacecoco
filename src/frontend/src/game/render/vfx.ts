@@ -1,4 +1,5 @@
 import { drawSprite, drawFullSprite } from './sprites';
+import type { ScorePopup } from '../types';
 
 export interface LaserVFX {
   id: string;
@@ -18,7 +19,6 @@ export interface ExplosionVFX {
   duration: number;
 }
 
-// Render thin red laser beam
 export function renderLaser(
   ctx: CanvasRenderingContext2D,
   laser: LaserVFX,
@@ -36,13 +36,25 @@ export function renderLaser(
   ctx.translate(laser.startX, laser.startY);
   ctx.rotate(angle);
   
-  // Draw laser sprite stretched to length
+  // Enhanced glow trail
+  ctx.shadowColor = '#ff0033';
+  ctx.shadowBlur = 30;
+  ctx.globalAlpha = 0.8;
+  
+  // Draw multiple layers for trail effect
+  for (let i = 0; i < 3; i++) {
+    ctx.globalAlpha = 0.3 - i * 0.1;
+    drawFullSprite(ctx, 'laser', 0, -6 - i * 2, length, 12 + i * 4);
+  }
+  
+  // Main laser beam
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 20;
   drawFullSprite(ctx, 'laser', 0, -4, length, 8);
   
   ctx.restore();
 }
 
-// Render pink pixel explosion animation
 export function renderExplosion(
   ctx: CanvasRenderingContext2D,
   explosion: ExplosionVFX,
@@ -51,8 +63,7 @@ export function renderExplosion(
   const elapsed = currentTime - explosion.createdAt;
   if (elapsed > explosion.duration) return;
 
-  // Explosion sprite sheet: 256x256, 4x4 grid = 16 frames
-  const frameSize = 64; // 256/4 = 64px per frame
+  const frameSize = 64;
   const totalFrames = 16;
   const frameIndex = Math.floor((elapsed / explosion.duration) * totalFrames);
   
@@ -61,6 +72,9 @@ export function renderExplosion(
   const row = Math.floor(frameIndex / 4);
   const col = frameIndex % 4;
 
+  ctx.save();
+  ctx.shadowColor = '#ff00ff';
+  ctx.shadowBlur = 40;
   drawSprite(
     ctx,
     'explosion',
@@ -73,4 +87,39 @@ export function renderExplosion(
     64,
     64
   );
+  ctx.restore();
+}
+
+export function renderScorePopup(
+  ctx: CanvasRenderingContext2D,
+  popup: ScorePopup,
+  currentTime: number
+) {
+  const elapsed = currentTime - popup.createdAt;
+  if (elapsed > popup.duration) return;
+
+  const progress = elapsed / popup.duration;
+  const alpha = 1 - progress;
+  const yOffset = -progress * 50;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = 'bold 32px Orbitron, monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  // Glow effect
+  ctx.shadowColor = popup.color;
+  ctx.shadowBlur = 20;
+  
+  // Outline
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 4;
+  ctx.strokeText(`+${popup.amount}`, popup.x, popup.y + yOffset);
+  
+  // Fill
+  ctx.fillStyle = popup.color;
+  ctx.fillText(`+${popup.amount}`, popup.x, popup.y + yOffset);
+  
+  ctx.restore();
 }

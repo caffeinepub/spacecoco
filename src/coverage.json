@@ -1,53 +1,141 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T20:35:35.103Z",
+  "generatedAt": "2026-02-13T23:06:29.685Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 7,
+    "implemented": 7,
     "items": [
       {
-        "id": "REQ-29",
-        "summary": "Fix the Play screen blank/no-render issue by ensuring the requestAnimationFrame game loop actually starts after sprites finish loading (avoid stale React hook closures). In particular, `startGame()` and `resumeGame()` must invoke a `gameLoop` function that sees the latest `spritesLoaded` value and does not early-return incorrectly.",
+        "id": "REQ-32",
+        "summary": "Upgrade the Spacecoco start experience (Home screen + Lobby screen) to a high-motion, retro-cartoon neon presentation: add an animated hero/splash scene with UFOs/aliens flying across the screen and bright cows firing eye-lasers, while keeping the game name and core navigation intact.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/components/start/NeonStartScene.tsx",
+          "frontend/src/pages/HomePage.tsx",
+          "frontend/src/pages/LobbyPage.tsx",
+          "frontend/src/index.css"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/start/NeonStartScene.tsx",
+          "frontend/src/pages/HomePage.tsx",
+          "frontend/src/pages/LobbyPage.tsx",
+          "frontend/src/index.css"
+        ]
+      },
+      {
+        "id": "REQ-33",
+        "summary": "Revamp the in-game scoring UI (HUD) to a modern arcade retro-neon style with large digits, bright neon color accents (purple/red/blue/green as primary palette), and high-clarity readability over gameplay.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/ui/GameHUD.tsx",
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/ui/GameHUD.tsx",
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js"
+        ]
+      },
+      {
+        "id": "REQ-34",
+        "summary": "Implement an updated competitive scoring model that awards points when the snake eats objects and when it successfully eliminates an opponent, with on-screen score feedback (e.g., floating neon number popups) that clearly communicates how many points were gained.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/types.ts",
           "frontend/src/game/hooks/useGameLoop.ts",
+          "frontend/src/game/render/vfx.ts",
           "frontend/src/pages/PlayPage.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/game/types.ts",
           "frontend/src/game/hooks/useGameLoop.ts",
+          "frontend/src/game/render/vfx.ts",
           "frontend/src/pages/PlayPage.tsx"
         ]
       },
       {
-        "id": "REQ-30",
-        "summary": "Add a robust runtime fallback so the Play screen is never fully blank if sprite loading fails: surface a user-visible error overlay with an actionable message and ensure at least a minimal canvas render (e.g., clear + starfield) still occurs even when `loadAllSprites()` rejects.",
+        "id": "REQ-35",
+        "summary": "Add the competitive elimination rule: when a snake hits an opponent's head with its body, the opponent resets back to the normal starting size, and the winner can collect dropped point items to gain score and grow.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/game/types.ts",
+          "frontend/src/game/constants.ts",
           "frontend/src/game/hooks/useGameLoop.ts",
-          "frontend/src/pages/PlayPage.tsx"
+          "frontend/src/game/render/entities.ts",
+          "frontend/src/game/render/obstacles.ts"
         ],
         "matchedFiles": [
+          "frontend/src/game/types.ts",
+          "frontend/src/game/constants.ts",
           "frontend/src/game/hooks/useGameLoop.ts",
-          "frontend/src/pages/PlayPage.tsx"
+          "frontend/src/game/render/entities.ts",
+          "frontend/src/game/render/obstacles.ts"
         ]
       },
       {
-        "id": "REQ-31",
-        "summary": "Verify and correct the runtime sprite asset paths used by the sprite loader so they resolve in production (IC canister hosting) and allow `spritesLoaded` to become true when the assets exist under `frontend/public/assets/generated`.",
+        "id": "REQ-36",
+        "summary": "Increase perceived visual quality during gameplay using web-feasible rendering techniques without changing the core rules: add a brighter, more 'expensive' neon look via post-processing-like effects (e.g., glow/bloom styling, laser trails, subtle motion blur/trailing) while preserving gameplay readability and performance.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/game/render/vfx.ts",
           "frontend/src/game/render/sprites.ts",
           "frontend/src/game/hooks/useGameLoop.ts",
-          "frontend/src/pages/PlayPage.tsx"
+          "frontend/src/index.css"
         ],
         "matchedFiles": [
+          "frontend/src/game/render/vfx.ts",
+          "frontend/src/game/hooks/useGameLoop.ts",
+          "frontend/src/index.css"
+        ]
+      },
+      {
+        "id": "REQ-37",
+        "summary": "Upgrade audio polish using web-feasible techniques: replace or improve SFX to higher-quality versions and add stronger gameplay feedback (e.g., stereo/spatial feel, filters/ducking where appropriate), while keeping mute behavior working on the Play screen.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/audio/useSfx.ts",
+          "frontend/src/game/hooks/useGameLoop.ts",
+          "frontend/src/pages/PlayPage.tsx",
+          "frontend/public/assets/audio/spacecoco-pew.wav",
+          "frontend/public/assets/audio/spacecoco-muuuuh.wav",
+          "frontend/public/assets/audio/spacecoco-boom.wav"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/audio/useSfx.ts",
           "frontend/src/game/hooks/useGameLoop.ts",
           "frontend/src/pages/PlayPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-38",
+        "summary": "Generate and include new high-quality retro-cartoon neon static art assets and sprite sheets needed for the updated start/menu presentation and brighter in-game VFX, placed under frontend/public/assets/generated and loaded directly by the frontend (no backend image serving).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/public/assets/generated/spacecoco-splash-neon.dim_3840x2160.png",
+          "frontend/public/assets/generated/spacecoco-menu-banner-neon.dim_2560x900.png",
+          "frontend/public/assets/generated/spacecoco-menu-ufo-sprites.dim_1024x256.png",
+          "frontend/public/assets/generated/spacecoco-menu-cow-laser-sprites.dim_1024x256.png",
+          "frontend/public/assets/generated/spacecoco-neon-sparks-sprites.dim_512x512.png",
+          "frontend/public/assets/generated/spacecoco-hero-neon-cartoon.dim_1600x600.png",
+          "frontend/src/components/start/NeonStartScene.tsx",
+          "frontend/src/pages/HomePage.tsx",
+          "frontend/src/game/render/sprites.ts"
+        ],
+        "matchedFiles": [
+          "frontend/public/assets/generated/spacecoco-splash-neon.dim_3840x2160.png",
+          "frontend/public/assets/generated/spacecoco-menu-banner-neon.dim_2560x900.png",
+          "frontend/public/assets/generated/spacecoco-menu-ufo-sprites.dim_1024x256.png",
+          "frontend/public/assets/generated/spacecoco-menu-cow-laser-sprites.dim_1024x256.png",
+          "frontend/public/assets/generated/spacecoco-neon-sparks-sprites.dim_512x512.png",
+          "frontend/public/assets/generated/spacecoco-hero-neon-cartoon.dim_1600x600.png",
+          "frontend/src/components/start/NeonStartScene.tsx",
+          "frontend/src/pages/HomePage.tsx"
         ]
       }
     ]
@@ -57,8 +145,26 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/public/assets/generated/spacecoco-hero-neon-cartoon.dim_1600x600.png",
+    "frontend/public/assets/generated/spacecoco-menu-banner-neon.dim_2560x900.png",
+    "frontend/public/assets/generated/spacecoco-menu-cow-laser-sprites.dim_1024x256.png",
+    "frontend/public/assets/generated/spacecoco-menu-ufo-sprites.dim_1024x256.png",
+    "frontend/public/assets/generated/spacecoco-neon-sparks-sprites.dim_512x512.png",
+    "frontend/public/assets/generated/spacecoco-splash-neon.dim_3840x2160.png",
+    "frontend/src/components/start/NeonStartScene.tsx",
+    "frontend/src/game/audio/useSfx.ts",
+    "frontend/src/game/constants.ts",
     "frontend/src/game/hooks/useGameLoop.ts",
+    "frontend/src/game/render/entities.ts",
+    "frontend/src/game/render/obstacles.ts",
+    "frontend/src/game/render/vfx.ts",
+    "frontend/src/game/types.ts",
+    "frontend/src/game/ui/GameHUD.tsx",
+    "frontend/src/index.css",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/LobbyPage.tsx",
     "frontend/src/pages/PlayPage.tsx",
+    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

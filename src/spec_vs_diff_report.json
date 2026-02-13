@@ -1,41 +1,59 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T20:35:35.100Z",
-  "summary": "Diff adds sprite-load state/error handling in the game loop hook and updates PlayPage to auto-start after sprites load and to show loading/error overlays. However, the diff excerpt does not provide evidence that start/resume are implemented with a non-stale requestAnimationFrame loop (REQ-29) nor that sprite asset URLs were corrected for production (REQ-31).",
+  "generatedAt": "2026-02-13T23:06:29.681Z",
+  "summary": "Implemented an animated neon start/menu canvas scene and updated Home/Lobby pages to use it; revamped HUD styling with large neon digits; added neon palette/glow CSS/Tailwind utilities; enhanced gameplay VFX (laser glow/trail, explosions, point-drop rendering, score popup rendering); and upgraded SFX playback with WebAudio-based stereo panning while respecting mute. However, the diff summary does not provide evidence that the required generated image assets were actually added under frontend/public/assets/generated, nor does it clearly show (due to truncation) the full competitive scoring/elimination logic (head-vs-body elimination, respawn to initial length, point-drop spawning/collection and growth, and score updates for cows/penguins) being implemented end-to-end.",
   "missing_requirements": [
     {
-      "id": "REQ-29",
-      "requirement": "Ensure the requestAnimationFrame game loop starts correctly after sprites finish loading (avoid stale closures). startGame() and resumeGame() must invoke a gameLoop that sees the latest spritesLoaded value and does not early-return incorrectly; no React hook dependency warnings for start/resume logic.",
-      "reason": "PlayPage now calls startGame() when spritesLoaded becomes true, and useGameLoop introduces spritesLoadedRef, but the diff is truncated before showing startGame()/resumeGame()/gameLoop implementation. There is no explicit evidence in the provided diff excerpt that startGame()/resumeGame() schedule requestAnimationFrame using the latest spritesLoaded (e.g., via refs) or that prior early-return logic was removed.",
+      "id": "REQ-34",
+      "requirement": "Updated competitive scoring model: award points when eating objects and when eliminating an opponent, with on-screen score feedback popups.",
+      "reason": "Score popup rendering and scoring constants/types are present, but the diff summary does not show the actual game-loop logic that increments score when eating cows/penguins and on elimination, nor the creation/lifecycle of score popups at those events (useGameLoop.ts is truncated before scoring/collision handling evidence).",
       "evidence": [
         "frontend/src/game/hooks/useGameLoop.ts (truncated)",
-        "frontend/src/pages/PlayPage.tsx (truncated)"
+        "frontend/src/game/constants.ts",
+        "frontend/src/game/render/vfx.ts",
+        "frontend/src/game/types.ts"
       ]
     },
     {
-      "id": "REQ-31",
-      "requirement": "Verify and correct runtime sprite asset paths used by the sprite loader so they resolve in production under /assets/generated/ and allow spritesLoaded to become true; avoid 404s.",
-      "reason": "No changes to the sprite loader or its asset path construction are shown. The diff only shows loadAllSprites() being invoked, not any modification ensuring production-correct paths like /assets/generated/.",
+      "id": "REQ-35",
+      "requirement": "Competitive elimination rule: body hits opponent head resets opponent to starting size; winner can collect dropped point items to gain score and grow.",
+      "reason": "Types/constants/rendering for POINT_DROP and elimination drop counts exist, but the diff summary does not show the head-vs-body collision detection, opponent reset to INITIAL_SNAKE_LENGTH, spawning of POINT_DROP obstacles, or the collection logic that increases score and grows the winner (useGameLoop.ts is truncated before that logic is visible).",
       "evidence": [
-        "frontend/src/game/hooks/useGameLoop.ts (truncated)"
+        "frontend/src/game/hooks/useGameLoop.ts (truncated)",
+        "frontend/src/game/constants.ts",
+        "frontend/src/game/types.ts",
+        "frontend/src/game/render/obstacles.ts"
       ]
-    }
-  ],
-  "hallucinated_features": [
+    },
     {
-      "description": "Change to/mention of using a “modern music track instead of chiptune.”",
-      "reason": "Not requested by REQ-29/30/31, and the BuildRequest explicitly focuses on fixing blank rendering and adding sprite-load failure fallback rather than changing audio behavior.",
+      "id": "REQ-38",
+      "requirement": "Generate and include new retro-cartoon neon art assets and sprite sheets under frontend/public/assets/generated and reference them via /assets/generated/... paths.",
+      "reason": "Code references multiple /assets/generated/... images, but the diff summary lists no added/modified files under frontend/public/assets/generated, so there is no evidence the required PNGs/sprite sheets were actually added.",
       "evidence": [
-        "frontend/src/pages/PlayPage.tsx (truncated)"
+        "frontend/src/components/start/NeonStartScene.tsx",
+        "frontend/src/pages/HomePage.tsx"
       ]
     }
   ],
-  "confidence": 0.62,
+  "hallucinated_features": [],
+  "confidence": 0.63,
   "changed_files": [
     "frontend-file-summaries.txt",
+    "frontend/src/components/start/NeonStartScene.tsx",
+    "frontend/src/game/audio/useSfx.ts",
+    "frontend/src/game/constants.ts",
     "frontend/src/game/hooks/useGameLoop.ts",
+    "frontend/src/game/render/entities.ts",
+    "frontend/src/game/render/obstacles.ts",
+    "frontend/src/game/render/vfx.ts",
+    "frontend/src/game/types.ts",
+    "frontend/src/game/ui/GameHUD.tsx",
+    "frontend/src/index.css",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/LobbyPage.tsx",
     "frontend/src/pages/PlayPage.tsx",
+    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }
