@@ -1,16 +1,20 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
-  "summary": "Build a decentralized web game on Internet Computer named \"Spacecoco\": a fast, absurd, addictive multiplayer (up to 8 players) Snake-style game with multi-input controls, ICP wallet-based cosmetic skins, dynamic planet modifiers, bosses, power-ups, and an on-chain leaderboard.",
+  "projectStateVersion": 11,
+  "summary": "Build a decentralized web game on Internet Computer named \"Spacecoco\": a fast, absurd, addictive multiplayer (up to 8 players) Snake-style game with multi-input controls, ICP wallet-based cosmetic skins, dynamic planet modifiers, bosses, power-ups, and an on-chain leaderboard — now with a full replacement of current visuals to arcade pixel-art (neon snake, UFO/cow sprites, starfield) and a replacement of the music with a more modern, high-energy style.",
   "architectural_notes": [
     "Project pivot: replace used-items marketplace with a Snake-style multiplayer web game on Internet Computer called \"Spacecoco\".",
     "Multiplayer target: up to 8 players with real-time state synchronization.",
     "Use ICP wallet integration for cosmetic skin selection/switching.",
     "Leaderboard should be stored/validated on-chain.",
-    "User confirmed changes should be additive only and must not alter the existing Spacecoco theme/mechanics beyond the specified tweaks."
+    "User-approved scope change: replace (not just add) existing sprite/visual assets with a new arcade pixel-art style (neon snake, UFO/cow, starfield, VFX).",
+    "User-approved scope change: replace existing music direction/system content with more modern, high-energy tracks (\"GTA V\" vibe).",
+    "Gameplay tweak requested: snake should always be in motion; growth primarily from eating UFOs; cows/penguins provide bonus points; add animated crocodile entities."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Production build (Version 4) shows a blank screen: game does not render anything and there is no movement."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-the-product-s-overall-visual-theme-and-apply-it-consistently-across-the-ui-for-the-gatos-use-items-used-items-marketplace-theme-must-be-a-coherent-distinct-style-colors-typography-spacing-components-suitable-for-a-trusted-second-hand-marketplace-and-must-avoid-default-generic-styling",
@@ -163,6 +167,86 @@
         "REQ-21"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-in-canvas-spacecoco-visuals-with-an-arcade-pixel-art-style-and-use-sprite-based-rendering-for-core-entities-snake-ufo-cow-penguin-boss-crocodile-laser-vfx-and-pixel-explosion-vfx-while-keeping-the-existing-starfield-background",
+      "title": "Replace the current in-canvas Spacecoco visuals with an arcade pixel-art style and use sprite-based rendering for core entities (snake, UFO, cow, penguin boss, crocodile, laser VFX, and pixel explosion VFX) while keeping the existing starfield background.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-add-the-required-pixel-art-sprite-assets-under-frontend-public-assets-generated-and-update-the-game-renderer-to-load-and-draw-them",
+      "title": "Generate and add the required pixel-art sprite assets under frontend/public/assets/generated and update the game renderer to load and draw them.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-chiptune-oscillator-background-music-with-a-more-modern-high-energy-action-focused-original-soundtrack-and-integrate-it-with-the-existing-play-screen-mute-control",
+      "title": "Replace the current chiptune/oscillator background music with a more modern, high-energy, action-focused original soundtrack and integrate it with the existing Play screen mute control.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-updated-core-gameplay-rules-the-snake-is-always-moving-the-snake-grows-more-when-eating-ufos-cows-and-penguins-grant-bonus-points-game-over-occurs-when-the-snake-head-hits-the-border-or-its-own-body",
+      "title": "Implement the updated core gameplay rules: the snake is always moving; the snake grows more when eating UFOs; cows and penguins grant bonus points; game over occurs when the snake head hits the border or its own body.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-animated-fun-crocodile-entities-to-the-game-as-additional-moving-targets-obstacles-consistent-with-an-eat-and-grow-famous-game-feel-including-clear-scoring-behavior-when-collected-defeated",
+      "title": "Add animated, fun crocodile entities to the game as additional moving targets/obstacles consistent with an “eat and grow” famous-game feel, including clear scoring behavior when collected/defeated.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-sound-effects-for-1-firing-the-red-laser-pew-and-2-eating-a-cow-muuuuh-and-trigger-them-during-the-corresponding-gameplay-events",
+      "title": "Add sound effects for (1) firing the red laser (“pew”) and (2) eating a cow (“muuuuh”), and trigger them during the corresponding gameplay events.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-keep-all-user-facing-ui-text-in-english-while-updating-any-in-game-instruction-text-that-no-longer-matches-the-new-rules-ufo-driven-growth-and-bonus-points-from-cows-penguins-crocodiles",
+      "title": "Keep all user-facing UI text in English while updating any in-game instruction text that no longer matches the new rules (UFO-driven growth and bonus points from cows/penguins/crocodiles).",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-play-screen-blank-no-render-issue-by-ensuring-the-requestanimationframe-game-loop-actually-starts-after-sprites-finish-loading-avoid-stale-react-hook-closures-in-particular-startgame-and-resumegame-must-invoke-a-gameloop-function-that-sees-the-latest-spritesloaded-value-and-does-not-early-return-incorrectly",
+      "title": "Fix the Play screen blank/no-render issue by ensuring the requestAnimationFrame game loop actually starts after sprites finish loading (avoid stale React hook closures). In particular, `startGame()` and `resumeGame()` must invoke a `gameLoop` function that sees the latest `spritesLoaded` value and does not early-return incorrectly.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-robust-runtime-fallback-so-the-play-screen-is-never-fully-blank-if-sprite-loading-fails-surface-a-user-visible-error-overlay-with-an-actionable-message-and-ensure-at-least-a-minimal-canvas-render-e-g-clear-starfield-still-occurs-even-when-loadallsprites-rejects",
+      "title": "Add a robust runtime fallback so the Play screen is never fully blank if sprite loading fails: surface a user-visible error overlay with an actionable message and ensure at least a minimal canvas render (e.g., clear + starfield) still occurs even when `loadAllSprites()` rejects.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-and-correct-the-runtime-sprite-asset-paths-used-by-the-sprite-loader-so-they-resolve-in-production-ic-canister-hosting-and-allow-spritesloaded-to-become-true-when-the-assets-exist-under-frontend-public-assets-generated",
+      "title": "Verify and correct the runtime sprite asset paths used by the sprite loader so they resolve in production (IC canister hosting) and allow `spritesLoaded` to become true when the assets exist under `frontend/public/assets/generated`.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -261,6 +345,30 @@
     {
       "id": "AR-24",
       "summary": "At the start of a match, play a short looping chiptune background track at low volume (without removing existing dynamic/intensifying music behavior).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Replace existing Spacecoco in-game visuals with an arcade pixel-art style: neon-green 20px grid snake with black outline, head eyes + tongue animation, metallic gray UFO with red lights, flying cow sprite, pixel explosions, red laser VFX, and black starfield with twinkling white stars.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Replace the existing music/audio direction with more modern, action-focused, 'GTA V'-like music (overall replacement rather than additive tracks).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "Adjust core gameplay rules: snake is always moving; grows more when eating UFOs; cows and penguins grant extra points (growth behavior clarified as UFO-driven); keep classic game-over on hitting body or border unless otherwise overridden.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-28",
+      "summary": "Add animated, fun crocodile entities as additional targets/obstacles consistent with 'eat and grow' famous game feel (including point behavior to be defined).",
       "reqIds": [],
       "status": "pending"
     }

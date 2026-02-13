@@ -38,11 +38,12 @@ export interface PowerUp {
 
 export interface Obstacle {
   id: string;
-  type: 'UFO' | 'FLYING_COW' | 'CRATER' | 'ICE_PATCH' | 'UFO_WITH_COW';
+  type: 'UFO' | 'FLYING_COW' | 'CRATER' | 'ICE_PATCH' | 'UFO_WITH_COW' | 'CROCODILE';
   position: Position;
   active: boolean;
-  velocity?: { x: number; y: number }; // For descending UFOs
-  linkedCowId?: string; // For UFO-cow association
+  velocity?: { x: number; y: number };
+  linkedCowId?: string;
+  animationFrame?: number;
 }
 
 export interface Boss {
@@ -64,4 +65,6 @@ export interface GameState {
   boss: Boss | null;
   isGameOver: boolean;
   isPaused: boolean;
+  lasers: Array<{ id: string; startX: number; startY: number; endX: number; endY: number; createdAt: number; duration: number }>;
+  explosions: Array<{ id: string; x: number; y: number; createdAt: number; duration: number }>;
 }

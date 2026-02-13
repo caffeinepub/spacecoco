@@ -2,91 +2,9 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-render-a-black-starfield-background-with-randomly-placed-stars-on-the-play-screen-canvas-as-an-additive-visual-layer-do-not-change-the-existing-spacecoco-theme-the-starfield-should-be-subtly-animated-e-g-gentle-drift-or-twinkle-while-keeping-gameplay-visuals-readable",
-      "featureTitle": "Render a black starfield background with randomly placed stars on the Play screen canvas as an additive visual layer (do not change the existing Spacecoco theme). The starfield should be subtly animated (e.g., gentle drift or twinkle) while keeping gameplay visuals readable.",
+      "featureId": "feature-fix-the-play-screen-blank-no-render-issue-by-ensuring-the-requestanimationframe-game-loop-actually-starts-after-sprites-finish-loading-avoid-stale-react-hook-closures-in-particular-startgame-and-resumegame-must-invoke-a-gameloop-function-that-sees-the-latest-spritesloaded-value-and-does-not-early-return-incorrectly",
+      "featureTitle": "Fix the Play screen blank/no-render issue by ensuring the requestAnimationFrame game loop actually starts after sprites finish loading (avoid stale React hook closures). In particular, `startGame()` and `resumeGame()` must invoke a `gameLoop` function that sees the latest `spritesLoaded` value and does not early-return incorrectly.",
       "files": [
-        "frontend/src/game/hooks/useGameLoop.ts",
-        "frontend/src/game/render/starfield.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-17"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-game-initialization-so-the-snake-spawns-centered-on-the-grid-with-green-color-and-an-initial-length-of-5-blocks-while-keeping-the-rest-of-the-existing-game-theme-and-mechanics-intact",
-      "featureTitle": "Update game initialization so the snake spawns centered on the grid with green color and an initial length of 5 blocks, while keeping the rest of the existing game theme and mechanics intact.",
-      "files": [
-        "frontend/src/game/constants.ts",
-        "frontend/src/game/hooks/useGameLoop.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-18"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-adjust-obstacle-spawning-rules-so-that-every-2-seconds-a-ufo-descends-from-the-top-of-the-playfield-carrying-a-cow-inside-as-an-additive-behavior-do-not-remove-existing-obstacle-power-up-systems-integrate-with-them",
-      "featureTitle": "Adjust obstacle spawning rules so that every 2 seconds a UFO descends from the top of the playfield carrying a cow inside, as an additive behavior (do not remove existing obstacle/power-up systems; integrate with them).",
-      "files": [
-        "frontend/src/game/hooks/useGameLoop.ts",
-        "frontend/src/game/render/obstacles.ts",
-        "frontend/src/game/types.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-19"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-ensure-the-penguin-boss-spawn-rule-is-enforced-every-5-levels-spawn-a-penguin-boss-in-the-center-of-the-playfield-additive-confirmation-adjustment-that-must-not-break-other-boss-logic-including-existing-circling-mechanics",
-      "featureTitle": "Ensure the penguin boss spawn rule is enforced: every 5 levels, spawn a penguin boss in the center of the playfield (additive confirmation/adjustment that must not break other boss logic, including existing circling mechanics).",
-      "files": [
-        "frontend/src/game/constants.ts",
-        "frontend/src/game/hooks/useGameLoop.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-20"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-at-the-start-of-each-match-play-a-short-looping-chiptune-background-track-at-low-volume-this-must-be-additive-it-must-not-remove-or-disable-any-existing-dynamic-intensifying-music-behavior-if-present-it-should-coexist-or-transition-without-regressing-existing-audio-features",
-      "featureTitle": "At the start of each match, play a short looping chiptune background track at low volume. This must be additive: it must not remove or disable any existing dynamic/intensifying music behavior (if present); it should coexist or transition without regressing existing audio features.",
-      "files": [
-        "frontend/src/game/audio/useChiptuneLoop.ts",
         "frontend/src/game/hooks/useGameLoop.ts",
         "frontend/src/pages/PlayPage.tsx"
       ],
@@ -99,7 +17,47 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-21"
+        "REQ-29"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-robust-runtime-fallback-so-the-play-screen-is-never-fully-blank-if-sprite-loading-fails-surface-a-user-visible-error-overlay-with-an-actionable-message-and-ensure-at-least-a-minimal-canvas-render-e-g-clear-starfield-still-occurs-even-when-loadallsprites-rejects",
+      "featureTitle": "Add a robust runtime fallback so the Play screen is never fully blank if sprite loading fails: surface a user-visible error overlay with an actionable message and ensure at least a minimal canvas render (e.g., clear + starfield) still occurs even when `loadAllSprites()` rejects.",
+      "files": [
+        "frontend/src/game/hooks/useGameLoop.ts",
+        "frontend/src/pages/PlayPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-30"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-verify-and-correct-the-runtime-sprite-asset-paths-used-by-the-sprite-loader-so-they-resolve-in-production-ic-canister-hosting-and-allow-spritesloaded-to-become-true-when-the-assets-exist-under-frontend-public-assets-generated",
+      "featureTitle": "Verify and correct the runtime sprite asset paths used by the sprite loader so they resolve in production (IC canister hosting) and allow `spritesLoaded` to become true when the assets exist under `frontend/public/assets/generated`.",
+      "files": [
+        "frontend/src/game/hooks/useGameLoop.ts",
+        "frontend/src/pages/PlayPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-31"
       ],
       "confidence": "high"
     }

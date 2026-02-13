@@ -1,126 +1,79 @@
 {
   "kind": "build_request",
-  "title": "Add animated starfield, deterministic spawns, timed UFO drops, boss timing, and intro chiptune loop (additive)",
-  "priority": "normal",
+  "title": "Fix Spacecoco blank Play screen by starting the game loop correctly after sprite load",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-17",
-      "text": "Render a black starfield background with randomly placed stars on the Play screen canvas as an additive visual layer (do not change the existing Spacecoco theme). The starfield should be subtly animated (e.g., gentle drift or twinkle) while keeping gameplay visuals readable.",
+      "id": "REQ-29",
+      "text": "Fix the Play screen blank/no-render issue by ensuring the requestAnimationFrame game loop actually starts after sprites finish loading (avoid stale React hook closures). In particular, `startGame()` and `resumeGame()` must invoke a `gameLoop` function that sees the latest `spritesLoaded` value and does not early-return incorrectly.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-10"
         ],
         "quotes": [
-          "Agrega fondo negro con estrellas aleatorias.",
-          "si a la segunda opción quiero que solo añadas los cambios sin cambiar nada de nuestra temática"
+          "ni siquiera aparece nada",
+          "solo as lo que tengas que hacer para que el juego funcione al 100%"
         ]
       },
       "acceptanceCriteria": [
-        "When a match is running on /play, the canvas shows a black background with a random starfield.",
-        "The starfield exhibits subtle animation (twinkle/drift) without distracting from or obscuring the snake/obstacles.",
-        "No changes are made to global branding/theme outside the Play screen background rendering."
+        "When navigating to /play from the Lobby, the canvas renders the starfield + snake within 1 second after assets load.",
+        "The snake is always moving without requiring any user input.",
+        "Pausing and resuming reliably restarts the animation loop and rendering (no freeze/blank screen after resume).",
+        "There are no React console warnings about missing hook dependencies for the game loop start/resume logic."
       ]
     },
     {
-      "id": "REQ-18",
-      "text": "Update game initialization so the snake spawns centered on the grid with green color and an initial length of 5 blocks, while keeping the rest of the existing game theme and mechanics intact.",
+      "id": "REQ-30",
+      "text": "Add a robust runtime fallback so the Play screen is never fully blank if sprite loading fails: surface a user-visible error overlay with an actionable message and ensure at least a minimal canvas render (e.g., clear + starfield) still occurs even when `loadAllSprites()` rejects.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6",
+          "msg-7"
         ],
         "quotes": [
-          "La serpiente inicia en el centro de la pantalla, color verde, tamaño cinco bloques."
+          "nada se mueve sabes porque?",
+          "ni siquiera aparece nada"
         ]
       },
       "acceptanceCriteria": [
-        "On a new game start (including Play Again), the snake has 5 segments.",
-        "The snake’s initial head position is centered on the grid (rounded to the nearest grid cell).",
-        "The snake is rendered green at the start of the match."
+        "If any sprite fails to load, the UI shows an overlay on the Play screen indicating that assets failed to load (English text) rather than leaving a blank screen.",
+        "The failure state is logged to console with the underlying error.",
+        "The user can still navigate back to the Lobby from the Play screen in the failure state."
       ]
     },
     {
-      "id": "REQ-19",
-      "text": "Adjust obstacle spawning rules so that every 2 seconds a UFO descends from the top of the playfield carrying a cow inside, as an additive behavior (do not remove existing obstacle/power-up systems; integrate with them).",
+      "id": "REQ-31",
+      "text": "Verify and correct the runtime sprite asset paths used by the sprite loader so they resolve in production (IC canister hosting) and allow `spritesLoaded` to become true when the assets exist under `frontend/public/assets/generated`.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-6",
+          "msg-10"
         ],
         "quotes": [
-          "Cada dos segundos, un ovni baja desde arriba, con una vaca adentro.",
-          "si a la segunda opción quiero que solo añadas los cambios sin cambiar nada de nuestra temática"
+          "nada se mueve sabes porque?",
+          "ni siquiera aparece nada"
         ]
       },
       "acceptanceCriteria": [
-        "During active gameplay (not paused/game-over), a new UFO spawn event occurs at a 2-second interval.",
-        "Each spawned UFO originates above the visible playfield and moves downward into the playfield.",
-        "Each UFO spawn includes a cow inside/associated with it (represented visually or as a coupled obstacle entity), consistent with existing cow mechanics."
-      ]
-    },
-    {
-      "id": "REQ-20",
-      "text": "Ensure the penguin boss spawn rule is enforced: every 5 levels, spawn a penguin boss in the center of the playfield (additive confirmation/adjustment that must not break other boss logic, including existing circling mechanics).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Cada cinco niveles, aparece un pingüino jefe en el centro.",
-          "si a la segunda opción quiero que solo añadas los cambios sin cambiar nada de nuestra temática"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When the player reaches levels 5, 10, 15, ... a penguin boss appears.",
-        "The penguin boss spawns at the center of the playfield/grid.",
-        "Existing penguin boss win/progress rules (circle 3 times) continue to work."
-      ]
-    },
-    {
-      "id": "REQ-21",
-      "text": "At the start of each match, play a short looping chiptune background track at low volume. This must be additive: it must not remove or disable any existing dynamic/intensifying music behavior (if present); it should coexist or transition without regressing existing audio features.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Música chiptune espacial de fondo, loop corto, volumen bajo al empezar.”",
-          "si a la segunda opción quiero que solo añadas los cambios sin cambiar nada de nuestra temática"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When a match starts, a chiptune track begins playing automatically and loops.",
-        "Initial playback volume is low by default.",
-        "The existing mute/unmute UI on the Play screen continues to function for the match audio.",
-        "No existing dynamic/intensifying/planet audio behavior is removed; if such behavior exists, it still triggers as before."
+        "In production build, `loadAllSprites()` resolves successfully and `spritesLoaded` becomes true when the expected files exist under `/assets/generated/`.",
+        "The “Loading Game Assets…” overlay disappears once sprites are loaded, and gameplay starts automatically.",
+        "No 404s are emitted in the browser network panel for the sprite asset URLs referenced by the sprite loader."
       ]
     }
   ],
   "constraints": [
-    "Do not change the existing Spacecoco theme/branding; implement these items as additive gameplay/visual/audio tweaks only.",
-    "All user-facing text must remain in English.",
-    "Respect the existing frontend immutable paths and do not modify files under frontend/src/components/ui or the listed immutable hooks files."
+    "Do not edit any files under the immutable frontend paths listed in SYSTEM_CONTEXT (e.g., `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useActor.ts`, `frontend/src/components/ui`).",
+    "Keep all user-facing text in English."
   ],
   "nonGoals": [
-    "Do not rebrand the app from Spacecoco to Serpentia in this change.",
-    "Do not redesign the overall UI theme or navigation.",
-    "Do not implement new backend game APIs or change backend canister state/schema as part of these additive gameplay tweaks."
+    "Adding new gameplay features (boss logic changes, new power-ups, multiplayer sync) beyond what is required to make rendering/movement work again.",
+    "Backend/canister changes in Motoko unless a frontend fix cannot resolve the blank screen issue."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

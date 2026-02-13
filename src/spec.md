@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Add additive play-screen visual, spawn, obstacle timing, boss timing, and match-start audio improvements without changing the existing Spacecoco theme.
+**Goal:** Fix the Spacecoco Play screen blank/no-render issue by reliably starting (and restarting) the requestAnimationFrame game loop after sprites finish loading, and prevent a fully blank screen if sprite loading fails.
 
 **Planned changes:**
-- Render an additive black starfield background on the /play canvas with subtle animation (twinkle/drift) while keeping gameplay visuals readable.
-- Update match initialization so the snake starts centered on the grid, green, and with an initial length of 5 segments (including Play Again).
-- Add a timed obstacle behavior: every 2 seconds during active gameplay, spawn a UFO from above the playfield that descends downward, paired with/containing a cow, integrated with existing obstacle/power-up systems.
-- Enforce penguin boss timing: on levels 5, 10, 15, etc., spawn the penguin boss at the center while preserving existing boss mechanics (including circling rules).
-- Play a short looping chiptune background track at low volume at the start of each match, ensuring existing mute/unmute and any dynamic/intensifying music behavior continues to work.
+- Update Play screen game loop start/resume logic so `startGame()` and `resumeGame()` invoke a `gameLoop` that always sees the latest `spritesLoaded` value (avoid stale React hook closures) and does not incorrectly early-return.
+- Ensure pausing and resuming reliably restarts the animation loop and rendering without freezing or showing a blank screen.
+- Add a runtime failure fallback: if sprite loading fails, show an English error overlay with an actionable message, log the underlying error to the console, and still perform a minimal canvas render (e.g., clear + starfield) while allowing navigation back to the Lobby.
+- Verify and correct sprite asset URL/path resolution so `loadAllSprites()` succeeds in production hosting with assets under `/assets/generated/`, and remove any missing-hook-dependency console warnings related to loop start/resume logic.
 
-**User-visible outcome:** On /play, players see a subtly animated starfield background, start each match with a centered green 5-segment snake, encounter regular descending UFO-with-cow drops every 2 seconds, get a center-spawn penguin boss every 5 levels, and hear a low-volume looping chiptune that respects existing audio controls/behavior.
+**User-visible outcome:** When entering /play from the Lobby, the canvas renders (starfield + snake) and the snake moves automatically shortly after assets load; pausing/resuming works reliably; if assets fail to load, an error overlay appears instead of a blank screen and the user can return to the Lobby.

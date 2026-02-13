@@ -1,121 +1,74 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Additive Play screen upgrades: animated starfield, centered 5-length green snake spawn, timed UFO+cow drops, boss timing, and chiptune loop",
+  "title": "Spacecoco Play screen: start game loop after sprite load, add load-failure fallback, and fix production asset paths",
   "requirements": [
     {
-      "id": "REQ-17",
-      "summary": "Add an animated starfield layer to the /play canvas background while preserving existing Spacecoco visuals and readability.",
+      "id": "REQ-29",
+      "summary": "Ensure the requestAnimationFrame game loop starts reliably after sprites load and on resume, without stale React hook closures or missing-hook-dependency warnings.",
       "acceptanceCriteria": [
-        "When a match is running on /play, the canvas shows a black background with a random starfield.",
-        "The starfield exhibits subtle animation (twinkle/drift) without distracting from or obscuring the snake/obstacles.",
-        "No changes are made to global branding/theme outside the Play screen background rendering."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/render/starfield.ts",
-          "operation": "create",
-          "description": "Implement a small canvas starfield renderer (generate random stars once, then animate via gentle drift/twinkle) designed to be drawn as the first layer each frame, keeping gameplay visuals readable."
-        },
-        {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
-          "operation": "modify",
-          "description": "Integrate the starfield renderer into the existing canvas render pipeline as an additive background layer (draw starfield after clearing to black, before rendering gameplay entities)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-18",
-      "summary": "Initialize each match with the snake centered on the grid, green, and 5 blocks long without changing other mechanics.",
-      "acceptanceCriteria": [
-        "On a new game start (including Play Again), the snake has 5 segments.",
-        "The snake’s initial head position is centered on the grid (rounded to the nearest grid cell).",
-        "The snake is rendered green at the start of the match."
+        "When navigating to /play from the Lobby, the canvas renders the starfield + snake within 1 second after assets load.",
+        "The snake is always moving without requiring any user input.",
+        "Pausing and resuming reliably restarts the animation loop and rendering (no freeze/blank screen after resume).",
+        "There are no React console warnings about missing hook dependencies for the game loop start/resume logic."
       ],
       "file_operations": [
         {
           "path": "frontend/src/game/hooks/useGameLoop.ts",
           "operation": "modify",
-          "description": "Update match initialization (including Play Again) to spawn a 5-segment snake centered on the grid; ensure initial rendering uses green as the default match-start appearance while keeping existing theme/mechanics intact."
-        },
-        {
-          "path": "frontend/src/game/constants.ts",
-          "operation": "modify",
-          "description": "Add/adjust a snake-start constant (e.g., initial length = 5) to avoid hardcoding and to ensure consistent behavior across restarts."
-        }
-      ]
-    },
-    {
-      "id": "REQ-19",
-      "summary": "Add a timed UFO drop behavior: every 2 seconds during active gameplay, spawn a UFO descending from above with a cow inside/associated, integrated with existing obstacles/power-ups.",
-      "acceptanceCriteria": [
-        "During active gameplay (not paused/game-over), a new UFO spawn event occurs at a 2-second interval.",
-        "Each spawned UFO originates above the visible playfield and moves downward into the playfield.",
-        "Each UFO spawn includes a cow inside/associated with it (represented visually or as a coupled obstacle entity), consistent with existing cow mechanics."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
-          "operation": "modify",
-          "description": "Add a 2-second spawn timer that, while the match is active (not paused/game-over), spawns a descending UFO from above the playfield and couples it with a cow entity/representation; update per-tick movement so the UFO descends into the playfield without removing existing obstacle/power-up behaviors."
-        },
-        {
-          "path": "frontend/src/game/types.ts",
-          "operation": "modify",
-          "description": "Extend obstacle/boss-related typing as needed to support a descending UFO with an associated cow (e.g., optional linkage/grouping metadata) while keeping existing entity types compatible."
-        },
-        {
-          "path": "frontend/src/game/render/obstacles.ts",
-          "operation": "create",
-          "description": "Add a focused obstacle rendering helper for canvas that can draw the new descending UFO + cow association in a readable, theme-consistent way (shape-based or existing sprite usage if already available in the project)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-20",
-      "summary": "Enforce penguin boss timing: every 5 levels, spawn a penguin boss at the center while preserving existing boss behaviors (including circling mechanics).",
-      "acceptanceCriteria": [
-        "When the player reaches levels 5, 10, 15, ... a penguin boss appears.",
-        "The penguin boss spawns at the center of the playfield/grid.",
-        "Existing penguin boss win/progress rules (circle 3 times) continue to work."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
-          "operation": "modify",
-          "description": "Ensure the boss spawn rule is checked against level milestones (5, 10, 15, ...) and spawns a penguin boss at the playfield center when appropriate, without altering existing boss progress/win logic (including any circling mechanics already implemented)."
-        },
-        {
-          "path": "frontend/src/game/constants.ts",
-          "operation": "modify",
-          "description": "Confirm and use the existing boss spawn interval constant (every 5 levels) consistently in the game loop logic to prevent regressions."
-        }
-      ]
-    },
-    {
-      "id": "REQ-21",
-      "summary": "Add a low-volume looping chiptune background track that starts with each match and respects existing mute/unmute and any dynamic/intensifying music behavior.",
-      "acceptanceCriteria": [
-        "When a match starts, a chiptune track begins playing automatically and loops.",
-        "Initial playback volume is low by default.",
-        "The existing mute/unmute UI on the Play screen continues to function for the match audio.",
-        "No existing dynamic/intensifying/planet audio behavior is removed; if such behavior exists, it still triggers as before."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/audio/useChiptuneLoop.ts",
-          "operation": "create",
-          "description": "Implement a lightweight match-scoped chiptune loop controller (e.g., Web Audio–based) that can start/stop on match lifecycle, loop seamlessly, and expose volume/mute controls without disabling other audio systems."
+          "description": "Refactor the animation loop start/resume flow to avoid stale closures: make the game loop function stable (or stored in a ref) and read sprite-load state from a ref so startGame()/resumeGame() always invoke a loop that sees the latest spritesLoaded value. Also ensure start/resume cancels any previous requestAnimationFrame before starting a new one, and ensure React hooks have correct dependencies to eliminate console warnings."
         },
         {
           "path": "frontend/src/pages/PlayPage.tsx",
           "operation": "modify",
-          "description": "Wire the existing mute/unmute button state to the match audio controller so toggling mute affects the chiptune (and does not break any other existing Play screen audio behaviors)."
+          "description": "Update PlayPage’s effect that auto-starts the game after sprites load to include all required hook dependencies (e.g., include startGame in the dependency array) and avoid any start/resume logic that can capture stale values. Continue using existing shadcn-ui Button/Card components for UI structure; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-30",
+      "summary": "Add a runtime fallback so Play is never fully blank if sprite loading fails: show an English error overlay and still render at least a minimal animated canvas (clear + starfield).",
+      "acceptanceCriteria": [
+        "If any sprite fails to load, the UI shows an overlay on the Play screen indicating that assets failed to load (English text) rather than leaving a blank screen.",
+        "The failure state is logged to console with the underlying error.",
+        "The user can still navigate back to the Lobby from the Play screen in the failure state."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/hooks/useGameLoop.ts",
+          "operation": "modify",
+          "description": "Track sprite-loading failure state (e.g., an error value) when loadAllSprites() rejects, keep logging the underlying error to console, and ensure a minimal render loop still runs even without sprites (at minimum: clear + starfield render) so the canvas is never blank."
+        },
+        {
+          "path": "frontend/src/pages/PlayPage.tsx",
+          "operation": "modify",
+          "description": "Add a user-visible error overlay for sprite load failure with an actionable English message (e.g., suggest refresh and/or checking connection) while preserving access to the existing “Back to Lobby” navigation. Continue using existing shadcn-ui Card/Button components for the overlay UI; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-31",
+      "summary": "Verify and correct runtime sprite asset paths so sprite loading succeeds in production (IC canister hosting) for files under frontend/public/assets/generated.",
+      "acceptanceCriteria": [
+        "In production build, `loadAllSprites()` resolves successfully and `spritesLoaded` becomes true when the expected files exist under `/assets/generated/`.",
+        "The “Loading Game Assets…” overlay disappears once sprites are loaded, and gameplay starts automatically.",
+        "No 404s are emitted in the browser network panel for the sprite asset URLs referenced by the sprite loader."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/render/sprites.ts",
+          "operation": "modify",
+          "description": "Update sprite URL construction to be production-safe under IC canister hosting (e.g., resolve paths via the app base URL rather than assuming a leading-slash absolute path). Ensure the referenced filenames exactly match those in frontend/public/assets/generated (e.g., frontend/public/assets/generated/spacecoco-snake-sprites.dim_256x256.png, frontend/public/assets/generated/spacecoco-ufo.dim_64x64.png, frontend/public/assets/generated/spacecoco-cow.dim_64x64.png, frontend/public/assets/generated/spacecoco-penguin-boss.dim_128x128.png, frontend/public/assets/generated/spacecoco-crocodile-sprites.dim_256x128.png, frontend/public/assets/generated/spacecoco-laser-red.dim_64x16.png, frontend/public/assets/generated/spacecoco-explosion-pink-sprites.dim_256x256.png). Keep error reporting accurate so 404s are diagnosable."
         },
         {
           "path": "frontend/src/game/hooks/useGameLoop.ts",
           "operation": "modify",
-          "description": "Expose match lifecycle signals/callbacks (match start, restart, game-over, pause/resume if needed) so the Play screen can start the chiptune loop at match start and keep it running/looping appropriately without regressing any existing dynamic/intensifying music logic."
+          "description": "Align sprite-load state transitions with the corrected sprite paths so spritesLoaded reliably becomes true when assets exist, and ensure the game auto-start logic triggers rendering/movement once spritesLoaded flips true."
+        },
+        {
+          "path": "frontend/src/pages/PlayPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the “Loading Game Assets…” overlay is driven by the corrected sprite loading lifecycle so it disappears promptly after successful loads and gameplay starts automatically. Continue using existing shadcn-ui Card for the loading overlay; verify the component's usage instructions before implementing."
         }
       ]
     }
