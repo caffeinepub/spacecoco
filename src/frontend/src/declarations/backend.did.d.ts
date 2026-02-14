@@ -21,6 +21,29 @@ export interface Listing {
   'location' : string,
   'condition' : string,
 }
+export interface Lobby {
+  'id' : bigint,
+  'status' : LobbyStatus,
+  'creator' : Principal,
+  'createdAt' : Time,
+  'players' : Array<Principal>,
+  'maxPlayers' : bigint,
+}
+export type LobbyStatus = { 'finished' : null } |
+  { 'waiting' : null } |
+  { 'inProgress' : null };
+export interface Match {
+  'startedAt' : Time,
+  'actions' : Array<PlayerAction>,
+  'players' : Array<Principal>,
+  'lobbyId' : bigint,
+}
+export interface PlayerAction {
+  'action' : string,
+  'player' : Principal,
+  'timestamp' : Time,
+  'sequenceNumber' : bigint,
+}
 export type Time = bigint;
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
@@ -33,6 +56,7 @@ export interface _SERVICE {
     [string, string, bigint, string, string, string],
     bigint
   >,
+  'createLobby' : ActorMethod<[bigint], bigint>,
   'deleteListing' : ActorMethod<[bigint], undefined>,
   'filterListingsByCategory' : ActorMethod<[string], Array<Listing>>,
   'filterListingsByCategoryAndPriceRange' : ActorMethod<
@@ -49,6 +73,7 @@ export interface _SERVICE {
   'getAllCategories' : ActorMethod<[], Array<string>>,
   'getAllConditions' : ActorMethod<[], Array<string>>,
   'getAllListings' : ActorMethod<[], Array<Listing>>,
+  'getAllLobbies' : ActorMethod<[], Array<Lobby>>,
   'getAllLocations' : ActorMethod<[], Array<string>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
@@ -56,15 +81,23 @@ export interface _SERVICE {
   'getListingCount' : ActorMethod<[], bigint>,
   'getListingsByOwner' : ActorMethod<[Principal], Array<Listing>>,
   'getListingsPaginated' : ActorMethod<[bigint, bigint], Array<Listing>>,
+  'getLobby' : ActorMethod<[bigint], [] | [Lobby]>,
+  'getMatch' : ActorMethod<[bigint], [] | [Match]>,
+  'getMatchActions' : ActorMethod<[bigint], Array<PlayerAction>>,
   'getNewestListings' : ActorMethod<[bigint], Array<Listing>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'getWaitingLobbies' : ActorMethod<[], Array<Lobby>>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'joinLobby' : ActorMethod<[bigint], undefined>,
+  'leaveLobby' : ActorMethod<[bigint], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'searchFilterListings' : ActorMethod<
     [string, string, string, string, bigint, bigint],
     Array<Listing>
   >,
   'searchListingsByText' : ActorMethod<[string], Array<Listing>>,
+  'startMatch' : ActorMethod<[bigint], undefined>,
+  'submitAction' : ActorMethod<[bigint, string], undefined>,
   'updateListing' : ActorMethod<
     [bigint, string, string, bigint, string, string, string],
     undefined

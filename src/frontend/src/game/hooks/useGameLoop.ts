@@ -35,7 +35,8 @@ export function useGameLoop(
   onLaserFired?: () => void,
   onCowEaten?: () => void,
   onElimination?: () => void,
-  onTongueHiss?: () => void
+  onTongueHiss?: () => void,
+  beatPhase: number = 0
 ) {
   const centerX = Math.floor(GRID_WIDTH / 2);
   const centerY = Math.floor(GRID_HEIGHT / 2);
@@ -151,40 +152,45 @@ export function useGameLoop(
         starfieldRef.current.render(ctx);
       }
 
-      // Render game entities
+      // Render game entities with coordinated animation
       const renderer = toonRendererRef.current;
       if (renderer) {
-        // Obstacles
+        // Calculate interaction intensity for enhanced feedback
+        const hasLaser = state.lasers.length > 0;
+        const hasExplosion = state.explosions.length > 0;
+        const interactionBoost = (hasLaser ? 0.2 : 0) + (hasExplosion ? 0.3 : 0);
+        
+        // Obstacles with coordinated motion
         state.obstacles.forEach(obstacle => {
           if (obstacle.type === 'UFO') {
-            renderUFO(renderer, ctx, obstacle, currentTime);
+            renderUFO(renderer, ctx, obstacle, currentTime, beatPhase);
           } else if (obstacle.type === 'FLYING_COW') {
-            renderCow(renderer, ctx, obstacle);
+            renderCow(renderer, ctx, obstacle, beatPhase);
           } else if (obstacle.type === 'POINT_DROP') {
-            renderPointDrop(renderer, ctx, obstacle, currentTime);
+            renderPointDrop(renderer, ctx, obstacle, currentTime, beatPhase);
           } else if (obstacle.type === 'CROCODILE') {
             renderCrocodile(renderer, ctx, obstacle);
           }
         });
 
-        // Boss
+        // Boss with coordinated motion
         if (state.boss) {
-          renderPenguinBoss(renderer, ctx, state.boss);
+          renderPenguinBoss(renderer, ctx, state.boss, beatPhase);
         }
 
-        // Opponents
+        // Opponents with coordinated motion
         state.opponents.forEach(opponent => {
           if (opponent.isAlive) {
-            renderOpponentSnake(renderer, ctx, opponent, currentTime);
+            renderOpponentSnake(renderer, ctx, opponent, currentTime, beatPhase);
           }
         });
 
-        // Player snake
-        renderSnake(renderer, ctx, state.snake, currentTime, showTongue);
+        // Player snake with coordinated motion
+        renderSnake(renderer, ctx, state.snake, currentTime, showTongue, beatPhase);
 
-        // VFX
+        // VFX with enhanced feedback
         state.lasers.forEach(laser => {
-          renderLaser(renderer, ctx, laser, currentTime);
+          renderLaser(renderer, ctx, laser, currentTime, beatPhase);
         });
         state.explosions.forEach(explosion => {
           renderExplosion(renderer, ctx, explosion, currentTime);
@@ -201,7 +207,7 @@ export function useGameLoop(
 
     lastFrameTimeRef.current = performance.now();
     rafIdRef.current = requestAnimationFrame(loop);
-  }, [canvasRef, onTongueHiss]);
+  }, [canvasRef, onTongueHiss, beatPhase]);
 
   const stopLoop = useCallback(() => {
     if (rafIdRef.current !== null) {
@@ -260,7 +266,12 @@ export function useGameLoop(
     const ctx = canvas.getContext('2d');
     if (ctx) {
       starfieldRef.current = new StarfieldRenderer(logicalWidth, logicalHeight);
-      toonRendererRef.current = new ToonRenderer(ctx, { quality: 'high', brightness: 1.2 });
+      toonRendererRef.current = new ToonRenderer(ctx, { 
+        quality: 'high', 
+        brightness: 1.5,
+        contrast: 1.3,
+        saturation: 1.4,
+      });
     }
 
     // Handle resize
@@ -458,7 +469,7 @@ export function useGameLoop(
               amount: 10,
               createdAt: now,
               duration: 1000,
-              color: '#00ff88',
+              color: '#00ffaa',
             });
           } else if (obs.type === 'FLYING_COW') {
             scoreGain += POINTS_PER_COW;
@@ -469,7 +480,7 @@ export function useGameLoop(
               amount: POINTS_PER_COW,
               createdAt: now,
               duration: 1000,
-              color: '#ff00ff',
+              color: '#ff22ff',
             });
             if (onCowEaten) onCowEaten();
           } else if (obs.type === 'POINT_DROP') {
@@ -485,7 +496,7 @@ export function useGameLoop(
               amount: POINTS_PER_POINT_DROP,
               createdAt: now,
               duration: 1000,
-              color: '#ffff00',
+              color: '#ffff22',
             });
           }
           newObstacles.splice(i, 1);

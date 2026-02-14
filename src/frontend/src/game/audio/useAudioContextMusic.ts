@@ -11,11 +11,14 @@ interface MusicState {
   needsUnlock: boolean;
 }
 
+type IntensityState = 'danger' | 'attack' | 'pre-explosion' | 'normal';
+
 export function useAudioContextMusic(
   isPlaying: boolean,
   isMuted: boolean,
   intensity: number = 0.5,
-  beatPhase: number = 0
+  beatPhase: number = 0,
+  intensityState?: IntensityState
 ) {
   const stateRef = useRef<MusicState>({
     audioContext: null,
@@ -118,13 +121,23 @@ export function useAudioContextMusic(
     state.sourceNode = null;
   }, []);
 
-  // Update gain based on intensity and beat (not in render loop)
+  // Update gain based on intensity state and beat (not in render loop)
   useEffect(() => {
     const state = stateRef.current;
     if (!state.gainNode || !state.audioContext) return;
 
     const ctx = state.audioContext;
-    const baseVolume = 0.3;
+    let baseVolume = 0.3;
+
+    // Adjust base volume based on intensity state
+    if (intensityState === 'danger') {
+      baseVolume = 0.5;
+    } else if (intensityState === 'attack') {
+      baseVolume = 0.4;
+    } else if (intensityState === 'pre-explosion') {
+      baseVolume = 0.1; // Silence before explosion
+    }
+
     const intensityBoost = intensity * 0.3;
     const beatAccent = Math.abs(Math.sin(beatPhase * Math.PI)) * 0.1;
     
@@ -134,7 +147,7 @@ export function useAudioContextMusic(
       targetVolume,
       ctx.currentTime + 0.1
     );
-  }, [intensity, beatPhase, isMuted]);
+  }, [intensity, beatPhase, isMuted, intensityState]);
 
   // Initialize AudioContext and load buffer on mount
   useEffect(() => {

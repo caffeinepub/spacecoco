@@ -1,228 +1,202 @@
 import { useEffect, useRef } from 'react';
 
-interface NeonStartSceneProps {
-  className?: string;
+interface Sprite {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  type: 'ufo' | 'cow' | 'spark';
+  phase: number;
+  scale: number;
 }
 
-export function NeonStartScene({ className = '' }: NeonStartSceneProps) {
+/**
+ * @deprecated Legacy 2D canvas hero scene. The app now uses NeonSpaceBackground3D
+ * as a persistent 3D background layer. This component is kept for reference but
+ * should not be used in new code.
+ */
+export function NeonStartScene() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number>(0);
-  const ufoSpritesRef = useRef<HTMLImageElement | null>(null);
-  const cowLaserSpritesRef = useRef<HTMLImageElement | null>(null);
-  const bannerRef = useRef<HTMLImageElement | null>(null);
-  const sparkSpritesRef = useRef<HTMLImageElement | null>(null);
-
-  // UFO and cow animation state
-  const ufosRef = useRef<Array<{ x: number; y: number; speed: number; frame: number }>>([]);
-  const cowsRef = useRef<Array<{ x: number; y: number; laserFrame: number; laserTimer: number }>>([]);
-  const sparksRef = useRef<Array<{ x: number; y: number; vx: number; vy: number; life: number; maxLife: number }>>([]);
+  const spritesRef = useRef<Sprite[]>([]);
+  const rafRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const localCanvas = canvasRef.current;
+    if (!localCanvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const localCtx = localCanvas.getContext('2d');
+    if (!localCtx) return;
 
-    // Set canvas size
-    const updateSize = () => {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    };
-    updateSize();
-    window.addEventListener('resize', updateSize);
-
-    // Load sprites
-    const banner = new Image();
-    banner.src = '/assets/generated/spacecoco-menu-banner-neon.dim_2560x900.png';
-    bannerRef.current = banner;
-
-    const ufoSprites = new Image();
-    ufoSprites.src = '/assets/generated/spacecoco-menu-ufo-sprites.dim_1024x256.png';
-    ufoSpritesRef.current = ufoSprites;
-
-    const cowLaserSprites = new Image();
-    cowLaserSprites.src = '/assets/generated/spacecoco-menu-cow-laser-sprites.dim_1024x256.png';
-    cowLaserSpritesRef.current = cowLaserSprites;
-
-    const sparkSprites = new Image();
-    sparkSprites.src = '/assets/generated/spacecoco-neon-sparks-sprites.dim_512x512.png';
-    sparkSpritesRef.current = sparkSprites;
-
-    // Initialize UFOs
-    for (let i = 0; i < 3; i++) {
-      ufosRef.current.push({
-        x: Math.random() * canvas.width / window.devicePixelRatio,
-        y: Math.random() * 200 - 100,
-        speed: 0.5 + Math.random() * 1,
-        frame: Math.random() * 4,
+    // Initialize sprites
+    spritesRef.current = [];
+    for (let i = 0; i < 8; i++) {
+      spritesRef.current.push({
+        x: Math.random() * localCanvas.width,
+        y: Math.random() * localCanvas.height,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
+        type: Math.random() > 0.5 ? 'ufo' : 'cow',
+        phase: Math.random() * Math.PI * 2,
+        scale: 0.8 + Math.random() * 0.4,
       });
     }
 
-    // Initialize cows
-    for (let i = 0; i < 2; i++) {
-      cowsRef.current.push({
-        x: 100 + i * 300,
-        y: 150 + Math.random() * 100,
-        laserFrame: 0,
-        laserTimer: Math.random() * 100,
+    // Add sparks
+    for (let i = 0; i < 15; i++) {
+      spritesRef.current.push({
+        x: Math.random() * localCanvas.width,
+        y: Math.random() * localCanvas.height,
+        vx: (Math.random() - 0.5) * 3,
+        vy: (Math.random() - 0.5) * 3,
+        type: 'spark',
+        phase: Math.random() * Math.PI * 2,
+        scale: 0.5 + Math.random() * 0.5,
       });
     }
-
-    let lastTime = Date.now();
 
     const animate = () => {
+      if (!localCanvas || !localCtx) return;
+
       const now = Date.now();
-      const delta = now - lastTime;
-      lastTime = now;
+      const elapsed = now - startTimeRef.current;
 
-      const rect = canvas.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
+      // Vibrant space gradient background
+      const gradient = localCtx.createLinearGradient(0, 0, localCanvas.width, localCanvas.height);
+      gradient.addColorStop(0, '#001a33');
+      gradient.addColorStop(0.5, '#002244');
+      gradient.addColorStop(1, '#001a33');
+      localCtx.fillStyle = gradient;
+      localCtx.fillRect(0, 0, localCanvas.width, localCanvas.height);
 
-      // Clear with dark space background
-      ctx.fillStyle = '#0a0015';
-      ctx.fillRect(0, 0, w, h);
+      // Update and render sprites
+      spritesRef.current.forEach(sprite => {
+        // Update position
+        sprite.x += sprite.vx;
+        sprite.y += sprite.vy;
 
-      // Draw banner background with glow
-      const bannerImg = bannerRef.current;
-      if (bannerImg && bannerImg.complete) {
-        ctx.save();
-        ctx.globalAlpha = 0.6;
-        ctx.filter = 'blur(20px)';
-        ctx.drawImage(bannerImg, 0, 0, w, h);
-        ctx.filter = 'none';
-        ctx.globalAlpha = 0.9;
-        ctx.drawImage(bannerImg, 0, 0, w, h);
-        ctx.restore();
-      }
+        // Wrap around edges
+        if (sprite.x < -50) sprite.x = localCanvas.width + 50;
+        if (sprite.x > localCanvas.width + 50) sprite.x = -50;
+        if (sprite.y < -50) sprite.y = localCanvas.height + 50;
+        if (sprite.y > localCanvas.height + 50) sprite.y = -50;
 
-      // Update and draw UFOs
-      const ufoImg = ufoSpritesRef.current;
-      if (ufoImg && ufoImg.complete) {
-        ufosRef.current.forEach((ufo) => {
-          ufo.y += ufo.speed;
-          ufo.frame += 0.1;
+        // Coordinated pulsing animation
+        const beatPhase = (elapsed * 0.002) % 1.0;
+        const pulse = 1.0 + Math.sin((beatPhase + sprite.phase) * Math.PI * 2) * 0.15;
+        const size = 40 * sprite.scale * pulse;
 
-          if (ufo.y > h + 50) {
-            ufo.y = -50;
-            ufo.x = Math.random() * w;
-          }
+        localCtx.save();
+        localCtx.translate(sprite.x, sprite.y);
 
-          const frameIndex = Math.floor(ufo.frame) % 4;
-          const spriteSize = 256;
+        if (sprite.type === 'ufo') {
+          // Brighter UFO with enhanced glow
+          const glowSize = size * 2;
+          const glowGradient = localCtx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+          glowGradient.addColorStop(0, 'rgba(0, 238, 255, 0.4)');
+          glowGradient.addColorStop(0.5, 'rgba(255, 136, 0, 0.3)');
+          glowGradient.addColorStop(1, 'rgba(255, 136, 0, 0)');
+          localCtx.fillStyle = glowGradient;
+          localCtx.fillRect(-glowSize, -glowSize, glowSize * 2, glowSize * 2);
 
-          ctx.save();
-          // Glow effect
-          ctx.shadowColor = '#00ffff';
-          ctx.shadowBlur = 30;
-          ctx.drawImage(
-            ufoImg,
-            frameIndex * spriteSize,
-            0,
-            spriteSize,
-            spriteSize,
-            ufo.x - 40,
-            ufo.y - 40,
-            80,
-            80
-          );
-          ctx.restore();
-        });
-      }
+          // UFO body - brighter colors
+          localCtx.fillStyle = '#00eeff';
+          localCtx.shadowBlur = 20;
+          localCtx.shadowColor = '#00eeff';
+          localCtx.beginPath();
+          localCtx.ellipse(0, 0, size * 0.6, size * 0.3, 0, 0, Math.PI * 2);
+          localCtx.fill();
 
-      // Update and draw cows with eye lasers
-      const cowImg = cowLaserSpritesRef.current;
-      if (cowImg && cowImg.complete) {
-        cowsRef.current.forEach((cow) => {
-          cow.laserTimer += delta * 0.01;
+          // Dome
+          localCtx.fillStyle = '#88ffff';
+          localCtx.beginPath();
+          localCtx.arc(0, -size * 0.1, size * 0.3, 0, Math.PI, true);
+          localCtx.fill();
+
+          // Pulsing lights
+          const lightAlpha = 0.7 + Math.sin(beatPhase * Math.PI * 4) * 0.3;
+          localCtx.fillStyle = `rgba(255, 136, 0, ${lightAlpha})`;
+          localCtx.shadowBlur = 15;
+          localCtx.shadowColor = '#ff8800';
+          localCtx.beginPath();
+          localCtx.arc(-size * 0.3, 0, size * 0.08, 0, Math.PI * 2);
+          localCtx.fill();
+          localCtx.beginPath();
+          localCtx.arc(size * 0.3, 0, size * 0.08, 0, Math.PI * 2);
+          localCtx.fill();
+
+          localCtx.shadowBlur = 0;
+        } else if (sprite.type === 'cow') {
+          // Brighter cow with enhanced glow
+          const glowSize = size * 1.8;
+          const glowGradient = localCtx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+          glowGradient.addColorStop(0, 'rgba(255, 34, 255, 0.4)');
+          glowGradient.addColorStop(1, 'rgba(255, 34, 255, 0)');
+          localCtx.fillStyle = glowGradient;
+          localCtx.fillRect(-glowSize, -glowSize, glowSize * 2, glowSize * 2);
+
+          // Cow body - brighter magenta
+          localCtx.fillStyle = '#ff22ff';
+          localCtx.shadowBlur = 18;
+          localCtx.shadowColor = '#ff22ff';
+          localCtx.beginPath();
+          localCtx.ellipse(0, 0, size * 0.4, size * 0.3, 0, 0, Math.PI * 2);
+          localCtx.fill();
+
+          // Head
+          localCtx.fillStyle = '#ff55ff';
+          localCtx.beginPath();
+          localCtx.ellipse(-size * 0.35, -size * 0.1, size * 0.2, size * 0.18, 0, 0, Math.PI * 2);
+          localCtx.fill();
+
+          // Eye laser effect - brighter
+          const laserAlpha = 0.8 + Math.sin(beatPhase * Math.PI * 6) * 0.2;
+          localCtx.strokeStyle = `rgba(255, 0, 0, ${laserAlpha})`;
+          localCtx.lineWidth = 3;
+          localCtx.shadowBlur = 20;
+          localCtx.shadowColor = '#ff0000';
+          localCtx.beginPath();
+          localCtx.moveTo(-size * 0.4, -size * 0.12);
+          localCtx.lineTo(-size * 0.7, -size * 0.15);
+          localCtx.stroke();
+
+          localCtx.shadowBlur = 0;
+        } else if (sprite.type === 'spark') {
+          // Brighter sparks with enhanced glow
+          const sparkAlpha = 0.7 + Math.sin((beatPhase + sprite.phase) * Math.PI * 2) * 0.3;
           
-          if (cow.laserTimer > 100) {
-            cow.laserFrame = (cow.laserFrame + 1) % 4;
-            cow.laserTimer = 0;
+          localCtx.fillStyle = `rgba(255, 255, 100, ${sparkAlpha})`;
+          localCtx.shadowBlur = 15;
+          localCtx.shadowColor = '#ffff66';
+          localCtx.beginPath();
+          localCtx.arc(0, 0, size * 0.15, 0, Math.PI * 2);
+          localCtx.fill();
 
-            // Spawn sparks when laser fires
-            if (cow.laserFrame === 1) {
-              for (let i = 0; i < 5; i++) {
-                sparksRef.current.push({
-                  x: cow.x + 40,
-                  y: cow.y,
-                  vx: (Math.random() - 0.5) * 4,
-                  vy: (Math.random() - 0.5) * 4,
-                  life: 0,
-                  maxLife: 30 + Math.random() * 30,
-                });
-              }
-            }
+          // Spark rays
+          localCtx.strokeStyle = `rgba(255, 255, 200, ${sparkAlpha * 0.6})`;
+          localCtx.lineWidth = 2;
+          for (let i = 0; i < 4; i++) {
+            const angle = (i * Math.PI) / 2 + beatPhase * Math.PI * 2;
+            localCtx.beginPath();
+            localCtx.moveTo(0, 0);
+            localCtx.lineTo(Math.cos(angle) * size * 0.3, Math.sin(angle) * size * 0.3);
+            localCtx.stroke();
           }
 
-          const spriteSize = 256;
+          localCtx.shadowBlur = 0;
+        }
 
-          ctx.save();
-          // Glow effect
-          ctx.shadowColor = '#ff00ff';
-          ctx.shadowBlur = 25;
-          ctx.drawImage(
-            cowImg,
-            cow.laserFrame * spriteSize,
-            0,
-            spriteSize,
-            spriteSize,
-            cow.x - 40,
-            cow.y - 40,
-            80,
-            80
-          );
-          ctx.restore();
-        });
-      }
+        localCtx.restore();
+      });
 
-      // Update and draw sparks
-      const sparkImg = sparkSpritesRef.current;
-      if (sparkImg && sparkImg.complete) {
-        sparksRef.current = sparksRef.current.filter((spark) => {
-          spark.x += spark.vx;
-          spark.y += spark.vy;
-          spark.life += 1;
-
-          if (spark.life >= spark.maxLife) return false;
-
-          const alpha = 1 - spark.life / spark.maxLife;
-          const sparkSize = 128;
-          const frameIndex = Math.floor((spark.life / spark.maxLife) * 4) % 4;
-
-          ctx.save();
-          ctx.globalAlpha = alpha;
-          ctx.shadowColor = '#ffff00';
-          ctx.shadowBlur = 15;
-          ctx.drawImage(
-            sparkImg,
-            frameIndex * sparkSize,
-            0,
-            sparkSize,
-            sparkSize,
-            spark.x - 16,
-            spark.y - 16,
-            32,
-            32
-          );
-          ctx.restore();
-
-          return true;
-        });
-      }
-
-      animationFrameRef.current = requestAnimationFrame(animate);
+      rafRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener('resize', updateSize);
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
       }
     };
   }, []);
@@ -230,7 +204,9 @@ export function NeonStartScene({ className = '' }: NeonStartSceneProps) {
   return (
     <canvas
       ref={canvasRef}
-      className={`w-full h-full ${className}`}
+      width={1600}
+      height={600}
+      className="w-full h-full"
       style={{ display: 'block' }}
     />
   );

@@ -1,158 +1,434 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Play screen audio unlock, focus-safe 60fps loop, 4K-crisp DPR canvas, and upgraded toon silhouettes/textures",
+  "title": "Motor Snake 3D scaffold + async multiplayer UI + apocalyptic anomaly HUD theme (frontend-only)",
   "requirements": [
     {
-      "id": "REQ-48",
-      "summary": "Initialize AudioContext immediately on Play mount and unlock/start audio via user gesture on mobile while preserving mute toggle behavior.",
+      "id": "REQ-1",
+      "summary": "Restore reliable frontend build/runtime so '/', '/lobby', and '/play' render without exceptions.",
       "acceptanceCriteria": [
-        "When the Play screen mounts, an AudioContext is created (or prepared) immediately, but actual playback only starts after a user gesture if required by the platform/browser.",
-        "Toggling mute always silences music and SFX immediately and reliably, including on mobile where audio requires a user gesture to begin.",
-        "No audio-start logic is executed from a per-frame render loop; audio start/stop is triggered by lifecycle/state transitions (e.g., start/resume/pause/mute) rather than every frame."
+        "Running the standard build command(s) completes without errors.",
+        "Running canister deploy completes without errors.",
+        "The app loads in the browser and routes '/' '/lobby' '/play' render without runtime exceptions."
       ],
       "file_operations": [
+        {
+          "path": "frontend/src/components/background/NeonBackgroundLayer.tsx",
+          "operation": "modify",
+          "description": "Fix invalid module structure by moving the React import to the top-level import section and ensuring the ErrorBoundary file compiles cleanly; keep the WebGL fallback behavior intact."
+        },
+        {
+          "path": "frontend/src/pages/PlayPage.tsx",
+          "operation": "modify",
+          "description": "Remove dependency on the legacy 2D canvas loop for the default run-path and ensure Play renders the new Motor Snake 3D scaffold container without runtime errors."
+        },
+        {
+          "path": "frontend/src/game/hooks/useGameLoop.ts",
+          "operation": "modify",
+          "description": "Deprecate the legacy 2D loop from the primary Play run-path (keep it usable only if explicitly routed/selected); ensure it no longer blocks builds (types/imports remain valid)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Replace legacy snake gameplay with a new 3D Motor Snake scaffold organized into clear systems (world/physics/collisions/power-ups/ghost).",
+      "acceptanceCriteria": [
+        "The Play page runs the new 3D game scaffold (not the old 2D grid/canvas gameplay).",
+        "The new scaffold exposes clear modules/systems for world, physics/environment, collisions, power-ups, and ghost behavior (even if simplified).",
+        "No remnants of the prior gameplay loop are required for the new run-path (the old loop may remain only as unused/deprecated code)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "create",
+          "description": "Create the main 3D game root component that wires together the core systems (world, environment/physics, input, collisions/enemies, anomalies/power-ups, ghost) and exposes a single update loop suitable for a 3D game."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/state/gameState.ts",
+          "operation": "create",
+          "description": "Define shared state models for the Motor Snake 3D scaffold (player, tail segments, world mode, active effects, enemy/anomaly registries, ghost influence) to keep systems modular."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/WorldSystem.ts",
+          "operation": "create",
+          "description": "Implement the hollow-sphere world state + transitions as an isolated system module that can be driven by input/events."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/EnvironmentSystem.ts",
+          "operation": "create",
+          "description": "Implement environment/physics scaffolding (gravity cycle, wind bursts, fog intensity, acid rain) as a modular system with callable triggers."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
+          "operation": "create",
+          "description": "Implement collision/event orchestration scaffolding (enemy impacts, core break checks, hazard effects) with simplified placeholder detection rules."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/AnomalyPowerUpSystem.ts",
+          "operation": "create",
+          "description": "Implement the anomaly spawner and power-up acquisition/active-state scaffolding, separated from enemies and environment."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/GhostSystem.ts",
+          "operation": "create",
+          "description": "Implement a persistent ghost scaffold (spawn-on-death, follow behavior placeholder, influence meter, replacement mode) that persists across runs without page reload."
+        },
+        {
+          "path": "frontend/src/pages/PlayPage.tsx",
+          "operation": "modify",
+          "description": "Wire the Play page UI overlay (pause/mute/back) to render the new MotorSnakeGameRoot (3D game) instead of the legacy 2D canvas loop; keep graceful audio unlock behavior."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Implement a hollow spherical world with inside/outside traversal, a visible red core, and a core-break-to-abyss transition scaffold.",
+      "acceptanceCriteria": [
+        "The 3D scene renders a sphere world with an interior traversal mode.",
+        "A player-controlled snake can move along the interior surface without leaving the surface unintentionally.",
+        "A transition mechanism exists to move from inside to outside traversal (even if via a debug key/button).",
+        "A red core is visible at the center, and triggering 'core break' transitions to an abyss presentation and then returns the player back to normal gameplay state (via a deterministic rule)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/motorSnake3d/render/SphereWorld.tsx",
+          "operation": "create",
+          "description": "Create the 3D world renderer for the hollow sphere (interior/exterior presentation) and a central red core mesh; expose props for world mode and abyss presentation."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/WorldSystem.ts",
+          "operation": "modify",
+          "description": "Add inside-surface constraint + a deterministic inside/outside toggle mechanism (debug key/button support) and a placeholder 'core break' event that switches to an abyss state and returns/respawns."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/ui/DebugWorldControls.tsx",
+          "operation": "create",
+          "description": "Add a minimal debug UI overlay to toggle inside/outside traversal and trigger 'core break' for testing."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "modify",
+          "description": "Wire SphereWorld + DebugWorldControls into the game root so interior traversal, core visibility, and abyss transition are reachable during Play."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Add an environment/physics scaffold: gravity cycles, wind portals, fog distortion, and acid rain that melts tail unless shielded.",
+      "acceptanceCriteria": [
+        "A 5-second gravity cycle is observable in-game (HUD/debug readout is acceptable).",
+        "Wind portal events can be triggered/spawned and apply a radial force effect to the player snake.",
+        "Fog/distortion is visible and can be toggled/varied by environment intensity.",
+        "Acid rain events occur (or can be triggered) and remove tail segments when shield is inactive; with shield active, segments are not removed."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/motorSnake3d/systems/EnvironmentSystem.ts",
+          "operation": "modify",
+          "description": "Implement the 5-second gravity multiplier cycle (0x..3x), wind portal burst triggers (radial impulse), fog intensity signal, and acid rain events that request tail segment removal unless shield is active."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/ui/EnvironmentDebugPanel.tsx",
+          "operation": "create",
+          "description": "Add a lightweight HUD/debug panel to display current gravity multiplier and allow triggering wind portals, fog intensity changes, and acid rain for validation."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/TailSystem.ts",
+          "operation": "create",
+          "description": "Create a tail behavior module that can remove segments (acid rain) and accept impulses (wind/whip), keeping tail logic separate from input and world systems."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "modify",
+          "description": "Wire EnvironmentSystem + TailSystem + EnvironmentDebugPanel so gravity, wind, fog, and acid rain can be observed and affect the player scaffold."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Add analog joystick input for 3D control with smooth vs abrupt response differences and a brake-triggered tail whip scaffold.",
+      "acceptanceCriteria": [
+        "On touch devices, a virtual analog joystick is available; on desktop, a fallback control scheme exists (e.g., mouse/keys mapped to an analog vector).",
+        "Movement response differs between low vs high joystick acceleration (observable difference in turning stability and oscillation).",
+        "Triggering a brake/deceleration event causes a noticeable tail-coil/whip impulse effect on the snake (simplified physics is acceptable)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/motorSnake3d/input/useAnalogInput.ts",
+          "operation": "create",
+          "description": "Create an input hook that produces a normalized analog vector + acceleration/jerk signals, supporting both virtual joystick (touch) and desktop fallback mapping."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/input/VirtualJoystick.tsx",
+          "operation": "create",
+          "description": "Create a touch-friendly virtual joystick overlay component used on mobile to generate analog input. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
+          "operation": "create",
+          "description": "Implement the player movement scaffold on the sphere surface that uses analog input smoothing vs aggressive twisting behavior based on input acceleration; expose a brake/deceleration action."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/TailSystem.ts",
+          "operation": "modify",
+          "description": "Add tail reaction scaffolding for sudden head braking: tail coils and emits a whip-like impulse that can boost/perturb the player (simplified impulse model acceptable)."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "modify",
+          "description": "Wire VirtualJoystick + useAnalogInput into PlayerMotorSystem and ensure brake/whip behavior is reachable via UI/keyboard (desktop) and gesture/button (mobile)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Create enemy archetypes and collision-triggered event sequences for cow/UFO/penguin impacts, including baby attachments removable via shake.",
+      "acceptanceCriteria": [
+        "Each archetype exists as a spawnable entity in the world.",
+        "Colliding with each archetype triggers its respective event sequence (freeze dome + shards, fold pulse + teleport, fire ring + baby attachments).",
+        "Baby penguin attachments visibly reduce movement speed and can be removed via a deliberate 'shake' input/action."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/motorSnake3d/entities/enemies.ts",
+          "operation": "create",
+          "description": "Define the three enemy archetypes as spawnable entities (flying cow, UFO, kamikaze penguin) with placeholder geometry and IDs to support collision events."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/EnemySpawnerSystem.ts",
+          "operation": "create",
+          "description": "Create an enemy spawner scaffold that can spawn each archetype deterministically (debug-triggered) and optionally on timers."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
+          "operation": "modify",
+          "description": "Add collision outcomes for each archetype: freeze dome + shard projectiles, fold pulse + teleport-to-centerline position, fire ring + baby penguin attachments that slow movement until shaken off."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
+          "operation": "modify",
+          "description": "Add a deliberate 'shake' action (input gesture/key) that removes attached baby penguins and restores speed, to satisfy the attachment-removal mechanic."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/ui/DebugSpawnPanel.tsx",
+          "operation": "create",
+          "description": "Add debug UI to spawn each enemy archetype and visualize attachment counts and current slow factor for quick validation."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "modify",
+          "description": "Wire EnemySpawnerSystem + DebugSpawnPanel so each enemy can be spawned and collided with during Play."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Implement anomaly-spawned power-ups (black hole, shooting star, mirror) with observable active states and tradeoffs.",
+      "acceptanceCriteria": [
+        "Power-ups spawn via an 'anomaly spawner' system distinct from enemy spawning.",
+        "Each of the three power-ups can be acquired and has an observable active state with a duration and clear tradeoff.",
+        "Mirror power-up reverses the player’s view or controls for 2 seconds and makes collisions non-lethal/non-blocking during that window."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/motorSnake3d/entities/anomalies.ts",
+          "operation": "create",
+          "description": "Define anomaly entities and the three power-up types, keeping anomaly spawning separate from enemies and environment hazards."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/AnomalyPowerUpSystem.ts",
+          "operation": "modify",
+          "description": "Implement anomaly spawning and acquisition; add the three power-ups with duration + tradeoff scaffolds: black hole suction + self-risk timer, shooting star phasing + melt over time, mirror intangible + reversed view/controls for 2 seconds."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
+          "operation": "modify",
+          "description": "Respect Mirror power-up intangibility by making collisions non-blocking/non-lethal during its active window (scaffolded rules acceptable)."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/ui/PowerUpStatusHUD.tsx",
+          "operation": "create",
+          "description": "Add a HUD element showing active power-up, remaining duration, and the current tradeoff indicator (e.g., melt rate/self-suction warning)."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "modify",
+          "description": "Wire anomaly spawns and PowerUpStatusHUD into the Play run-path so power-ups can be tested during gameplay."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Add a persistent ghost scaffold that appears after death, speaks the required line, and can take over via an influence meter.",
+      "acceptanceCriteria": [
+        "Dying once causes a ghost to appear in later gameplay sessions without requiring a page reload.",
+        "The ghost speaks the required line in English as on-screen subtitle and/or audio.",
+        "A measurable ghost influence meter increases over time when the ghost is not countered; reaching the threshold triggers a 'replacement' mode with a noticeable gameplay change (e.g., increased speed) and UI label."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/motorSnake3d/systems/GhostSystem.ts",
+          "operation": "modify",
+          "description": "Implement persistent ghost state across runs within the same page session; on first death, enable ghost-follow behavior and drive an influence meter that can reach a replacement threshold."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/ui/GhostOverlayHUD.tsx",
+          "operation": "create",
+          "description": "Add a readable UI overlay showing ghost subtitle (including: \"You are not you anymore, it's me now\"), influence meter, and a clear 'REPLACED' indicator when replacement mode is active."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
+          "operation": "modify",
+          "description": "Apply a noticeable gameplay change in replacement mode (e.g., higher base speed/response) controlled by GhostSystem state."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "modify",
+          "description": "Wire GhostOverlayHUD into the Play overlay stack and ensure ghost state persists when restarting the run from the Play page without reloading."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Implement async (polling/event-synced) multiplayer UI flow for up to 10 players: create/join lobby, list participants, start match, and submit actions as ordered events.",
+      "acceptanceCriteria": [
+        "Lobby creation returns a join code/id and persists on the backend.",
+        "Players can join a lobby until it reaches 10 participants; the UI shows current participants and remaining slots.",
+        "A match can be started, and clients can submit actions as events that are stored and retrievable in order (polling-based).",
+        "No WebSocket or real-time assumptions are introduced; the game runs correctly under polling/event sync constraints."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/multiplayer/useLobby.ts",
+          "operation": "create",
+          "description": "Create a frontend hook wrapping backend actor calls for lobby lifecycle (create/join/leave/get) and match lifecycle (start/get) using polling for updates; ensure no real-time/WebSocket assumptions."
+        },
+        {
+          "path": "frontend/src/multiplayer/useMatchEvents.ts",
+          "operation": "create",
+          "description": "Create a polling-based hook for ordered action/event submission and retrieval (submit action + poll ordered actions) to support async/event-synced multiplayer."
+        },
+        {
+          "path": "frontend/src/pages/LobbyPage.tsx",
+          "operation": "modify",
+          "description": "Replace the 'Coming Soon' multiplayer UI with functional create/join flows using the multiplayer hooks; show participants and remaining slots up to 10; enable start match when ready. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/PlayPage.tsx",
+          "operation": "modify",
+          "description": "When launched in multiplayer mode, connect Play to the polling/event-synced match hooks and route local player actions into ordered event submissions (non-real-time), while continuing to run the 3D scaffold locally."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/multiplayer/MultiplayerBridge.ts",
+          "operation": "create",
+          "description": "Add a thin bridge module that translates Motor Snake 3D player actions into event strings for submission and applies polled events to placeholder remote player representations (non-real-time scaffold)."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "modify",
+          "description": "Wire MultiplayerBridge to accept incoming ordered events (polling) and render placeholder remote snakes/ghosts based on the event stream (scaffolded)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "summary": "Add a VFX + audio cue pipeline scaffold with callable triggers and adaptive electro-orchestral intensity states; handle mute/unlock gracefully.",
+      "acceptanceCriteria": [
+        "There are callable VFX triggers for: gravity shift, freeze dome, fold pulse teleport, fire ring, black hole, shooting star, mirror.",
+        "Music intensity responds to a gameplay intensity signal and supports at least: 'danger', 'attack', and 'pre-explosion silence' states (simplified mapping is acceptable).",
+        "Muting stops/avoids ongoing looped SFX and does not cause errors; audio unlock remains gesture-gated."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/motorSnake3d/vfx/VfxBus.ts",
+          "operation": "create",
+          "description": "Create a VFX trigger bus (event names + payload scaffold) that systems can call for gravity shift, freeze dome, fold pulse, fire ring, black hole, shooting star, and mirror."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/vfx/VfxLayer3D.tsx",
+          "operation": "create",
+          "description": "Create a 3D VFX layer that listens to VfxBus triggers and spawns placeholder particles/lights/screen-distortion hooks in the scene (simplified visuals acceptable)."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/audio/AudioDirector.ts",
+          "operation": "create",
+          "description": "Create an audio director that maps gameplay intensity + named triggers to the existing audio hooks (music intensity states: danger/attack/pre-explosion silence; SFX trigger points) and remains gesture-gated/unlocked by the Play page flow."
+        },
         {
           "path": "frontend/src/game/audio/useAudioContextMusic.ts",
           "operation": "modify",
-          "description": "Create/prepare the AudioContext at hook initialization time (on mount) and add explicit user-gesture unlock support (e.g., resume) so playback start is driven by Play lifecycle/state transitions rather than any frame loop."
-        },
-        {
-          "path": "frontend/src/game/audio/useAudioContextSfx.ts",
-          "operation": "modify",
-          "description": "Add an explicit ‘prepare/init’ API to create the AudioContext immediately (without playing), and ensure mute immediately stops/avoids starting any active oscillators/sources."
+          "description": "Extend the music hook (without breaking current callers) to support discrete intensity states (danger/attack/pre-explosion silence) in addition to numeric intensity; ensure mute remains safe and unlock is gesture-gated."
         },
         {
           "path": "frontend/src/pages/PlayPage.tsx",
           "operation": "modify",
-          "description": "Wire early audio preparation on Play mount and add a one-time user gesture handler (pointer/touch/keyboard) that unlocks audio contexts on mobile while keeping the existing mute toggle semantics intact."
+          "description": "Route Motor Snake 3D gameplay intensity and VFX trigger events into AudioDirector; keep existing mute toggle behavior and ensure looped audio stops cleanly when muted."
+        },
+        {
+          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "operation": "modify",
+          "description": "Wire VfxBus and VfxLayer3D so environment/collisions/power-ups can trigger scene VFX via a single pipeline."
         }
       ]
     },
     {
-      "id": "REQ-49",
-      "summary": "Run a single focus-safe RAF loop targeting 60fps and pause/resume cleanly on visibility/focus changes without duplicated loops or blank renders.",
+      "id": "REQ-11",
+      "summary": "Update UI copy across Home/Lobby/Play to match Motor Snake 3D (hollow sphere, anomalies, extreme physics) and ensure English-only user-facing text.",
       "acceptanceCriteria": [
-        "The Play screen runs updates/renders via requestAnimationFrame with a 60fps target (where the browser allows).",
-        "On document visibility change (hidden) and/or window blur, the game loop stops (no accumulating RAF callbacks), and on visibility/focus return it resumes cleanly.",
-        "After multiple hide/show cycles, there is still exactly one active RAF loop and gameplay continues from the same paused/unpaused state as intended (no speedup, no freeze, no blank canvas)."
+        "Home page hero/subtitle and feature cards do not mention the previous cow/UFO/laser-only loop as the primary premise; copy reflects the new mechanics at a high level.",
+        "Lobby multiplayer section references up to 10 players (not 8) and no longer shows 'Coming Soon' for the implemented lobby actions.",
+        "All modified/new user-visible strings are in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
+          "path": "frontend/src/pages/HomePage.tsx",
           "operation": "modify",
-          "description": "Refactor the RAF driver into explicit start/stop controls to guarantee exactly one active loop; add visibilitychange + blur/focus handling to stop the loop when hidden/unfocused and resume it safely (without spawning duplicate RAF callbacks), keeping state-consistent pause/resume behavior."
+          "description": "Rewrite hero/subtitle, features, and how-to-play copy to describe Motor Snake 3D (hollow sphere traversal, anomalies, extreme physics, ghost pressure) and remove contradictory legacy premises; keep all user-facing text in English."
+        },
+        {
+          "path": "frontend/src/pages/LobbyPage.tsx",
+          "operation": "modify",
+          "description": "Update multiplayer text to 'up to 10 players' and remove 'Coming Soon' phrasing in favor of the implemented create/join/start flow; keep all user-facing text in English. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/pages/PlayPage.tsx",
           "operation": "modify",
-          "description": "Ensure Play UI pause/resume controls integrate with the updated loop start/stop behavior (no duplicated loops across pause and focus cycles) and that a render occurs after resume to avoid any perceived blank canvas."
+          "description": "Update Play overlays (mode labels, instructions panel) to reflect 3D joystick control, sphere traversal, anomalies/power-ups, and ghost influence; keep all user-facing text in English."
+        },
+        {
+          "path": "frontend/src/game/ui/ControlsHintOverlay.tsx",
+          "operation": "modify",
+          "description": "Update the controls hint overlay text to reflect analog joystick + brake/shake actions and desktop fallback mapping (English only). Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-50",
-      "summary": "Implement DPR-scaled (clamped) canvas backing resolution for crisp 4K/high-DPI rendering and apply correct image smoothing for toon primitives vs bitmap textures/sprites.",
+      "id": "REQ-12",
+      "summary": "Adopt a cohesive apocalyptic-anomaly UI theme (HUD/menus/lobby) with readable overlays and no blue/purple primary palette.",
       "acceptanceCriteria": [
-        "On high-DPI displays, the canvas backing resolution scales with devicePixelRatio (with an upper clamp so performance stays stable), while CSS size remains consistent.",
-        "Toon/vector-style primitives remain smooth (no jagged edges) at high DPI.",
-        "If any bitmap textures/sprite images are rendered, the appropriate image smoothing setting is applied so they are not blurred unintentionally.",
-        "The visual result is measurably sharper than a non-DPR-scaled canvas (text and outlines are crisp, no ‘soft’ look)."
+        "A single coherent theme is applied across Lobby/Play/HUD (colors, typography usage, panels).",
+        "Primary palette is not blue/purple; readability over the 3D scene is maintained (sufficient contrast for body text and buttons)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/render/canvasDpr.ts",
-          "operation": "create",
-          "description": "Add a small utility to size the canvas backing store using devicePixelRatio with a clamp (e.g., max 2), keep CSS size stable, and provide a consistent drawing transform/setup for crisp high-DPI rendering."
-        },
-        {
-          "path": "frontend/src/pages/PlayPage.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Apply DPR-aware canvas sizing on mount and on resize using the new canvas DPR utility so the displayed size stays consistent while the backing resolution is scaled/clamped for crisp 4K rendering."
+          "description": "Replace the current purple/blue-primary neon tokens with an apocalyptic-anomaly palette (e.g., ash/charcoal base, ember/orange primary, acid-green accent) while preserving contrast and readability over the 3D scene."
         },
         {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
+          "path": "frontend/tailwind.config.js",
           "operation": "modify",
-          "description": "Update draw initialization to respect DPR-scaled canvas sizing (logical vs backing dimensions) so the starfield and toon renderer render sharply and consistently after resizes."
+          "description": "Adjust extended theme/shadow tokens to match the new palette (remove purple-forward neon shadow defaults); keep typography and animation utilities intact."
         },
         {
-          "path": "frontend/src/game/render/toonRenderer.ts",
+          "path": "frontend/src/pages/LobbyPage.tsx",
           "operation": "modify",
-          "description": "Ensure toon/vector primitives keep high-quality smoothing enabled by default, and provide a safe way for callers to temporarily toggle smoothing when drawing bitmap/pixel assets as needed."
+          "description": "Align Lobby panels/buttons to the new theme (readable translucent panels, ember/acid accents) and ensure consistent styling with Play HUD. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/game/render/sprites.ts",
+          "path": "frontend/src/game/ui/GameHUD.tsx",
           "operation": "modify",
-          "description": "When drawing any legacy bitmap sprites, temporarily set canvas image smoothing appropriately (typically disabled for pixel art) to prevent unintended blur on high-DPI canvases."
-        }
-      ]
-    },
-    {
-      "id": "REQ-51",
-      "summary": "Upgrade penguin boss, UFO, and alien/pilot visuals to readable silhouettes with clear toon details while preserving existing renderer style and gameplay.",
-      "acceptanceCriteria": [
-        "Penguin boss rendering is updated so it reads clearly as a penguin (distinct head/body separation, beak/eyes/flippers silhouette cues) rather than a single circle entity.",
-        "UFO rendering is updated so it reads clearly as a spacecraft (distinct hull/dome/lights cues) rather than a plain ellipse, while preserving the existing glow treatment and drift motion.",
-        "Alien presence is represented visually (e.g., an alien pilot visible in/near the UFO or as a distinct rendered feature) using original artwork (no third-party copyrighted characters).",
-        "Entities remain readable over the starfield and VFX; silhouettes are recognizable at typical gameplay zoom.",
-        "All user-facing UI text remains in English (no new Spanish UI text introduced)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/render/obstacles.ts",
-          "operation": "modify",
-          "description": "Replace the current generic UFO and penguin boss drawing with clearer multi-part silhouettes (hull+dome+lights for UFO; head/body/beak/eyes/flippers cues for penguin) while preserving existing glow treatment, drift motion, and gameplay hit rules."
-        },
-        {
-          "path": "frontend/src/game/render/toonMaterials.ts",
-          "operation": "modify",
-          "description": "Extend toon texture accessors/material definitions to support UFO decals/emissive accents and an alien pilot visual element used by the improved UFO rendering, with safe null fallbacks."
-        },
-        {
-          "path": "frontend/src/game/render/toonRenderer.ts",
-          "operation": "modify",
-          "description": "Add/adjust renderer helpers as needed to support drawing layered toon shapes plus optional texture overlays (e.g., decals/pilot) while keeping the overall Spacecoco toon style consistent."
-        }
-      ]
-    },
-    {
-      "id": "REQ-52",
-      "summary": "Add new 4K toon textures and wire them into the existing toon texture loader/rendering pipeline with resilient fallbacks (no blank screen if load fails).",
-      "acceptanceCriteria": [
-        "New/updated textures are added under frontend/public/assets/generated and load successfully via the existing texture loader paths used at runtime.",
-        "If textures fail to load, the game still renders (fallback rendering remains functional) and the Play screen is never fully blank.",
-        "No backend image serving is introduced; all new art is shipped as static frontend assets."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/assets/generated/ufo-toon-albedo-v2.dim_4096x4096.png",
-          "operation": "create",
-          "description": "Add the generated toon UFO exterior albedo texture asset at frontend/public/assets/generated/ufo-toon-albedo-v2.dim_4096x4096.png and ensure it is included in the build output."
-        },
-        {
-          "path": "frontend/public/assets/generated/penguin-toon-albedo-v2.dim_4096x4096.png",
-          "operation": "create",
-          "description": "Add the generated toon penguin boss albedo texture asset at frontend/public/assets/generated/penguin-toon-albedo-v2.dim_4096x4096.png and ensure it is included in the build output."
-        },
-        {
-          "path": "frontend/public/assets/generated/alien-pilot-toon-albedo.dim_4096x4096.png",
-          "operation": "create",
-          "description": "Add the generated toon alien pilot texture asset at frontend/public/assets/generated/alien-pilot-toon-albedo.dim_4096x4096.png and ensure it is included in the build output."
-        },
-        {
-          "path": "frontend/public/assets/generated/ufo-decals-emissive.dim_2048x2048.png",
-          "operation": "create",
-          "description": "Add the generated toon emissive decal sheet asset at frontend/public/assets/generated/ufo-decals-emissive.dim_2048x2048.png and ensure it is included in the build output."
-        },
-        {
-          "path": "frontend/src/game/render/toonMaterials.ts",
-          "operation": "modify",
-          "description": "Update the toon texture loader to load the new assets from frontend/public/assets/generated/ufo-toon-albedo-v2.dim_4096x4096.png, frontend/public/assets/generated/penguin-toon-albedo-v2.dim_4096x4096.png, frontend/public/assets/generated/alien-pilot-toon-albedo.dim_4096x4096.png, and frontend/public/assets/generated/ufo-decals-emissive.dim_2048x2048.png; keep robust error handling so rendering falls back to shape-only drawing if any texture fails."
-        },
-        {
-          "path": "frontend/src/game/render/obstacles.ts",
-          "operation": "modify",
-          "description": "Wire the new textures into the UFO/penguin rendering paths (using safe null checks and existing shape fallbacks) so the Play screen never becomes blank if assets fail to load."
+          "description": "Update HUD colors/badges to align with the new apocalyptic-anomaly palette and keep text readable over the 3D scene. Verify the component's usage instructions before implementing."
         }
       ]
     }

@@ -25,7 +25,32 @@ export const Listing = IDL.Record({
   'location' : IDL.Text,
   'condition' : IDL.Text,
 });
+export const LobbyStatus = IDL.Variant({
+  'finished' : IDL.Null,
+  'waiting' : IDL.Null,
+  'inProgress' : IDL.Null,
+});
+export const Lobby = IDL.Record({
+  'id' : IDL.Nat,
+  'status' : LobbyStatus,
+  'creator' : IDL.Principal,
+  'createdAt' : Time,
+  'players' : IDL.Vec(IDL.Principal),
+  'maxPlayers' : IDL.Nat,
+});
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const PlayerAction = IDL.Record({
+  'action' : IDL.Text,
+  'player' : IDL.Principal,
+  'timestamp' : Time,
+  'sequenceNumber' : IDL.Nat,
+});
+export const Match = IDL.Record({
+  'startedAt' : Time,
+  'actions' : IDL.Vec(PlayerAction),
+  'players' : IDL.Vec(IDL.Principal),
+  'lobbyId' : IDL.Nat,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -35,6 +60,7 @@ export const idlService = IDL.Service({
       [IDL.Nat],
       [],
     ),
+  'createLobby' : IDL.Func([IDL.Nat], [IDL.Nat], []),
   'deleteListing' : IDL.Func([IDL.Nat], [], []),
   'filterListingsByCategory' : IDL.Func(
       [IDL.Text],
@@ -69,6 +95,7 @@ export const idlService = IDL.Service({
   'getAllCategories' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
   'getAllConditions' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
   'getAllListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+  'getAllLobbies' : IDL.Func([], [IDL.Vec(Lobby)], ['query']),
   'getAllLocations' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -84,13 +111,19 @@ export const idlService = IDL.Service({
       [IDL.Vec(Listing)],
       ['query'],
     ),
+  'getLobby' : IDL.Func([IDL.Nat], [IDL.Opt(Lobby)], ['query']),
+  'getMatch' : IDL.Func([IDL.Nat], [IDL.Opt(Match)], ['query']),
+  'getMatchActions' : IDL.Func([IDL.Nat], [IDL.Vec(PlayerAction)], ['query']),
   'getNewestListings' : IDL.Func([IDL.Nat], [IDL.Vec(Listing)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'getWaitingLobbies' : IDL.Func([], [IDL.Vec(Lobby)], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'joinLobby' : IDL.Func([IDL.Nat], [], []),
+  'leaveLobby' : IDL.Func([IDL.Nat], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'searchFilterListings' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Nat],
@@ -98,6 +131,8 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'searchListingsByText' : IDL.Func([IDL.Text], [IDL.Vec(Listing)], ['query']),
+  'startMatch' : IDL.Func([IDL.Nat], [], []),
+  'submitAction' : IDL.Func([IDL.Nat, IDL.Text], [], []),
   'updateListing' : IDL.Func(
       [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
       [],
@@ -125,7 +160,32 @@ export const idlFactory = ({ IDL }) => {
     'location' : IDL.Text,
     'condition' : IDL.Text,
   });
+  const LobbyStatus = IDL.Variant({
+    'finished' : IDL.Null,
+    'waiting' : IDL.Null,
+    'inProgress' : IDL.Null,
+  });
+  const Lobby = IDL.Record({
+    'id' : IDL.Nat,
+    'status' : LobbyStatus,
+    'creator' : IDL.Principal,
+    'createdAt' : Time,
+    'players' : IDL.Vec(IDL.Principal),
+    'maxPlayers' : IDL.Nat,
+  });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const PlayerAction = IDL.Record({
+    'action' : IDL.Text,
+    'player' : IDL.Principal,
+    'timestamp' : Time,
+    'sequenceNumber' : IDL.Nat,
+  });
+  const Match = IDL.Record({
+    'startedAt' : Time,
+    'actions' : IDL.Vec(PlayerAction),
+    'players' : IDL.Vec(IDL.Principal),
+    'lobbyId' : IDL.Nat,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -135,6 +195,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         [],
       ),
+    'createLobby' : IDL.Func([IDL.Nat], [IDL.Nat], []),
     'deleteListing' : IDL.Func([IDL.Nat], [], []),
     'filterListingsByCategory' : IDL.Func(
         [IDL.Text],
@@ -169,6 +230,7 @@ export const idlFactory = ({ IDL }) => {
     'getAllCategories' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'getAllConditions' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'getAllListings' : IDL.Func([], [IDL.Vec(Listing)], ['query']),
+    'getAllLobbies' : IDL.Func([], [IDL.Vec(Lobby)], ['query']),
     'getAllLocations' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
@@ -184,13 +246,19 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Listing)],
         ['query'],
       ),
+    'getLobby' : IDL.Func([IDL.Nat], [IDL.Opt(Lobby)], ['query']),
+    'getMatch' : IDL.Func([IDL.Nat], [IDL.Opt(Match)], ['query']),
+    'getMatchActions' : IDL.Func([IDL.Nat], [IDL.Vec(PlayerAction)], ['query']),
     'getNewestListings' : IDL.Func([IDL.Nat], [IDL.Vec(Listing)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'getWaitingLobbies' : IDL.Func([], [IDL.Vec(Lobby)], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'joinLobby' : IDL.Func([IDL.Nat], [], []),
+    'leaveLobby' : IDL.Func([IDL.Nat], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'searchFilterListings' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat, IDL.Nat],
@@ -202,6 +270,8 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Listing)],
         ['query'],
       ),
+    'startMatch' : IDL.Func([IDL.Nat], [], []),
+    'submitAction' : IDL.Func([IDL.Nat, IDL.Text], [], []),
     'updateListing' : IDL.Func(
         [IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, IDL.Text, IDL.Text, IDL.Text],
         [],

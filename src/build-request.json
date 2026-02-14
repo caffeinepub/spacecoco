@@ -1,147 +1,249 @@
 {
   "kind": "build_request",
-  "title": "Implement immediate AudioContext init, 60fps focus-safe loop, crisp 4K canvas rendering, and non-generic character silhouettes",
-  "priority": "normal",
+  "title": "Replace prior gameplay with new Motor Snake 3D structure + fix deployment and add async multiplayer (up to 10)",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-48",
-      "text": "Initialize WebAudio (AudioContext) at the earliest possible time in the Play screen lifecycle and ensure audio playback is started from a user gesture on mobile without breaking the existing mute toggle behavior.",
-      "target": "frontend",
+      "id": "REQ-1",
+      "text": "Fix the previous deployment failure so the project builds and deploys successfully again (local build + canister deploy). Identify the root cause and apply the minimal code/config change needed to restore reliable deployments.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-6"
+          "msg-1",
+          "msg-12"
         ],
         "quotes": [
-          "AudioContext ON desde el primer frame.\n...Y si es móvil, userGestureRequired = true;—que no se coma el mute.",
-          "si aslo ya"
+          "🙏 Encountered a deployment error",
+          "arregla errores del anterior"
         ]
       },
       "acceptanceCriteria": [
-        "When the Play screen mounts, an AudioContext is created (or prepared) immediately, but actual playback only starts after a user gesture if required by the platform/browser.",
-        "Toggling mute always silences music and SFX immediately and reliably, including on mobile where audio requires a user gesture to begin.",
-        "No audio-start logic is executed from a per-frame render loop; audio start/stop is triggered by lifecycle/state transitions (e.g., start/resume/pause/mute) rather than every frame."
+        "Running the standard build command(s) completes without errors.",
+        "Running canister deploy completes without errors.",
+        "The app loads in the browser and routes '/' '/lobby' '/play' render without runtime exceptions."
       ]
     },
     {
-      "id": "REQ-49",
-      "text": "Enforce a stable 60fps game loop target and add focus/visibility handling so the game loop is paused/stopped when the tab/app loses focus and is resumed when focus returns, without causing blank renders or duplicated loops.",
+      "id": "REQ-2",
+      "text": "Replace the existing snake game mechanics with a new 'Motor Snake 3D' foundation that supports: extreme physics, a hollow spherical world (inside/outside traversal), anomaly-based power-ups, reactive tail behavior, enemy collision events, and a persistent ghost concept. This should be delivered as a playable/inspectable scaffold (systems wired together with placeholder tuning) rather than a fully balanced game.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-6"
+          "msg-2",
+          "msg-14",
+          "msg-15"
         ],
         "quotes": [
-          "Todo en 60fps:\nframeRate(60); y si se cae, noLoop() y loop() cuando vuelva el foco.",
-          "si aslo ya"
+          "cambia la mecánica completamente a lo que te dije",
+          "si empieza con la estructura nueva",
+          "ya comienza"
         ]
       },
       "acceptanceCriteria": [
-        "The Play screen runs updates/renders via requestAnimationFrame with a 60fps target (where the browser allows).",
-        "On document visibility change (hidden) and/or window blur, the game loop stops (no accumulating RAF callbacks), and on visibility/focus return it resumes cleanly.",
-        "After multiple hide/show cycles, there is still exactly one active RAF loop and gameplay continues from the same paused/unpaused state as intended (no speedup, no freeze, no blank canvas)."
+        "The Play page runs the new 3D game scaffold (not the old 2D grid/canvas gameplay).",
+        "The new scaffold exposes clear modules/systems for world, physics/environment, collisions, power-ups, and ghost behavior (even if simplified).",
+        "No remnants of the prior gameplay loop are required for the new run-path (the old loop may remain only as unused/deprecated code)."
       ]
     },
     {
-      "id": "REQ-50",
-      "text": "Make Play screen canvas rendering crisp on high-DPI and 4K displays by rendering at devicePixelRatio-scaled resolution (clamped to a reasonable maximum such as 2) and applying correct image smoothing settings for vector/toon rendering vs any bitmap textures/sprites used.",
+      "id": "REQ-3",
+      "text": "Implement a hollow spherical world foundation: player movement constrained to the inside surface of a sphere, with the ability to transition to the exterior surface. Include a red core object at the center and a placeholder 'core break' event that transitions to an 'abyss' state (e.g., distinct environment/lighting and a return/respawn mechanic).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-6"
+          "msg-2"
         ],
         "quotes": [
-          "Se mira para chingado:\npixelDensity(2); si es 4K.\nimageMode(CENTER); smooth();\nSi usas loadImage(), pon noSmooth()—si no, se ve borroso.",
-          "si aslo ya"
+          "El mundo no es plano: es una esfera hueca. Puedes rodar por dentro, salir al exterior... Y si rompes el núcleo —un punto rojo en el centro—, el planeta se parte, y caes a un abismo..."
         ]
       },
       "acceptanceCriteria": [
-        "On high-DPI displays, the canvas backing resolution scales with devicePixelRatio (with an upper clamp so performance stays stable), while CSS size remains consistent.",
-        "Toon/vector-style primitives remain smooth (no jagged edges) at high DPI.",
-        "If any bitmap textures/sprite images are rendered, the appropriate image smoothing setting is applied so they are not blurred unintentionally.",
-        "The visual result is measurably sharper than a non-DPR-scaled canvas (text and outlines are crisp, no ‘soft’ look)."
+        "The 3D scene renders a sphere world with an interior traversal mode.",
+        "A player-controlled snake can move along the interior surface without leaving the surface unintentionally.",
+        "A transition mechanism exists to move from inside to outside traversal (even if via a debug key/button).",
+        "A red core is visible at the center, and triggering 'core break' transitions to an abyss presentation and then returns the player back to normal gameplay state (via a deterministic rule)."
       ]
     },
     {
-      "id": "REQ-51",
-      "text": "Replace overly-generic ‘circle/blob’ visuals for key entities (Penguin boss, UFO, aliens/pilots) with clearer silhouettes and readable character details while keeping the existing Spacecoco toon renderer style and gameplay rules intact.",
+      "id": "REQ-4",
+      "text": "Add an environment/physics system scaffold that supports time-varying gravity (fluctuates every 5 seconds between 0x and 3x), radial wind bursts from invisible portals, fog that distorts perception, and acid rain that can remove tail segments unless a shield is active.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-6"
+          "msg-2"
         ],
         "quotes": [
-          "no quiero que se miren círculos y bolas arriba de otra bola, quiero que se mire, que se distinga que son pingüinos, que se distingue que son alienígenas, que es una nave espacial volando a un lado con rayos láseres",
-          "si aslo ya"
+          "gravedad que fluctúa cada cinco segundos entre cero y triple, viento radial que sale de portales invisibles, lluvia ácida que derrite segmentos de cola si no tienes escudo, niebla que distorsiona la vista"
         ]
       },
       "acceptanceCriteria": [
-        "Penguin boss rendering is updated so it reads clearly as a penguin (distinct head/body separation, beak/eyes/flippers silhouette cues) rather than a single circle entity.",
-        "UFO rendering is updated so it reads clearly as a spacecraft (distinct hull/dome/lights cues) rather than a plain ellipse, while preserving the existing glow treatment and drift motion.",
-        "Alien presence is represented visually (e.g., an alien pilot visible in/near the UFO or as a distinct rendered feature) using original artwork (no third-party copyrighted characters).",
-        "Entities remain readable over the starfield and VFX; silhouettes are recognizable at typical gameplay zoom.",
-        "All user-facing UI text remains in English (no new Spanish UI text introduced)."
+        "A 5-second gravity cycle is observable in-game (HUD/debug readout is acceptable).",
+        "Wind portal events can be triggered/spawned and apply a radial force effect to the player snake.",
+        "Fog/distortion is visible and can be toggled/varied by environment intensity.",
+        "Acid rain events occur (or can be triggered) and remove tail segments when shield is inactive; with shield active, segments are not removed."
       ]
     },
     {
-      "id": "REQ-52",
-      "text": "Generate and include new high-detail toon textures needed to support the improved, non-generic entity silhouettes, place them under frontend/public/assets/generated, and wire them into the existing toon texture loader/rendering pipeline.",
+      "id": "REQ-5",
+      "text": "Implement analog joystick input for controlling the snake in 3D. Smooth input should result in stable, elegant motion; abrupt input should produce more aggressive twisting/spring-like movement. Include a tail reaction scaffold where sudden head braking causes the tail to coil and impart a whip-like impulse.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-6"
+          "msg-2"
         ],
         "quotes": [
-          "Quiero que se mire... que se distinga que son pingüinos... alienígenas... una nave espacial... con rayos láseres",
-          "si aslo ya"
+          "El jugador usa joystick analógico... cuanto más suave mueves... cuanto más brusco... La cola no solo sigue, reacciona: si la cabeza frena, la cola se enrolla y te lanza como látigo."
         ]
       },
       "acceptanceCriteria": [
-        "New/updated textures are added under frontend/public/assets/generated and load successfully via the existing texture loader paths used at runtime.",
-        "If textures fail to load, the game still renders (fallback rendering remains functional) and the Play screen is never fully blank.",
-        "No backend image serving is introduced; all new art is shipped as static frontend assets."
+        "On touch devices, a virtual analog joystick is available; on desktop, a fallback control scheme exists (e.g., mouse/keys mapped to an analog vector).",
+        "Movement response differs between low vs high joystick acceleration (observable difference in turning stability and oscillation).",
+        "Triggering a brake/deceleration event causes a noticeable tail-coil/whip impulse effect on the snake (simplified physics is acceptable)."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Create an enemy/collision event framework with three enemy archetypes and their signature collision outcomes: (1) Flying cow impact creates a white freeze dome (10m radius) that freezes entities temporarily and spawns floating shards that become projectiles; (2) UFO impact triggers a 'map fold' pulse that teleports the player to the sphere centerline/defined center position and leaves spark trails; (3) Kamikaze penguin impact creates a ring of fire and spawns baby penguins that attach to the tail and slow the player until shaken off.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Colisiones son arte: vaca voladora... domo blanco que congela... cristales... Ovni... mapa se pliegue... teletransportándote... Pingüino kamikaze... anillo de fuego... pingüinos bebés... se pegan a tu cola, ralentizándote hasta que los sacudas."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each archetype exists as a spawnable entity in the world.",
+        "Colliding with each archetype triggers its respective event sequence (freeze dome + shards, fold pulse + teleport, fire ring + baby attachments).",
+        "Baby penguin attachments visibly reduce movement speed and can be removed via a deliberate 'shake' input/action."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Create an anomaly-based power-up framework where power-ups spawn as anomalies (not standard drops) and implement three power-ups: (1) Mini black hole: grants enemy suction at distance but has a self-suction risk if held too long; (2) Shooting star: sets the snake on fire, phases through obstacles/enemies, burns enemies, but shortens/melts the snake over time; (3) Mirror: makes the snake intangible for 2 seconds and reverses the player’s view/controls during that duration.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Power-ups: no caen, aparecen como anomalías... agujero negro... estrella fugaz... espejo... intangible dos segundos, pero ves todo al revés."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Power-ups spawn via an 'anomaly spawner' system distinct from enemy spawning.",
+        "Each of the three power-ups can be acquired and has an observable active state with a duration and clear tradeoff.",
+        "Mirror power-up reverses the player’s view or controls for 2 seconds and makes collisions non-lethal/non-blocking during that window."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Add a persistent 'ghost' system scaffold: upon player death, spawn a ghost version that follows the player in subsequent runs and delivers the voice line: \"You are not you anymore, it's me now\". Include a growth/pressure mechanic where ignoring the ghost increases its influence, culminating in a placeholder 'replacement' state (e.g., ghost takes over visual identity and has higher speed) with clear UI indication.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Y el fantasma: cada vez que mueres... te habla. \"Ya no eres tú, soy yo ahora\", y si lo dejas crecer, te reemplaza por completo..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Dying once causes a ghost to appear in later gameplay sessions without requiring a page reload.",
+        "The ghost speaks the required line in English as on-screen subtitle and/or audio.",
+        "A measurable ghost influence meter increases over time when the ghost is not countered; reaching the threshold triggers a 'replacement' mode with a noticeable gameplay change (e.g., increased speed) and UI label."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Implement async/event-synced multiplayer scaffolding for up to 10 players (non-real-time). Add backend support for creating/joining a lobby, listing lobby participants, starting a match, and submitting player input/actions as ordered events. Update the Lobby page UI to enable creating and joining lobbies, showing player count up to 10, and starting the match when ready.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-6",
+          "msg-9",
+          "msg-12"
+        ],
+        "quotes": [
+          "si multijugados de asta 10 personas",
+          "Modo multijugador: hasta cuatro serpientes",
+          "si empieza con la estructura nueva"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Lobby creation returns a join code/id and persists on the backend.",
+        "Players can join a lobby until it reaches 10 participants; the UI shows current participants and remaining slots.",
+        "A match can be started, and clients can submit actions as events that are stored and retrievable in order (polling-based).",
+        "No WebSocket or real-time assumptions are introduced; the game runs correctly under polling/event sync constraints."
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Add a VFX + audio cue pipeline scaffold for the new mechanics: particles/lights/screen distortion hooks that can be triggered by the environment system, collisions, and power-ups; and adaptive electro-orchestral music intensity changes (e.g., strings on danger, bass on attack, silence before an explosion). Use existing audio hooks where possible and ensure graceful behavior when audio is locked/muted.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Todo visual: cada efecto tiene su partícula, su sonido, su luz. La pantalla parpadea, se distorsiona... La música es orquesta electrónica... silencio absoluto antes de una explosión."
+        ]
+      },
+      "acceptanceCriteria": [
+        "There are callable VFX triggers for: gravity shift, freeze dome, fold pulse teleport, fire ring, black hole, shooting star, mirror.",
+        "Music intensity responds to a gameplay intensity signal and supports at least: 'danger', 'attack', and 'pre-explosion silence' states (simplified mapping is acceptable).",
+        "Muting stops/avoids ongoing looped SFX and does not cause errors; audio unlock remains gesture-gated."
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Update user-facing UI copy across the Home/Lobby/Play flow to reflect the new Motor Snake 3D experience (extreme physics, hollow sphere, anomalies), removing references that contradict the new mechanics. Ensure all user-facing text is in English.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-0"
+        ],
+        "quotes": [
+          "Use English for any user-facing text in the build request."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Home page hero/subtitle and feature cards do not mention the previous cow/UFO/laser-only loop as the primary premise; copy reflects the new mechanics at a high level.",
+        "Lobby multiplayer section references up to 10 players (not 8) and no longer shows 'Coming Soon' for the implemented lobby actions.",
+        "All modified/new user-visible strings are in English."
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Adopt a consistent, distinctive visual theme for the new Motor Snake 3D UI overlay (HUD, menus, lobby) that matches the new 'apocalyptic anomaly' tone while keeping text readable over the 3D scene. Avoid blue/purple as the primary palette.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Esto no es un juego... Esto es una experiencia..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A single coherent theme is applied across Lobby/Play/HUD (colors, typography usage, panels).",
+        "Primary palette is not blue/purple; readability over the 3D scene is maintained (sufficient contrast for body text and buttons)."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/immutablePaths (e.g., frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
-    "Keep all user-facing UI text in English.",
-    "Do not introduce third-party copyrighted characters or assets (e.g., do not ship “Baby Yoda / Grogu” imagery); use original, Spacecoco-appropriate alien characters instead.",
-    "Frontend-only changes for this request; do not change Motoko backend state/schema."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not edit files under frontend/immutablePaths (compose existing hooks/components instead).",
+    "Multiplayer must be implemented as async/event-synced (polling/turn-like), not real-time (no WebSockets)."
   ],
   "nonGoals": [
-    "Implementing p5.js APIs (e.g., pixelDensity(), smooth(), noLoop()) literally; only replicate the intent within the current React/canvas/toon-renderer architecture.",
-    "Adding new gameplay mechanics beyond visual readability and the loop/audio initialization behavior described.",
-    "Adding third-party authentication or external asset hosting/CDNs."
+    "Implementing true real-time 10-player action networking.",
+    "Fully tuning/balancing all mechanics to final gameplay quality (this request is for structure/scaffolding).",
+    "Integrating third-party auth providers beyond Internet Identity."
   ],
   "imageRequirements": {
-    "required": [
-      "Toon-style UFO exterior texture with clear hull + dome + accent lights (ufo-toon-albedo-v2.dim_4096x4096.png)",
-      "Toon-style penguin boss texture with clear beak/eyes/flippers silhouette cues (penguin-toon-albedo-v2.dim_4096x4096.png)",
-      "Toon-style alien pilot/character texture (alien-pilot-toon-albedo.dim_4096x4096.png)",
-      "Toon-style emissive light accents/decals sheet for UFO windows/controls (ufo-decals-emissive.dim_2048x2048.png)"
-    ],
-    "edits": [
-      "Improve silhouette/detail while preserving toon shading (ufo-toon-albedo.dim_4096x4096.png > ufo-toon-albedo-v2.dim_4096x4096.png)",
-      "Improve silhouette/detail while preserving toon shading (penguin-toon-albedo.dim_4096x4096.png > penguin-toon-albedo-v2.dim_4096x4096.png)"
-    ]
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [
-      "Prefer crisp high-DPI/4K canvas rendering (DPR-scaled) and stable 60fps loop behavior with focus-safe pause/resume.",
-      "Prefer AudioContext to be initialized immediately, but started via user gesture on mobile without breaking mute behavior.",
-      "Prefer non-generic, readable character silhouettes for penguins/aliens/UFOs (no blob/circle placeholders)."
-    ],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
+    "required": [],
+    "edits": []
   }
 }

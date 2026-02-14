@@ -8,11 +8,15 @@ export { materials as toonMaterials };
 interface ToonRenderOptions {
   quality: QualityLevel;
   brightness: number;
+  contrast: number;
+  saturation: number;
 }
 
 const defaultOptions: ToonRenderOptions = {
   quality: 'high',
-  brightness: 1.2,
+  brightness: 1.5,
+  contrast: 1.3,
+  saturation: 1.4,
 };
 
 export class ToonRenderer {
@@ -41,17 +45,20 @@ export class ToonRenderer {
   drawGlow(x: number, y: number, radius: number, color: string, intensity: number = 1.0) {
     if (this.options.quality === 'low') return;
 
-    const samples = this.options.quality === 'high' ? 3 : 2;
+    const samples = this.options.quality === 'high' ? 4 : 3;
+    const dpr = window.devicePixelRatio || 1;
+    const clampedRadius = Math.min(radius, 80); // Prevent excessive blur on high-DPI
     
     this.ctx.save();
     this.ctx.globalCompositeOperation = 'lighter';
     
     for (let i = 0; i < samples; i++) {
-      const r = radius * (1 - i / samples);
-      const alpha = (intensity / samples) * 0.3;
+      const r = clampedRadius * (1 - i / samples);
+      const alpha = (intensity / samples) * 0.4;
       
       const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, r);
       gradient.addColorStop(0, color.replace(')', `, ${alpha})`).replace('rgb', 'rgba'));
+      gradient.addColorStop(0.6, color.replace(')', `, ${alpha * 0.5})`).replace('rgb', 'rgba'));
       gradient.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
       
       this.ctx.fillStyle = gradient;
@@ -62,9 +69,12 @@ export class ToonRenderer {
   }
 
   drawOutline(path: Path2D, material: ToonMaterial) {
+    const dpr = window.devicePixelRatio || 1;
+    const clampedWidth = Math.min(material.outlineWidth, dpr > 1 ? 6 : 8); // Keep outlines crisp
+    
     this.ctx.save();
     this.ctx.strokeStyle = material.outlineColor;
-    this.ctx.lineWidth = material.outlineWidth;
+    this.ctx.lineWidth = clampedWidth;
     this.ctx.lineJoin = 'round';
     this.ctx.lineCap = 'round';
     this.ctx.stroke(path);
@@ -88,13 +98,13 @@ export class ToonRenderer {
       Math.max(width, height) * 0.7
     );
     
-    // Lighter highlight
-    const highlight = this.adjustBrightness(baseColor, 1.4);
+    // Brighter highlight for cartoon look
+    const highlight = this.adjustBrightness(baseColor, 1.6);
     gradient.addColorStop(0, highlight);
-    gradient.addColorStop(0.5, baseColor);
+    gradient.addColorStop(0.4, baseColor);
     
-    // Darker shadow
-    const shadow = this.adjustBrightness(baseColor, 0.6);
+    // Darker shadow with more contrast
+    const shadow = this.adjustBrightness(baseColor, 0.5);
     gradient.addColorStop(1, shadow);
     
     return gradient;
@@ -139,9 +149,10 @@ export class ToonRenderer {
     this.drawOutline(path, material);
   }
 
-  drawSnakeSegment(x: number, y: number, size: number, material: ToonMaterial, wave: number = 0) {
+  drawSnakeSegment(x: number, y: number, size: number, material: ToonMaterial, wave: number = 0, squash: number = 1.0) {
     this.ctx.save();
     this.ctx.translate(x + size / 2, y + size / 2 + wave);
+    this.ctx.scale(1.0, squash);
     
     const path = new Path2D();
     path.arc(0, 0, size / 2, 0, Math.PI * 2);
@@ -168,13 +179,41 @@ export class ToonRenderer {
     this.ctx.restore();
   }
 
+  drawRimLight(x: number, y: number, radius: number, color: string, angle: number = 0) {
+    this.ctx.save();
+    const rimX = x + Math.cos(angle) * radius * 0.3;
+    const rimY = y + Math.sin(angle) * radius * 0.3;
+    
+    const gradient = this.ctx.createRadialGradient(rimX, rimY, 0, rimX, rimY, radius * 0.6);
+    gradient.addColorStop(0, color.replace(')', ', 0.4)').replace('rgb', 'rgba'));
+    gradient.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
+    
+    this.ctx.fillStyle = gradient;
+    this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    this.ctx.restore();
+  }
+
   applyGlobalBrightness() {
-    if (this.options.brightness === 1.0) return;
+    const { brightness, contrast, saturation } = this.options;
+    
+    if (brightness === 1.0 && contrast === 1.0 && saturation === 1.0) return;
     
     this.ctx.save();
-    this.ctx.globalCompositeOperation = 'lighter';
-    this.ctx.fillStyle = `rgba(255, 255, 255, ${(this.options.brightness - 1.0) * 0.15})`;
-    this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    
+    // Brightness boost
+    if (brightness > 1.0) {
+      this.ctx.globalCompositeOperation = 'lighter';
+      this.ctx.fillStyle = `rgba(255, 255, 255, ${(brightness - 1.0) * 0.25})`;
+      this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    }
+    
+    // Contrast and saturation boost via color energy
+    if (contrast > 1.0 || saturation > 1.0) {
+      this.ctx.globalCompositeOperation = 'overlay';
+      this.ctx.fillStyle = `rgba(138, 43, 226, ${(saturation - 1.0) * 0.08})`;
+      this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    }
+    
     this.ctx.restore();
   }
 

@@ -1,619 +1,172 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 17,
-  "summary": "Build a decentralized web game on Internet Computer named \"Spacecoco\": a fast, absurd, addictive multiplayer (up to 8 players) Snake-style game with multi-input controls, ICP wallet-based cosmetic skins, dynamic planet modifiers, bosses, power-ups, and an on-chain leaderboard — now pivoting to a full visual/audio overhaul that completely replaces the prior pixel-art retro-neon look with a vector/toon-shaded, high-end 4K/60fps presentation (glow, motion blur, fake-PBR gradients, skeletal/spline-like animation where feasible) and a continuously looping lo-fi futuristic soundtrack with beat-synced SFX and AudioContext-driven dynamics.",
+  "projectStateVersion": 3,
+  "summary": "Build a new 3D 'Motor Snake' game structure with extreme physics/effects and a hollow spherical world (inside/outside), replacing prior mechanics; include async/event-based multiplayer up to 10 players and first address/fix errors from the previous project (including prior deployment error).",
   "architectural_notes": [
-    "Project pivot: replace used-items marketplace with a Snake-style multiplayer web game on Internet Computer called \"Spacecoco\".",
-    "Multiplayer target: up to 8 players with real-time state synchronization.",
-    "Use ICP wallet integration for cosmetic skin selection/switching.",
-    "Leaderboard should be stored/validated on-chain.",
-    "Gameplay tweak requested: snake should always be in motion; growth primarily from eating UFOs; cows/penguins provide bonus points; add animated crocodile entities.",
-    "New art direction request: move from arcade pixel-art replacement to a higher-detail retro-cartoon neon look (very bright/‘expensive’) using web-feasible rendering (WebGL/WebGPU postprocessing; no Vulkan/true ray tracing/HDR10).",
-    "New UX request: highly animated splash/home/menu presentation with UFOs/aliens and cows firing lasers for an immediate ‘wow’ effect.",
-    "New gameplay request: competitive elimination—body hits opponent head => opponent resets to normal size; winner can collect dropped points to grow/score.",
-    "User-approved scope change: replace the current pixel-art/sprite-based arcade-neon visuals entirely with a shader-capable vector/toon-styled renderer (web-feasible via Three.js/R3F + postprocessing) including outlines, glow, motion blur, parallax, and fake-PBR gradients targeting 4K/60fps.",
-    "User-approved scope change: replace the current music direction/system with a continuous perfectly-looping lo-fi futuristic soundtrack plus beat-synced SFX using AudioContext (GainNode dynamics and scheduled playback)."
+    "Project direction: replace prior gameplay mechanics entirely with new 'Motor Snake 3D' extreme-mechanics design; start by building the foundational structure/scaffolding.",
+    "Multiplayer constraint: implement as non-real-time (async/event-synced) but support up to 10 players.",
+    "World topology: hollow sphere with inside/outside traversal as a core world assumption."
   ],
   "known_issues": [
-    "Production build (Version 4) shows a blank screen: game does not render anything and there is no movement.",
-    "Current character visuals are perceived as overly generic (circles/blobs) and need clearer silhouettes/details so entities read as penguins/aliens/UFOs/laser action."
+    "Prior deployment error encountered; requires investigation/fix as part of stabilizing the project."
   ],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Toon-style UFO exterior texture with clear hull + dome + accent lights (ufo-toon-albedo-v2.dim_4096x4096.png)\n- Toon-style penguin boss texture with clear beak/eyes/flippers silhouette cues (penguin-toon-albedo-v2.dim_4096x4096.png)\n- Toon-style alien pilot/character texture (alien-pilot-toon-albedo.dim_4096x4096.png)\n- Toon-style emissive light accents/decals sheet for UFO windows/controls (ufo-decals-emissive.dim_2048x2048.png)\n\n## Edit Images\n- Improve silhouette/detail while preserving toon shading (ufo-toon-albedo.dim_4096x4096.png > ufo-toon-albedo-v2.dim_4096x4096.png)\n- Improve silhouette/detail while preserving toon shading (penguin-toon-albedo.dim_4096x4096.png > penguin-toon-albedo-v2.dim_4096x4096.png)",
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-create-the-product-s-overall-visual-theme-and-apply-it-consistently-across-the-ui-for-the-gatos-use-items-used-items-marketplace-theme-must-be-a-coherent-distinct-style-colors-typography-spacing-components-suitable-for-a-trusted-second-hand-marketplace-and-must-avoid-default-generic-styling",
-      "title": "Create the product’s overall visual theme and apply it consistently across the UI for the “Gatos Use Items” used-items marketplace. Theme must be a coherent, distinct style (colors, typography, spacing, components) suitable for a trusted second-hand marketplace, and must avoid default/generic styling.",
+      "id": "feature-fix-the-previous-deployment-failure-so-the-project-builds-and-deploys-successfully-again-local-build-canister-deploy-identify-the-root-cause-and-apply-the-minimal-code-config-change-needed-to-restore-reliable-deployments",
+      "title": "Fix the previous deployment failure so the project builds and deploys successfully again (local build + canister deploy). Identify the root cause and apply the minimal code/config change needed to restore reliable deployments.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-internet-identity-sign-in-and-session-aware-navigation-so-users-can-create-and-manage-their-own-used-item-listings",
-      "title": "Implement Internet Identity sign-in and session-aware navigation so users can create and manage their own used-item listings.",
+      "id": "feature-replace-the-existing-snake-game-mechanics-with-a-new-motor-snake-3d-foundation-that-supports-extreme-physics-a-hollow-spherical-world-inside-outside-traversal-anomaly-based-power-ups-reactive-tail-behavior-enemy-collision-events-and-a-persistent-ghost-concept-this-should-be-delivered-as-a-playable-inspectable-scaffold-systems-wired-together-with-placeholder-tuning-rather-than-a-fully-balanced-game",
+      "title": "Replace the existing snake game mechanics with a new 'Motor Snake 3D' foundation that supports: extreme physics, a hollow spherical world (inside/outside traversal), anomaly-based power-ups, reactive tail behavior, enemy collision events, and a persistent ghost concept. This should be delivered as a playable/inspectable scaffold (systems wired together with placeholder tuning) rather than a fully balanced game.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-build-the-core-marketplace-pages-home-landing-browse-listings-listing-details-create-listing-sell-and-my-listings-wired-to-backend-apis-using-react-query",
-      "title": "Build the core marketplace pages: Home/Landing, Browse Listings, Listing Details, Create Listing (“Sell”), and My Listings, wired to backend APIs using React Query.",
+      "id": "feature-implement-a-hollow-spherical-world-foundation-player-movement-constrained-to-the-inside-surface-of-a-sphere-with-the-ability-to-transition-to-the-exterior-surface-include-a-red-core-object-at-the-center-and-a-placeholder-core-break-event-that-transitions-to-an-abyss-state-e-g-distinct-environment-lighting-and-a-return-respawn-mechanic",
+      "title": "Implement a hollow spherical world foundation: player movement constrained to the inside surface of a sphere, with the ability to transition to the exterior surface. Include a red core object at the center and a placeholder 'core break' event that transitions to an 'abyss' state (e.g., distinct environment/lighting and a return/respawn mechanic).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-environment-physics-system-scaffold-that-supports-time-varying-gravity-fluctuates-every-5-seconds-between-0x-and-3x-radial-wind-bursts-from-invisible-portals-fog-that-distorts-perception-and-acid-rain-that-can-remove-tail-segments-unless-a-shield-is-active",
+      "title": "Add an environment/physics system scaffold that supports time-varying gravity (fluctuates every 5 seconds between 0x and 3x), radial wind bursts from invisible portals, fog that distorts perception, and acid rain that can remove tail segments unless a shield is active.",
       "reqIds": [
         "REQ-4"
       ],
       "version": 1
     },
     {
-      "id": "feature-support-listing-images-via-user-provided-image-urls-no-file-uploads-including-multi-image-previews-and-safe-validation",
-      "title": "Support listing images via user-provided image URLs (no file uploads), including multi-image previews and safe validation.",
+      "id": "feature-implement-analog-joystick-input-for-controlling-the-snake-in-3d-smooth-input-should-result-in-stable-elegant-motion-abrupt-input-should-produce-more-aggressive-twisting-spring-like-movement-include-a-tail-reaction-scaffold-where-sudden-head-braking-causes-the-tail-to-coil-and-impart-a-whip-like-impulse",
+      "title": "Implement analog joystick input for controlling the snake in 3D. Smooth input should result in stable, elegant motion; abrupt input should produce more aggressive twisting/spring-like movement. Include a tail reaction scaffold where sudden head braking causes the tail to coil and impart a whip-like impulse.",
       "reqIds": [
         "REQ-5"
       ],
       "version": 1
     },
     {
-      "id": "feature-generate-and-include-basic-brand-marketing-static-images-for-the-app-and-render-them-in-the-ui-from-frontend-static-assets-not-through-the-backend",
-      "title": "Generate and include basic brand/marketing static images for the app, and render them in the UI from frontend static assets (not through the backend).",
+      "id": "feature-create-an-enemy-collision-event-framework-with-three-enemy-archetypes-and-their-signature-collision-outcomes-1-flying-cow-impact-creates-a-white-freeze-dome-10m-radius-that-freezes-entities-temporarily-and-spawns-floating-shards-that-become-projectiles-2-ufo-impact-triggers-a-map-fold-pulse-that-teleports-the-player-to-the-sphere-centerline-defined-center-position-and-leaves-spark-trails-3-kamikaze-penguin-impact-creates-a-ring-of-fire-and-spawns-baby-penguins-that-attach-to-the-tail-and-slow-the-player-until-shaken-off",
+      "title": "Create an enemy/collision event framework with three enemy archetypes and their signature collision outcomes: (1) Flying cow impact creates a white freeze dome (10m radius) that freezes entities temporarily and spawns floating shards that become projectiles; (2) UFO impact triggers a 'map fold' pulse that teleports the player to the sphere centerline/defined center position and leaves spark trails; (3) Kamikaze penguin impact creates a ring of fire and spawns baby penguins that attach to the tail and slow the player until shaken off.",
       "reqIds": [
         "REQ-6"
       ],
       "version": 1
     },
     {
-      "id": "feature-rebrand-the-existing-app-as-spacecoco-and-replace-the-marketplace-navigation-pages-with-a-game-focused-ui-that-includes-a-home-screen-a-lobby-matchmaking-screen-the-in-game-play-screen-a-skins-screen-and-a-leaderboard-screen-all-user-facing-text-must-be-in-english",
-      "title": "Rebrand the existing app as “Spacecoco” and replace the marketplace navigation/pages with a game-focused UI that includes: a Home screen, a Lobby/Matchmaking screen, the in-game Play screen, a Skins screen, and a Leaderboard screen. All user-facing text must be in English.",
+      "id": "feature-create-an-anomaly-based-power-up-framework-where-power-ups-spawn-as-anomalies-not-standard-drops-and-implement-three-power-ups-1-mini-black-hole-grants-enemy-suction-at-distance-but-has-a-self-suction-risk-if-held-too-long-2-shooting-star-sets-the-snake-on-fire-phases-through-obstacles-enemies-burns-enemies-but-shortens-melts-the-snake-over-time-3-mirror-makes-the-snake-intangible-for-2-seconds-and-reverses-the-player-s-view-controls-during-that-duration",
+      "title": "Create an anomaly-based power-up framework where power-ups spawn as anomalies (not standard drops) and implement three power-ups: (1) Mini black hole: grants enemy suction at distance but has a self-suction risk if held too long; (2) Shooting star: sets the snake on fire, phases through obstacles/enemies, burns enemies, but shortens/melts the snake over time; (3) Mirror: makes the snake intangible for 2 seconds and reverses the player’s view/controls during that duration.",
       "reqIds": [
         "REQ-7"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-the-core-spacecoco-snake-style-gameplay-loop-on-the-play-screen-with-fast-responsive-movement-scoring-rounds-and-lose-win-conditions-the-game-must-support-level-progression-and-include-rotating-planet-modifiers-mars-craters-slow-movement-titan-fog-reduces-visibility-europa-slippery-ice-variable-gravity-low-high-effects-on-movement-obstacles-ufos-dropping-flying-cows-and-randomized-power-up-spawns",
-      "title": "Implement the core Spacecoco Snake-style gameplay loop on the Play screen with fast, responsive movement, scoring, rounds, and lose/win conditions. The game must support level progression and include: rotating planet modifiers (Mars craters slow movement; Titan fog reduces visibility; Europa slippery ice), variable gravity (low/high effects on movement), obstacles (UFOs dropping flying cows), and randomized power-up spawns.",
+      "id": "feature-add-a-persistent-ghost-system-scaffold-upon-player-death-spawn-a-ghost-version-that-follows-the-player-in-subsequent-runs-and-delivers-the-voice-line-you-are-not-you-anymore-it-s-me-now-include-a-growth-pressure-mechanic-where-ignoring-the-ghost-increases-its-influence-culminating-in-a-placeholder-replacement-state-e-g-ghost-takes-over-visual-identity-and-has-higher-speed-with-clear-ui-indication",
+      "title": "Add a persistent 'ghost' system scaffold: upon player death, spawn a ghost version that follows the player in subsequent runs and delivers the voice line: \"You are not you anymore, it's me now\". Include a growth/pressure mechanic where ignoring the ghost increases its influence, culminating in a placeholder 'replacement' state (e.g., ghost takes over visual identity and has higher speed) with clear UI indication.",
       "reqIds": [
         "REQ-8"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-cross-platform-controls-for-steering-the-snake-mobile-swipe-gestures-keyboard-arrow-keys-and-wasd-and-optional-mouse-follow-steering-provide-an-in-game-control-hint-overlay-that-adapts-to-the-current-input-method-english-text",
-      "title": "Add cross-platform controls for steering the snake: mobile swipe gestures, keyboard (arrow keys and WASD), and optional mouse-follow steering. Provide an in-game control hint overlay that adapts to the current input method (English text).",
+      "id": "feature-implement-async-event-synced-multiplayer-scaffolding-for-up-to-10-players-non-real-time-add-backend-support-for-creating-joining-a-lobby-listing-lobby-participants-starting-a-match-and-submitting-player-input-actions-as-ordered-events-update-the-lobby-page-ui-to-enable-creating-and-joining-lobbies-showing-player-count-up-to-10-and-starting-the-match-when-ready",
+      "title": "Implement async/event-synced multiplayer scaffolding for up to 10 players (non-real-time). Add backend support for creating/joining a lobby, listing lobby participants, starting a match, and submitting player input/actions as ordered events. Update the Lobby page UI to enable creating and joining lobbies, showing player count up to 10, and starting the match when ready.",
       "reqIds": [
         "REQ-9"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-multiplayer-matches-for-up-to-8-players-including-a-lobby-matchmaking-flow-match-creation-joining-and-synchronized-gameplay-state-suitable-for-the-internet-computer-environment",
-      "title": "Implement multiplayer matches for up to 8 players, including a lobby/matchmaking flow, match creation/joining, and synchronized gameplay state suitable for the Internet Computer environment.",
+      "id": "feature-add-a-vfx-audio-cue-pipeline-scaffold-for-the-new-mechanics-particles-lights-screen-distortion-hooks-that-can-be-triggered-by-the-environment-system-collisions-and-power-ups-and-adaptive-electro-orchestral-music-intensity-changes-e-g-strings-on-danger-bass-on-attack-silence-before-an-explosion-use-existing-audio-hooks-where-possible-and-ensure-graceful-behavior-when-audio-is-locked-muted",
+      "title": "Add a VFX + audio cue pipeline scaffold for the new mechanics: particles/lights/screen distortion hooks that can be triggered by the environment system, collisions, and power-ups; and adaptive electro-orchestral music intensity changes (e.g., strings on danger, bass on attack, silence before an explosion). Use existing audio hooks where possible and ensure graceful behavior when audio is locked/muted.",
       "reqIds": [
         "REQ-10"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-boss-encounters-spawn-a-penguin-boss-every-five-levels-players-must-circle-the-boss-three-times-to-win-advance-add-the-supreme-cow-unlock-at-1000-points-a-silent-floating-boss-with-red-eyes-that-launches-ufos-and-exploding-cow-missiles-causes-map-shake-and-makes-everything-extremely-slippery",
-      "title": "Add boss encounters: spawn a penguin boss every five levels; players must circle the boss three times to win/advance. Add the “Supreme Cow” unlock at 1000 points: a silent floating boss with red eyes that launches UFOs and exploding cow missiles, causes map shake, and makes everything extremely slippery.",
+      "id": "feature-update-user-facing-ui-copy-across-the-home-lobby-play-flow-to-reflect-the-new-motor-snake-3d-experience-extreme-physics-hollow-sphere-anomalies-removing-references-that-contradict-the-new-mechanics-ensure-all-user-facing-text-is-in-english",
+      "title": "Update user-facing UI copy across the Home/Lobby/Play flow to reflect the new Motor Snake 3D experience (extreme physics, hollow sphere, anomalies), removing references that contradict the new mechanics. Ensure all user-facing text is in English.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adopt-a-consistent-distinctive-visual-theme-for-the-new-motor-snake-3d-ui-overlay-hud-menus-lobby-that-matches-the-new-apocalyptic-anomaly-tone-while-keeping-text-readable-over-the-3d-scene-avoid-blue-purple-as-the-primary-palette",
+      "title": "Adopt a consistent, distinctive visual theme for the new Motor Snake 3D UI overlay (HUD, menus, lobby) that matches the new 'apocalyptic anomaly' tone while keeping text readable over the 3D scene. Avoid blue/purple as the primary palette.",
       "reqIds": [
         "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-cosmetic-skin-system-with-10-selectable-snake-skins-reticulated-python-king-cobra-black-mamba-anaconda-rattlesnake-krait-taipan-boa-constrictor-gaboon-viper-and-feathered-quetzalcoatl-players-can-change-their-active-skin-using-their-icp-wallet-on-chain-action-and-the-selected-skin-persists-per-user",
-      "title": "Add a cosmetic skin system with 10 selectable snake skins: Reticulated Python, King Cobra, Black Mamba, Anaconda, Rattlesnake, Krait, Taipan, Boa Constrictor, Gaboon Viper, and Feathered Quetzalcoatl. Players can change their active skin using their ICP wallet (on-chain action), and the selected skin persists per user.",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-an-on-chain-leaderboard-that-records-high-scores-and-exposes-read-apis-for-global-top-scores-and-a-player-s-personal-best-the-frontend-leaderboard-screen-must-display-the-global-leaderboard-and-the-current-user-s-best-score",
-      "title": "Implement an on-chain leaderboard that records high scores and exposes read APIs for global top scores and a player’s personal best. The frontend Leaderboard screen must display the global leaderboard and the current user’s best score.",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-an-in-game-audio-system-with-chiptune-style-space-music-a-base-track-that-gradually-intensifies-when-the-player-is-close-to-losing-planet-specific-remixes-for-mars-titan-europa-silence-before-the-supreme-cow-encounter-and-an-epic-chord-sting-when-it-begins-provide-basic-audio-settings-mute-volume-in-the-ui",
-      "title": "Add an in-game audio system with chiptune-style space music: a base track that gradually intensifies when the player is close to losing, planet-specific remixes for Mars/Titan/Europa, silence before the Supreme Cow encounter, and an epic chord sting when it begins. Provide basic audio settings (mute/volume) in the UI.",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-generate-and-include-the-required-spacecoco-static-art-assets-sprites-illustrations-under-frontend-public-assets-generated-and-render-them-in-the-ui-game-no-backend-image-serving",
-      "title": "Generate and include the required Spacecoco static art assets (sprites/illustrations) under frontend/public/assets/generated and render them in the UI/game (no backend image serving).",
-      "reqIds": [
-        "REQ-16"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-render-a-black-starfield-background-with-randomly-placed-stars-on-the-play-screen-canvas-as-an-additive-visual-layer-do-not-change-the-existing-spacecoco-theme-the-starfield-should-be-subtly-animated-e-g-gentle-drift-or-twinkle-while-keeping-gameplay-visuals-readable",
-      "title": "Render a black starfield background with randomly placed stars on the Play screen canvas as an additive visual layer (do not change the existing Spacecoco theme). The starfield should be subtly animated (e.g., gentle drift or twinkle) while keeping gameplay visuals readable.",
-      "reqIds": [
-        "REQ-17"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-game-initialization-so-the-snake-spawns-centered-on-the-grid-with-green-color-and-an-initial-length-of-5-blocks-while-keeping-the-rest-of-the-existing-game-theme-and-mechanics-intact",
-      "title": "Update game initialization so the snake spawns centered on the grid with green color and an initial length of 5 blocks, while keeping the rest of the existing game theme and mechanics intact.",
-      "reqIds": [
-        "REQ-18"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-adjust-obstacle-spawning-rules-so-that-every-2-seconds-a-ufo-descends-from-the-top-of-the-playfield-carrying-a-cow-inside-as-an-additive-behavior-do-not-remove-existing-obstacle-power-up-systems-integrate-with-them",
-      "title": "Adjust obstacle spawning rules so that every 2 seconds a UFO descends from the top of the playfield carrying a cow inside, as an additive behavior (do not remove existing obstacle/power-up systems; integrate with them).",
-      "reqIds": [
-        "REQ-19"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-penguin-boss-spawn-rule-is-enforced-every-5-levels-spawn-a-penguin-boss-in-the-center-of-the-playfield-additive-confirmation-adjustment-that-must-not-break-other-boss-logic-including-existing-circling-mechanics",
-      "title": "Ensure the penguin boss spawn rule is enforced: every 5 levels, spawn a penguin boss in the center of the playfield (additive confirmation/adjustment that must not break other boss logic, including existing circling mechanics).",
-      "reqIds": [
-        "REQ-20"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-at-the-start-of-each-match-play-a-short-looping-chiptune-background-track-at-low-volume-this-must-be-additive-it-must-not-remove-or-disable-any-existing-dynamic-intensifying-music-behavior-if-present-it-should-coexist-or-transition-without-regressing-existing-audio-features",
-      "title": "At the start of each match, play a short looping chiptune background track at low volume. This must be additive: it must not remove or disable any existing dynamic/intensifying music behavior (if present); it should coexist or transition without regressing existing audio features.",
-      "reqIds": [
-        "REQ-21"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-current-in-canvas-spacecoco-visuals-with-an-arcade-pixel-art-style-and-use-sprite-based-rendering-for-core-entities-snake-ufo-cow-penguin-boss-crocodile-laser-vfx-and-pixel-explosion-vfx-while-keeping-the-existing-starfield-background",
-      "title": "Replace the current in-canvas Spacecoco visuals with an arcade pixel-art style and use sprite-based rendering for core entities (snake, UFO, cow, penguin boss, crocodile, laser VFX, and pixel explosion VFX) while keeping the existing starfield background.",
-      "reqIds": [
-        "REQ-22"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-generate-and-add-the-required-pixel-art-sprite-assets-under-frontend-public-assets-generated-and-update-the-game-renderer-to-load-and-draw-them",
-      "title": "Generate and add the required pixel-art sprite assets under frontend/public/assets/generated and update the game renderer to load and draw them.",
-      "reqIds": [
-        "REQ-23"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-current-chiptune-oscillator-background-music-with-a-more-modern-high-energy-action-focused-original-soundtrack-and-integrate-it-with-the-existing-play-screen-mute-control",
-      "title": "Replace the current chiptune/oscillator background music with a more modern, high-energy, action-focused original soundtrack and integrate it with the existing Play screen mute control.",
-      "reqIds": [
-        "REQ-24"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-the-updated-core-gameplay-rules-the-snake-is-always-moving-the-snake-grows-more-when-eating-ufos-cows-and-penguins-grant-bonus-points-game-over-occurs-when-the-snake-head-hits-the-border-or-its-own-body",
-      "title": "Implement the updated core gameplay rules: the snake is always moving; the snake grows more when eating UFOs; cows and penguins grant bonus points; game over occurs when the snake head hits the border or its own body.",
-      "reqIds": [
-        "REQ-25"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-animated-fun-crocodile-entities-to-the-game-as-additional-moving-targets-obstacles-consistent-with-an-eat-and-grow-famous-game-feel-including-clear-scoring-behavior-when-collected-defeated",
-      "title": "Add animated, fun crocodile entities to the game as additional moving targets/obstacles consistent with an “eat and grow” famous-game feel, including clear scoring behavior when collected/defeated.",
-      "reqIds": [
-        "REQ-26"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-sound-effects-for-1-firing-the-red-laser-pew-and-2-eating-a-cow-muuuuh-and-trigger-them-during-the-corresponding-gameplay-events",
-      "title": "Add sound effects for (1) firing the red laser (“pew”) and (2) eating a cow (“muuuuh”), and trigger them during the corresponding gameplay events.",
-      "reqIds": [
-        "REQ-27"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-keep-all-user-facing-ui-text-in-english-while-updating-any-in-game-instruction-text-that-no-longer-matches-the-new-rules-ufo-driven-growth-and-bonus-points-from-cows-penguins-crocodiles",
-      "title": "Keep all user-facing UI text in English while updating any in-game instruction text that no longer matches the new rules (UFO-driven growth and bonus points from cows/penguins/crocodiles).",
-      "reqIds": [
-        "REQ-28"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-fix-the-play-screen-blank-no-render-issue-by-ensuring-the-requestanimationframe-game-loop-actually-starts-after-sprites-finish-loading-avoid-stale-react-hook-closures-in-particular-startgame-and-resumegame-must-invoke-a-gameloop-function-that-sees-the-latest-spritesloaded-value-and-does-not-early-return-incorrectly",
-      "title": "Fix the Play screen blank/no-render issue by ensuring the requestAnimationFrame game loop actually starts after sprites finish loading (avoid stale React hook closures). In particular, `startGame()` and `resumeGame()` must invoke a `gameLoop` function that sees the latest `spritesLoaded` value and does not early-return incorrectly.",
-      "reqIds": [
-        "REQ-29"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-robust-runtime-fallback-so-the-play-screen-is-never-fully-blank-if-sprite-loading-fails-surface-a-user-visible-error-overlay-with-an-actionable-message-and-ensure-at-least-a-minimal-canvas-render-e-g-clear-starfield-still-occurs-even-when-loadallsprites-rejects",
-      "title": "Add a robust runtime fallback so the Play screen is never fully blank if sprite loading fails: surface a user-visible error overlay with an actionable message and ensure at least a minimal canvas render (e.g., clear + starfield) still occurs even when `loadAllSprites()` rejects.",
-      "reqIds": [
-        "REQ-30"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-verify-and-correct-the-runtime-sprite-asset-paths-used-by-the-sprite-loader-so-they-resolve-in-production-ic-canister-hosting-and-allow-spritesloaded-to-become-true-when-the-assets-exist-under-frontend-public-assets-generated",
-      "title": "Verify and correct the runtime sprite asset paths used by the sprite loader so they resolve in production (IC canister hosting) and allow `spritesLoaded` to become true when the assets exist under `frontend/public/assets/generated`.",
-      "reqIds": [
-        "REQ-31"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-upgrade-the-spacecoco-start-experience-home-screen-lobby-screen-to-a-high-motion-retro-cartoon-neon-presentation-add-an-animated-hero-splash-scene-with-ufos-aliens-flying-across-the-screen-and-bright-cows-firing-eye-lasers-while-keeping-the-game-name-and-core-navigation-intact",
-      "title": "Upgrade the Spacecoco start experience (Home screen + Lobby screen) to a high-motion, retro-cartoon neon presentation: add an animated hero/splash scene with UFOs/aliens flying across the screen and bright cows firing eye-lasers, while keeping the game name and core navigation intact.",
-      "reqIds": [
-        "REQ-32"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-revamp-the-in-game-scoring-ui-hud-to-a-modern-arcade-retro-neon-style-with-large-digits-bright-neon-color-accents-purple-red-blue-green-as-primary-palette-and-high-clarity-readability-over-gameplay",
-      "title": "Revamp the in-game scoring UI (HUD) to a modern arcade retro-neon style with large digits, bright neon color accents (purple/red/blue/green as primary palette), and high-clarity readability over gameplay.",
-      "reqIds": [
-        "REQ-33"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-an-updated-competitive-scoring-model-that-awards-points-when-the-snake-eats-objects-and-when-it-successfully-eliminates-an-opponent-with-on-screen-score-feedback-e-g-floating-neon-number-popups-that-clearly-communicates-how-many-points-were-gained",
-      "title": "Implement an updated competitive scoring model that awards points when the snake eats objects and when it successfully eliminates an opponent, with on-screen score feedback (e.g., floating neon number popups) that clearly communicates how many points were gained.",
-      "reqIds": [
-        "REQ-34"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-the-competitive-elimination-rule-when-a-snake-hits-an-opponent-s-head-with-its-body-the-opponent-resets-back-to-the-normal-starting-size-and-the-winner-can-collect-dropped-point-items-to-gain-score-and-grow",
-      "title": "Add the competitive elimination rule: when a snake hits an opponent's head with its body, the opponent resets back to the normal starting size, and the winner can collect dropped point items to gain score and grow.",
-      "reqIds": [
-        "REQ-35"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-increase-perceived-visual-quality-during-gameplay-using-web-feasible-rendering-techniques-without-changing-the-core-rules-add-a-brighter-more-expensive-neon-look-via-post-processing-like-effects-e-g-glow-bloom-styling-laser-trails-subtle-motion-blur-trailing-while-preserving-gameplay-readability-and-performance",
-      "title": "Increase perceived visual quality during gameplay using web-feasible rendering techniques without changing the core rules: add a brighter, more 'expensive' neon look via post-processing-like effects (e.g., glow/bloom styling, laser trails, subtle motion blur/trailing) while preserving gameplay readability and performance.",
-      "reqIds": [
-        "REQ-36"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-upgrade-audio-polish-using-web-feasible-techniques-replace-or-improve-sfx-to-higher-quality-versions-and-add-stronger-gameplay-feedback-e-g-stereo-spatial-feel-filters-ducking-where-appropriate-while-keeping-mute-behavior-working-on-the-play-screen",
-      "title": "Upgrade audio polish using web-feasible techniques: replace or improve SFX to higher-quality versions and add stronger gameplay feedback (e.g., stereo/spatial feel, filters/ducking where appropriate), while keeping mute behavior working on the Play screen.",
-      "reqIds": [
-        "REQ-37"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-generate-and-include-new-high-quality-retro-cartoon-neon-static-art-assets-and-sprite-sheets-needed-for-the-updated-start-menu-presentation-and-brighter-in-game-vfx-placed-under-frontend-public-assets-generated-and-loaded-directly-by-the-frontend-no-backend-image-serving",
-      "title": "Generate and include new high-quality retro-cartoon neon static art assets and sprite sheets needed for the updated start/menu presentation and brighter in-game VFX, placed under frontend/public/assets/generated and loaded directly by the frontend (no backend image serving).",
-      "reqIds": [
-        "REQ-38"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-current-pixel-art-canvas-sprite-based-in-game-rendering-style-with-a-fully-new-high-end-vector-toon-shaded-presentation-across-the-play-screen-including-toon-shading-outlines-glow-fake-pbr-gradient-lighting-subtle-motion-blur-trails-and-parallax-layers-while-preserving-existing-gameplay-rules-and-hud-readability",
-      "title": "Replace the current pixel-art/canvas sprite-based in-game rendering style with a fully new high-end vector/toon-shaded presentation across the Play screen, including toon shading, outlines, glow, fake-PBR gradient lighting, subtle motion blur/trails, and parallax layers, while preserving existing gameplay rules and HUD readability.",
-      "reqIds": [
-        "REQ-39"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-play-screen-rendering-pipeline-to-support-4k-friendly-output-and-smooth-60fps-animation-where-possible-render-at-devicepixelratio-scaled-resolution-keep-the-visual-output-sharp-and-avoid-introducing-blank-empty-renders-during-initialization-or-asset-loading-failures",
-      "title": "Update the Play screen rendering pipeline to support 4K-friendly output and smooth 60fps animation where possible: render at devicePixelRatio-scaled resolution, keep the visual output sharp, and avoid introducing blank/empty renders during initialization or asset loading failures.",
-      "reqIds": [
-        "REQ-40"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-the-requested-space-background-vfx-on-the-play-screen-black-space-background-star-twinkle-that-matches-the-provided-formula-twinkle-sin-millis-0-02-0-8-0-2-with-per-star-alpha-and-shooting-stars-every-7-seconds-with-a-white-line-and-a-fading-trail-trailopacity-decreases-by-0-02-per-frame-tick",
-      "title": "Implement the requested space background VFX on the Play screen: black space background; star twinkle that matches the provided formula (twinkle = sin(millis() * 0.02) * 0.8 + 0.2) with per-star alpha; and shooting stars every 7 seconds with a white line and a fading trail (trailOpacity decreases by 0.02 per frame/tick).",
-      "reqIds": [
-        "REQ-41"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-ufo-visual-treatment-as-a-2d-sprite-graphic-with-a-prominent-glow-e-g-drawglow-radius-40-with-orange-like-glow-color-and-animate-ufo-movement-consistent-with-slow-descent-plus-subtle-lateral-drift",
-      "title": "Implement UFO visual treatment as a 2D sprite/graphic with a prominent glow (e.g., drawGlow radius 40 with orange-like glow color), and animate UFO movement consistent with slow descent plus subtle lateral drift.",
-      "reqIds": [
-        "REQ-42"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-global-visual-brightness-lighting-polish-to-the-play-screen-rendering-e-g-overall-brightness-1-2-equivalent-and-ambient-lighting-without-reducing-gameplay-readability",
-      "title": "Add global visual ‘brightness/lighting’ polish to the Play screen rendering (e.g., overall brightness ~1.2 equivalent and ambient lighting), without reducing gameplay readability.",
-      "reqIds": [
-        "REQ-43"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-current-background-music-approach-htmlaudioelement-loop-in-the-play-screen-with-an-audiocontext-based-system-that-plays-a-continuous-lo-fi-futuristic-chill-electronic-loop-with-seamless-looping-no-audible-cuts-starts-at-low-volume-and-ramps-intensity-volume-during-intense-gameplay-using-a-gainnode-driven-envelope-tied-to-a-pulse-beat",
-      "title": "Replace the current background music approach (HTMLAudioElement loop in the Play screen) with an AudioContext-based system that plays a continuous lo-fi futuristic/chill electronic loop with seamless looping (no audible cuts), starts at low volume, and ramps intensity/volume during intense gameplay using a GainNode-driven envelope tied to a pulse/beat.",
-      "reqIds": [
-        "REQ-44"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-beat-synchronized-audio-feedback-so-gameplay-hits-sfx-triggers-and-or-visual-accent-beats-align-with-a-consistent-pulse-e-g-500ms-beat-grid-as-referenced-using-audiocontext-scheduling-to-keep-timing-stable",
-      "title": "Implement beat-synchronized audio feedback so gameplay ‘hits’ (SFX triggers and/or visual accent beats) align with a consistent pulse (e.g., 500ms beat grid as referenced), using AudioContext scheduling to keep timing stable.",
-      "reqIds": [
-        "REQ-45"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-and-wire-the-requested-new-sfx-set-using-the-audiocontext-system-1-a-realistic-snake-hiss-triggered-when-the-snake-performs-its-hiss-gesture-map-to-an-existing-snake-animation-moment-such-as-tongue-display-cadence-2-a-soft-boing-triggered-on-a-defined-in-game-jump-like-event-use-opponent-respawn-reset-after-elimination-as-the-event-and-3-an-extending-laser-buzz-sound-when-the-laser-vfx-is-present-active-with-audible-lengthening-continuation-while-the-laser-persists",
-      "title": "Add and wire the requested new SFX set using the AudioContext system: (1) a realistic snake hiss triggered when the snake performs its ‘hiss’ gesture (map to an existing snake animation moment such as tongue display cadence), (2) a soft “boing” triggered on a defined in-game ‘jump-like’ event (use opponent respawn/reset after elimination as the event), and (3) an extending laser buzz sound when the laser VFX is present/active, with audible lengthening/continuation while the laser persists.",
-      "reqIds": [
-        "REQ-46"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-any-play-screen-instructional-text-that-no-longer-matches-the-new-rules-audio-interactions-while-keeping-all-user-facing-text-in-english",
-      "title": "Update any Play screen instructional text that no longer matches the new rules/audio interactions, while keeping all user-facing text in English.",
-      "reqIds": [
-        "REQ-47"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-initialize-webaudio-audiocontext-at-the-earliest-possible-time-in-the-play-screen-lifecycle-and-ensure-audio-playback-is-started-from-a-user-gesture-on-mobile-without-breaking-the-existing-mute-toggle-behavior",
-      "title": "Initialize WebAudio (AudioContext) at the earliest possible time in the Play screen lifecycle and ensure audio playback is started from a user gesture on mobile without breaking the existing mute toggle behavior.",
-      "reqIds": [
-        "REQ-48"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enforce-a-stable-60fps-game-loop-target-and-add-focus-visibility-handling-so-the-game-loop-is-paused-stopped-when-the-tab-app-loses-focus-and-is-resumed-when-focus-returns-without-causing-blank-renders-or-duplicated-loops",
-      "title": "Enforce a stable 60fps game loop target and add focus/visibility handling so the game loop is paused/stopped when the tab/app loses focus and is resumed when focus returns, without causing blank renders or duplicated loops.",
-      "reqIds": [
-        "REQ-49"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-make-play-screen-canvas-rendering-crisp-on-high-dpi-and-4k-displays-by-rendering-at-devicepixelratio-scaled-resolution-clamped-to-a-reasonable-maximum-such-as-2-and-applying-correct-image-smoothing-settings-for-vector-toon-rendering-vs-any-bitmap-textures-sprites-used",
-      "title": "Make Play screen canvas rendering crisp on high-DPI and 4K displays by rendering at devicePixelRatio-scaled resolution (clamped to a reasonable maximum such as 2) and applying correct image smoothing settings for vector/toon rendering vs any bitmap textures/sprites used.",
-      "reqIds": [
-        "REQ-50"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-overly-generic-circle-blob-visuals-for-key-entities-penguin-boss-ufo-aliens-pilots-with-clearer-silhouettes-and-readable-character-details-while-keeping-the-existing-spacecoco-toon-renderer-style-and-gameplay-rules-intact",
-      "title": "Replace overly-generic ‘circle/blob’ visuals for key entities (Penguin boss, UFO, aliens/pilots) with clearer silhouettes and readable character details while keeping the existing Spacecoco toon renderer style and gameplay rules intact.",
-      "reqIds": [
-        "REQ-51"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-generate-and-include-new-high-detail-toon-textures-needed-to-support-the-improved-non-generic-entity-silhouettes-place-them-under-frontend-public-assets-generated-and-wire-them-into-the-existing-toon-texture-loader-rendering-pipeline",
-      "title": "Generate and include new high-detail toon textures needed to support the improved, non-generic entity silhouettes, place them under frontend/public/assets/generated, and wire them into the existing toon texture loader/rendering pipeline.",
-      "reqIds": [
-        "REQ-52"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [
     {
+      "id": "AR-1",
+      "summary": "Create new 3D project structure for 'Motor Snake 3D' (core scaffolding replacing previous mechanics)",
+      "reqIds": [],
+      "status": "in_progress"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Implement hollow spherical world foundation (interior/exterior traversal)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Add dynamic physics/environment system scaffold (fluctuating gravity, radial wind portals, fog/visual distortion, acid rain + shield interaction)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add collision/enemy interaction framework (flying cow freeze dome + shards, UFO map-fold pulse/teleport, kamikaze penguin fire ring + baby penguin slow)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
       "id": "AR-5",
-      "summary": "Create the core \"Spacecoco\" Snake-style web gameplay loop with fast, responsive movement, scoring, rounds, and win/lose conditions.",
+      "summary": "Add anomaly-based power-up framework (mini black hole suction risk, meteor fire/phase-through + melting, mirror reverse-view + intangibility)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-6",
-      "summary": "Support multiplayer matches for up to 8 players (real-time), including lobby/matchmaking and synchronization suitable for Internet Computer.",
+      "summary": "Add persistent 'ghost' system concept scaffold (post-death follower that can replace player over time)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-7",
-      "summary": "Implement simple cross-platform controls: mobile swipe, PC arrow keys/WASD, and optional mouse-follow steering.",
+      "summary": "Async/event-synced multiplayer support for up to 10 players (non-real-time)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-8",
-      "summary": "Add 10 selectable snake skins (reticulated python, king cobra, black mamba, anaconda, rattlesnake, krait, taipan, boa constrictor, Gaboon viper, feathered Quetzalcoatl) and allow switching skins using an ICP wallet.",
+      "summary": "Visual/audio effects pipeline scaffold (particles/lights/screen distortion, adaptive electro-orchestral music cues)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-9",
-      "summary": "Add rotating alien planet round modifiers: Mars (craters slow movement), Titan (fog reduces visibility), Europa (slippery ice), plus variable gravity effects (low/high).",
+      "summary": "Fix errors from previous project, including deployment error, before/while integrating new structure",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Add obstacles and power-ups: UFOs that drop flying cows; eating a cow enables colored lasers (red burn, blue freeze, green poison).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-11",
-      "summary": "Add boss encounters: penguin bosses every five levels; players must circle the boss three times to win/advance.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-12",
-      "summary": "Add dynamic chiptune audio system: space background music that intensifies near losing, planet-specific remixes, silence before the \"Supreme Cow\", then an epic chord.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-13",
-      "summary": "Add \"Supreme Cow\" unlock at 1000 points: floating silent boss with red eyes that launches UFOs and exploding cow missiles, causes map shake and extreme slipperiness.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-14",
-      "summary": "Implement decentralization elements: on-chain leaderboard and randomized power-up distribution.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-19",
-      "summary": "Extend the backend canister to support Spacecoco game state and multiplayer synchronization: create/join/leave lobbies, start matches, accept player input updates, advance authoritative game ticks, and provide read APIs for current match state. Use canister-based randomness for power-up distribution.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-20",
-      "summary": "Add a black starfield background with randomly placed stars (preferably subtle animation) without changing the existing Spacecoco theme.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-21",
-      "summary": "Set the initial snake spawn to start centered on the screen, green color, with initial length of 5 blocks.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-22",
-      "summary": "Adjust obstacle spawning so a UFO descends from the top every 2 seconds carrying a cow inside (additive change).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-23",
-      "summary": "Ensure a penguin boss appears in the center every 5 levels (additive rule/confirmation).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-24",
-      "summary": "At the start of a match, play a short looping chiptune background track at low volume (without removing existing dynamic/intensifying music behavior).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-25",
-      "summary": "Replace existing Spacecoco in-game visuals with an arcade pixel-art style: neon-green 20px grid snake with black outline, head eyes + tongue animation, metallic gray UFO with red lights, flying cow sprite, pixel explosions, red laser VFX, and black starfield with twinkling white stars.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-26",
-      "summary": "Replace the existing music/audio direction with more modern, action-focused, 'GTA V'-like music (overall replacement rather than additive tracks).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-27",
-      "summary": "Adjust core gameplay rules: snake is always moving; grows more when eating UFOs; cows and penguins grant extra points (growth behavior clarified as UFO-driven); keep classic game-over on hitting body or border unless otherwise overridden.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-28",
-      "summary": "Add animated, fun crocodile entities as additional targets/obstacles consistent with 'eat and grow' famous game feel (including point behavior to be defined).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-29",
-      "summary": "Upgrade visuals to a high-quality retro-cartoon neon style (bright, cool, ‘expensive’ look) using web-feasible postprocessing (e.g., bloom/motion blur/trails) while keeping the core game intact.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-30",
-      "summary": "Create an animated, highly dynamic splash/home/menu presentation: aliens/UFOs flying across the screen, bright cows firing eye-lasers, lots of motion and ‘wow’ factor.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-31",
-      "summary": "Revamp the scoring/points system to be modern and entertaining: award points for eating objects and for eliminating opponents; add clear neon number popups/animations that match gameplay mechanics.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-32",
-      "summary": "Add competitive elimination rule: if a snake hits an opponent’s head with its body, the opponent resets to normal starting size while dropping points/collectibles that the winner can eat to gain points and grow.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-33",
-      "summary": "Improve SFX/audio polish with higher-quality sounds and stronger gameplay feedback (e.g., spatialization/filters where feasible in web) to increase clarity and addictiveness.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-34",
-      "summary": "Fully replace the current pixel-art/2D sprite renderer with a shader-capable web renderer (e.g., Three.js/React Three Fiber) to support toon shading, outlines, glow, fake-PBR gradients, motion blur, parallax layers, and a high-end vector-like 2D look across the game.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-35",
-      "summary": "Add a continuous lo-fi futuristic (chill electronic) background music system that loops perfectly with no pauses/cuts and dynamically ramps intensity/volume using AudioContext (GainNode) based on gameplay intensity and/or beat/pulse.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-36",
-      "summary": "Implement beat-synchronized audio feedback: real snake hiss SFX, soft 'boing' for monkey jump events, and an extending laser buzz, with timing aligned to the music pulse (AudioContext scheduling).",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-37",
-      "summary": "Upgrade background VFX: black space with per-star twinkle animation and periodic shooting stars with fade trails (timed spawns), matching the new high-end toon/vector aesthetic.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-38",
-      "summary": "Update audio initialization to use AudioContext from the start, ensure mobile user-gesture requirements are handled without breaking mute behavior, and start playback during setup/init rather than per-frame.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-39",
-      "summary": "Improve visual fidelity and character readability: ensure penguins/aliens/UFOs/laser VFX look like distinct characters (not generic circles/stacked blobs), with crisp rendering at high DPI/4K and smooth animation.",
-      "reqIds": [],
-      "status": "pending"
+      "status": "in_progress"
     }
   ],
-  "gameProjectType": "2d",
-  "projectName": "Spacecoco",
+  "gameProjectType": "3d",
+  "projectName": "Motor Snake 3D",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

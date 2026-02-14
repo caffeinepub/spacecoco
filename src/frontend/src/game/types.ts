@@ -72,6 +72,24 @@ export interface ScorePopup {
   color: string;
 }
 
+export interface Laser {
+  id: string;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  createdAt: number;
+  duration: number;
+}
+
+export interface Explosion {
+  id: string;
+  x: number;
+  y: number;
+  createdAt: number;
+  duration: number;
+}
+
 export interface GameState {
   snake: Snake;
   opponents: OpponentSnake[];
@@ -85,7 +103,7 @@ export interface GameState {
   boss: Boss | null;
   isGameOver: boolean;
   isPaused: boolean;
-  lasers: Array<{ id: string; startX: number; startY: number; endX: number; endY: number; createdAt: number; duration: number }>;
-  explosions: Array<{ id: string; x: number; y: number; createdAt: number; duration: number }>;
+  lasers: Laser[];
+  explosions: Explosion[];
   scorePopups: ScorePopup[];
 }
