@@ -1,125 +1,108 @@
-import { drawSprite, drawFullSprite } from './sprites';
+import { ToonRenderer, toonMaterials } from './toonRenderer';
 import type { ScorePopup } from '../types';
 
-export interface LaserVFX {
-  id: string;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-  createdAt: number;
-  duration: number;
-}
-
-export interface ExplosionVFX {
-  id: string;
-  x: number;
-  y: number;
-  createdAt: number;
-  duration: number;
-}
-
 export function renderLaser(
+  renderer: ToonRenderer,
   ctx: CanvasRenderingContext2D,
-  laser: LaserVFX,
-  currentTime: number
+  laser: { startX: number; startY: number; endX: number; endY: number; createdAt: number; duration: number },
+  time: number
 ) {
-  const elapsed = currentTime - laser.createdAt;
-  if (elapsed > laser.duration) return;
+  const age = time - laser.createdAt;
+  const progress = Math.min(1, age / laser.duration);
+  const alpha = 1 - progress;
 
-  const angle = Math.atan2(laser.endY - laser.startY, laser.endX - laser.startX);
-  const length = Math.sqrt(
-    Math.pow(laser.endX - laser.startX, 2) + Math.pow(laser.endY - laser.startY, 2)
+  if (alpha <= 0) return;
+
+  const material = toonMaterials.laser;
+
+  // Multi-layer glow
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  
+  // Outer glow
+  renderer.drawGlow(
+    (laser.startX + laser.endX) / 2,
+    (laser.startY + laser.endY) / 2,
+    material.glowRadius * 1.5,
+    material.glowColor,
+    material.glowIntensity
   );
 
-  ctx.save();
-  ctx.translate(laser.startX, laser.startY);
-  ctx.rotate(angle);
-  
-  // Enhanced glow trail
-  ctx.shadowColor = '#ff0033';
-  ctx.shadowBlur = 30;
-  ctx.globalAlpha = 0.8;
-  
-  // Draw multiple layers for trail effect
-  for (let i = 0; i < 3; i++) {
-    ctx.globalAlpha = 0.3 - i * 0.1;
-    drawFullSprite(ctx, 'laser', 0, -6 - i * 2, length, 12 + i * 4);
-  }
-  
-  // Main laser beam
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 20;
-  drawFullSprite(ctx, 'laser', 0, -4, length, 8);
-  
+  // Core beam
+  ctx.strokeStyle = material.baseColor;
+  ctx.lineWidth = 4;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(laser.startX, laser.startY);
+  ctx.lineTo(laser.endX, laser.endY);
+  ctx.stroke();
+
+  // Inner glow
+  ctx.strokeStyle = renderer.adjustBrightness(material.baseColor, 1.5);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(laser.startX, laser.startY);
+  ctx.lineTo(laser.endX, laser.endY);
+  ctx.stroke();
+
   ctx.restore();
 }
 
 export function renderExplosion(
+  renderer: ToonRenderer,
   ctx: CanvasRenderingContext2D,
-  explosion: ExplosionVFX,
-  currentTime: number
+  explosion: { x: number; y: number; createdAt: number; duration: number },
+  time: number
 ) {
-  const elapsed = currentTime - explosion.createdAt;
-  if (elapsed > explosion.duration) return;
+  const age = time - explosion.createdAt;
+  const progress = Math.min(1, age / explosion.duration);
+  const alpha = 1 - progress;
+  const radius = 20 + progress * 40;
 
-  const frameSize = 64;
-  const totalFrames = 16;
-  const frameIndex = Math.floor((elapsed / explosion.duration) * totalFrames);
-  
-  if (frameIndex >= totalFrames) return;
-
-  const row = Math.floor(frameIndex / 4);
-  const col = frameIndex % 4;
+  if (alpha <= 0) return;
 
   ctx.save();
-  ctx.shadowColor = '#ff00ff';
-  ctx.shadowBlur = 40;
-  drawSprite(
-    ctx,
-    'explosion',
-    col * frameSize,
-    row * frameSize,
-    frameSize,
-    frameSize,
-    explosion.x - 32,
-    explosion.y - 32,
-    64,
-    64
-  );
+  ctx.globalAlpha = alpha;
+
+  // Outer ring
+  const gradient = ctx.createRadialGradient(explosion.x, explosion.y, 0, explosion.x, explosion.y, radius);
+  gradient.addColorStop(0, 'rgba(255, 200, 0, 0.8)');
+  gradient.addColorStop(0.5, 'rgba(255, 100, 0, 0.6)');
+  gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(explosion.x, explosion.y, radius, 0, Math.PI * 2);
+  ctx.fill();
+
   ctx.restore();
 }
 
 export function renderScorePopup(
+  renderer: ToonRenderer,
   ctx: CanvasRenderingContext2D,
   popup: ScorePopup,
-  currentTime: number
+  time: number
 ) {
-  const elapsed = currentTime - popup.createdAt;
-  if (elapsed > popup.duration) return;
-
-  const progress = elapsed / popup.duration;
+  const age = time - popup.createdAt;
+  const progress = Math.min(1, age / popup.duration);
   const alpha = 1 - progress;
-  const yOffset = -progress * 50;
+  const offsetY = progress * 30;
+
+  if (alpha <= 0) return;
 
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.font = 'bold 32px Orbitron, monospace';
+  ctx.font = 'bold 24px Orbitron, monospace';
+  ctx.fillStyle = popup.color;
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 3;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  
-  // Glow effect
-  ctx.shadowColor = popup.color;
-  ctx.shadowBlur = 20;
-  
-  // Outline
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 4;
-  ctx.strokeText(`+${popup.amount}`, popup.x, popup.y + yOffset);
-  
-  // Fill
-  ctx.fillStyle = popup.color;
-  ctx.fillText(`+${popup.amount}`, popup.x, popup.y + yOffset);
-  
+
+  const text = `+${popup.amount}`;
+  ctx.strokeText(text, popup.x, popup.y - offsetY);
+  ctx.fillText(text, popup.x, popup.y - offsetY);
+
   ctx.restore();
 }

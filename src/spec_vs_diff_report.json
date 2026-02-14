@@ -1,59 +1,38 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T23:06:29.681Z",
-  "summary": "Implemented an animated neon start/menu canvas scene and updated Home/Lobby pages to use it; revamped HUD styling with large neon digits; added neon palette/glow CSS/Tailwind utilities; enhanced gameplay VFX (laser glow/trail, explosions, point-drop rendering, score popup rendering); and upgraded SFX playback with WebAudio-based stereo panning while respecting mute. However, the diff summary does not provide evidence that the required generated image assets were actually added under frontend/public/assets/generated, nor does it clearly show (due to truncation) the full competitive scoring/elimination logic (head-vs-body elimination, respawn to initial length, point-drop spawning/collection and growth, and score updates for cows/penguins) being implemented end-to-end.",
+  "generatedAt": "2026-02-14T00:09:19.220Z",
+  "summary": "Diff implements early WebAudio initialization with a one-time user-gesture unlock on PlayPage, adds a DPR scaling utility for crisp canvas rendering, and updates obstacle rendering to provide clearer UFO/penguin/alien silhouettes with texture-backed overlays and fallbacks. However, the diff summary is truncated for key loop code and does not show explicit focus/visibility pause/resume handling for the RAF loop, nor does it show the actual required new texture image assets being added under frontend/public/assets/generated.",
   "missing_requirements": [
     {
-      "id": "REQ-34",
-      "requirement": "Updated competitive scoring model: award points when eating objects and when eliminating an opponent, with on-screen score feedback popups.",
-      "reason": "Score popup rendering and scoring constants/types are present, but the diff summary does not show the actual game-loop logic that increments score when eating cows/penguins and on elimination, nor the creation/lifecycle of score popups at those events (useGameLoop.ts is truncated before scoring/collision handling evidence).",
+      "id": "REQ-49",
+      "requirement": "Enforce a stable 60fps game loop target and add focus/visibility handling so the game loop is paused/stopped when the tab/app loses focus and is resumed when focus returns, without causing blank renders or duplicated loops.",
+      "reason": "useGameLoop.ts is truncated right as RAF loop logic starts; the diff summary provides no evidence of document visibilitychange/window blur handlers, nor evidence that the loop is stopped and restarted cleanly without duplicated RAF callbacks after multiple hide/show cycles.",
       "evidence": [
-        "frontend/src/game/hooks/useGameLoop.ts (truncated)",
-        "frontend/src/game/constants.ts",
-        "frontend/src/game/render/vfx.ts",
-        "frontend/src/game/types.ts"
+        "frontend/src/game/hooks/useGameLoop.ts (truncated)"
       ]
     },
     {
-      "id": "REQ-35",
-      "requirement": "Competitive elimination rule: body hits opponent head resets opponent to starting size; winner can collect dropped point items to gain score and grow.",
-      "reason": "Types/constants/rendering for POINT_DROP and elimination drop counts exist, but the diff summary does not show the head-vs-body collision detection, opponent reset to INITIAL_SNAKE_LENGTH, spawning of POINT_DROP obstacles, or the collection logic that increases score and grows the winner (useGameLoop.ts is truncated before that logic is visible).",
+      "id": "REQ-52",
+      "requirement": "Generate and include new high-detail toon textures under frontend/public/assets/generated and wire them into the existing toon texture loader/rendering pipeline.",
+      "reason": "The loader is wired to new generated texture paths, but the diff summary does not show the actual image files being added under frontend/public/assets/generated (only code changes are shown).",
       "evidence": [
-        "frontend/src/game/hooks/useGameLoop.ts (truncated)",
-        "frontend/src/game/constants.ts",
-        "frontend/src/game/types.ts",
-        "frontend/src/game/render/obstacles.ts"
-      ]
-    },
-    {
-      "id": "REQ-38",
-      "requirement": "Generate and include new retro-cartoon neon art assets and sprite sheets under frontend/public/assets/generated and reference them via /assets/generated/... paths.",
-      "reason": "Code references multiple /assets/generated/... images, but the diff summary lists no added/modified files under frontend/public/assets/generated, so there is no evidence the required PNGs/sprite sheets were actually added.",
-      "evidence": [
-        "frontend/src/components/start/NeonStartScene.tsx",
-        "frontend/src/pages/HomePage.tsx"
+        "frontend/src/game/render/toonMaterials.ts"
       ]
     }
   ],
   "hallucinated_features": [],
-  "confidence": 0.63,
+  "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/start/NeonStartScene.tsx",
-    "frontend/src/game/audio/useSfx.ts",
-    "frontend/src/game/constants.ts",
+    "frontend/src/game/audio/useAudioContextMusic.ts",
+    "frontend/src/game/audio/useAudioContextSfx.ts",
     "frontend/src/game/hooks/useGameLoop.ts",
-    "frontend/src/game/render/entities.ts",
+    "frontend/src/game/render/canvasDpr.ts",
     "frontend/src/game/render/obstacles.ts",
-    "frontend/src/game/render/vfx.ts",
-    "frontend/src/game/types.ts",
-    "frontend/src/game/ui/GameHUD.tsx",
-    "frontend/src/index.css",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/LobbyPage.tsx",
+    "frontend/src/game/render/toonMaterials.ts",
+    "frontend/src/game/render/toonRenderer.ts",
     "frontend/src/pages/PlayPage.tsx",
-    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

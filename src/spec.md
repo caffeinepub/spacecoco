@@ -1,15 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Upgrade Spacecoco’s visual/audio presentation and competitive scoring to a brighter retro-cartoon neon style, with an animated start/menu experience and clearer, more exciting score feedback.
+**Goal:** Improve Play screen reliability and presentation by initializing WebAudio early (gesture-safe on mobile), enforcing a focus-safe 60fps loop, rendering crisply on high-DPI/4K displays, and upgrading key entity visuals from generic blobs to readable Spacecoco-style silhouettes.
 
 **Planned changes:**
-- Update Home + Lobby screens with a clearly animated retro-cartoon neon hero/splash presentation (moving UFO/alien elements and bright cow eye-laser effects) while keeping the game name and existing navigation intact.
-- Redesign the in-game HUD scoring UI to a modern arcade retro-neon style with larger, highly readable digits and neon accents (purple/red/blue/green).
-- Implement competitive scoring updates: award points for eating objects and for opponent eliminations, with brief on-screen score gain feedback (e.g., floating neon number popups).
-- Add elimination rule: head-vs-body collision eliminates the head owner (respawns/resets to starting size), spawns collectible point items, and lets the winner collect them for score + extra growth.
-- Improve gameplay visual quality with brighter neon/glow/trailing effects (e.g., laser glow/trails) while preserving readability and responsiveness.
-- Upgrade audio polish with higher-quality SFX and stronger gameplay feedback (e.g., panning/filters/ducking), keeping the existing mute toggle working.
-- Add new generated neon retro-cartoon art/sprite assets under `frontend/public/assets/generated` and reference them via `/assets/generated/...` paths (no backend image serving).
+- Initialize/prepare an AudioContext as soon as the Play screen mounts, while deferring actual audio start to an allowed user gesture on platforms that require it, without breaking the existing mute toggle behavior.
+- Refactor game-loop control to a single requestAnimationFrame-driven loop targeting 60fps, and pause/resume cleanly on visibility/focus changes without duplicated loops or blank renders.
+- Update canvas sizing to render at devicePixelRatio-scaled resolution (clamped for performance) and apply appropriate smoothing so toon/vector primitives stay smooth and any bitmap sprites/textures stay sharp (no unintended blur).
+- Replace overly-generic entity rendering for the Penguin boss, UFO, and alien presence with clearer silhouettes and readable details while preserving the existing Spacecoco toon style and gameplay rules.
+- Add and wire updated/new toon textures under `frontend/public/assets/generated` via the existing texture loader/pipeline, with safe fallbacks if textures fail to load.
 
-**User-visible outcome:** The start/menu screens feel more animated and neon-bright, gameplay looks and sounds more “arcade premium,” the HUD is bolder and clearer, and competitive play now includes elimination resets with collectible drops plus clear scoring feedback for eats and eliminations.
+**User-visible outcome:** The Play screen starts and resumes reliably (including after tab/app focus changes), audio works on mobile with gesture requirements while mute remains dependable, the canvas looks sharper on high-DPI/4K displays, and the penguin boss/UFO/aliens are visually recognizable rather than blob-like placeholders.

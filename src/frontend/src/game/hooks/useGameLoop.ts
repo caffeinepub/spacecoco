@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
-import type { GameState, Direction, Obstacle, Boss, SnakeSegment, OpponentSnake, ScorePopup } from '../types';
+import type { GameState, Direction, Obstacle, Boss, SnakeSegment, OpponentSnake, ScorePopup, Snake } from '../types';
 import { 
   GRID_WIDTH, 
   GRID_HEIGHT, 
@@ -24,6 +24,9 @@ import { renderUFO, renderCow, renderPenguinBoss, renderPointDrop } from '../ren
 import { renderSnake, renderCrocodile, renderOpponentSnake } from '../render/entities';
 import { renderLaser, renderExplosion, renderScorePopup } from '../render/vfx';
 import { loadAllSprites } from '../render/sprites';
+import { loadToonTextures } from '../render/toonMaterials';
+import { ToonRenderer } from '../render/toonRenderer';
+import { setupCanvasDpr } from '../render/canvasDpr';
 
 export function useGameLoop(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
@@ -31,17 +34,24 @@ export function useGameLoop(
   isMuted: boolean = false,
   onLaserFired?: () => void,
   onCowEaten?: () => void,
-  onElimination?: () => void
+  onElimination?: () => void,
+  onTongueHiss?: () => void
 ) {
   const centerX = Math.floor(GRID_WIDTH / 2);
   const centerY = Math.floor(GRID_HEIGHT / 2);
 
-  const createInitialSnake = (): SnakeSegment[] => {
+  const createInitialSnake = (): Snake => {
     const segments: SnakeSegment[] = [];
     for (let i = 0; i < INITIAL_SNAKE_LENGTH; i++) {
       segments.push({ x: centerX - i, y: centerY });
     }
-    return segments;
+    return {
+      segments,
+      direction: 'RIGHT',
+      nextDirection: 'RIGHT',
+      skinId: 0,
+      isAlive: true,
+    };
   };
 
   const createOpponentSnake = (id: string, startX: number, startY: number): OpponentSnake => {
@@ -58,17 +68,8 @@ export function useGameLoop(
   };
 
   const [gameState, setGameState] = useState<GameState>({
-    snake: {
-      segments: createInitialSnake(),
-      direction: 'RIGHT',
-      nextDirection: 'RIGHT',
-      skinId: 0,
-      isAlive: true,
-    },
-    opponents: [
-      createOpponentSnake('opp1', Math.floor(GRID_WIDTH * 0.25), Math.floor(GRID_HEIGHT * 0.3)),
-      createOpponentSnake('opp2', Math.floor(GRID_WIDTH * 0.75), Math.floor(GRID_HEIGHT * 0.7)),
-    ],
+    snake: createInitialSnake(),
+    opponents: [],
     score: 0,
     level: 1,
     eliminations: 0,
@@ -84,502 +85,234 @@ export function useGameLoop(
     scorePopups: [],
   });
 
-  const [isGameOver, setIsGameOver] = useState(false);
   const [spritesLoaded, setSpritesLoaded] = useState(false);
   const [spriteLoadError, setSpriteLoadError] = useState<string | null>(null);
-  const animationFrameRef = useRef<number>(0);
-  const lastUpdateRef = useRef<number>(0);
-  const lastUFOSpawnRef = useRef<number>(0);
-  const lastCrocodileSpawnRef = useRef<number>(0);
-  const lastTongueRef = useRef<number>(0);
+  const gameStateRef = useRef(gameState);
   const starfieldRef = useRef<StarfieldRenderer | null>(null);
-  const gameStateRef = useRef<GameState>(gameState);
-  const spritesLoadedRef = useRef<boolean>(false);
-  const keysPressed = useRef<Set<string>>(new Set());
-
-  // Load sprites on mount
-  useEffect(() => {
-    loadAllSprites()
-      .then(() => {
-        console.log('✅ All sprites loaded successfully');
-        setSpritesLoaded(true);
-        spritesLoadedRef.current = true;
-      })
-      .catch(err => {
-        console.error('❌ Failed to load sprites:', err);
-        setSpriteLoadError(err.message || 'Failed to load game assets');
-        setSpritesLoaded(false);
-        spritesLoadedRef.current = false;
-      });
-  }, []);
+  const toonRendererRef = useRef<ToonRenderer | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+  const lastFrameTimeRef = useRef<number>(0);
+  const dprRef = useRef<number>(1);
+  const tongueTimerRef = useRef<number>(0);
+  const lastMoveTimeRef = useRef<number>(0);
+  const lastObstacleSpawnRef = useRef<number>(0);
 
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
 
-  const spawnUFOWithCow = useCallback(() => {
-    const ufoId = `ufo-${Date.now()}`;
-    const cowId = `cow-${Date.now()}`;
-    const spawnX = Math.floor(Math.random() * (GRID_WIDTH - 4)) + 2;
-    
-    const ufo: Obstacle = {
-      id: ufoId,
-      type: 'UFO_WITH_COW',
-      position: { x: spawnX, y: -2 },
-      active: true,
-      velocity: { x: 0, y: 0.5 },
-      linkedCowId: cowId,
-    };
-
-    const cow: Obstacle = {
-      id: cowId,
-      type: 'FLYING_COW',
-      position: { x: spawnX, y: -1 },
-      active: true,
-      velocity: { x: 0, y: 0.5 },
-    };
-
-    setGameState(prev => {
-      const newState = {
-        ...prev,
-        obstacles: [...prev.obstacles, ufo, cow],
-      };
-      gameStateRef.current = newState;
-      return newState;
-    });
+  const calculateGameplayIntensity = useCallback((): number => {
+    const state = gameStateRef.current;
+    const baseIntensity = Math.min(state.level / 10, 0.5);
+    const obstacleIntensity = Math.min(state.obstacles.length / 20, 0.3);
+    const bossIntensity = state.boss ? 0.2 : 0;
+    return Math.min(baseIntensity + obstacleIntensity + bossIntensity, 1.0);
   }, []);
 
-  const spawnCrocodile = useCallback(() => {
-    const crocodileId = `croc-${Date.now()}`;
-    const spawnX = Math.floor(Math.random() * (GRID_WIDTH - 4)) + 2;
-    const spawnY = Math.floor(Math.random() * (GRID_HEIGHT - 4)) + 2;
-    
-    const crocodile: Obstacle = {
-      id: crocodileId,
-      type: 'CROCODILE',
-      position: { x: spawnX, y: spawnY },
-      active: true,
-      velocity: { x: (Math.random() - 0.5) * 0.3, y: (Math.random() - 0.5) * 0.3 },
-      animationFrame: 0,
-    };
+  const [gameplayIntensity, setGameplayIntensity] = useState(0.5);
 
-    setGameState(prev => {
-      const newState = {
-        ...prev,
-        obstacles: [...prev.obstacles, crocodile],
-      };
-      gameStateRef.current = newState;
-      return newState;
-    });
-  }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setGameplayIntensity(calculateGameplayIntensity());
+    }, 500);
+    return () => clearInterval(interval);
+  }, [calculateGameplayIntensity]);
 
-  const spawnPenguinBoss = useCallback(() => {
-    const boss: Boss = {
-      type: 'PENGUIN',
-      position: { x: centerX, y: centerY },
-      health: 3,
-      circleProgress: 0,
-      active: true,
-    };
+  // RAF loop control
+  const startLoop = useCallback(() => {
+    if (rafIdRef.current !== null) return; // Already running
 
-    setGameState(prev => {
-      const newState = {
-        ...prev,
-        boss,
-      };
-      gameStateRef.current = newState;
-      return newState;
-    });
-  }, [centerX, centerY]);
+    const loop = (currentTime: number) => {
+      const deltaTime = currentTime - lastFrameTimeRef.current;
+      lastFrameTimeRef.current = currentTime;
 
-  const spawnPointDrops = useCallback((x: number, y: number, count: number) => {
-    const drops: Obstacle[] = [];
-    for (let i = 0; i < count; i++) {
-      const angle = (Math.PI * 2 * i) / count;
-      const distance = 2;
-      drops.push({
-        id: `drop-${Date.now()}-${i}`,
-        type: 'POINT_DROP',
-        position: {
-          x: x + Math.cos(angle) * distance,
-          y: y + Math.sin(angle) * distance,
-        },
-        active: true,
-        pointValue: POINTS_PER_POINT_DROP,
-      });
-    }
-
-    setGameState(prev => {
-      const newState = {
-        ...prev,
-        obstacles: [...prev.obstacles, ...drops],
-      };
-      gameStateRef.current = newState;
-      return newState;
-    });
-  }, []);
-
-  const addScorePopup = useCallback((x: number, y: number, amount: number, color: string) => {
-    const popup: ScorePopup = {
-      id: `popup-${Date.now()}-${Math.random()}`,
-      x,
-      y,
-      amount,
-      createdAt: Date.now(),
-      duration: 1500,
-      color,
-    };
-
-    setGameState(prev => {
-      const newState = {
-        ...prev,
-        scorePopups: [...prev.scorePopups, popup],
-      };
-      gameStateRef.current = newState;
-      return newState;
-    });
-  }, []);
-
-  const updateOpponents = useCallback((opponents: OpponentSnake[]): OpponentSnake[] => {
-    return opponents.map(opp => {
-      if (!opp.isAlive) return opp;
-
-      const head = { ...opp.segments[0] };
-      
-      // Simple AI: move towards nearest food or random direction
-      const directions: Direction[] = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
-      const validDirections = directions.filter(dir => {
-        if (dir === 'UP' && opp.direction === 'DOWN') return false;
-        if (dir === 'DOWN' && opp.direction === 'UP') return false;
-        if (dir === 'LEFT' && opp.direction === 'RIGHT') return false;
-        if (dir === 'RIGHT' && opp.direction === 'LEFT') return false;
-        return true;
-      });
-
-      if (Math.random() < 0.1 && validDirections.length > 0) {
-        opp.direction = validDirections[Math.floor(Math.random() * validDirections.length)];
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext('2d');
+      if (!canvas || !ctx) {
+        rafIdRef.current = requestAnimationFrame(loop);
+        return;
       }
 
-      switch (opp.direction) {
-        case 'UP':
-          head.y -= 1;
-          break;
-        case 'DOWN':
-          head.y += 1;
-          break;
-        case 'LEFT':
-          head.x -= 1;
-          break;
-        case 'RIGHT':
-          head.x += 1;
-          break;
+      const state = gameStateRef.current;
+
+      // Update tongue timer for hiss cadence
+      tongueTimerRef.current += deltaTime;
+      const showTongue = tongueTimerRef.current % TONGUE_CADENCE < TONGUE_CADENCE / 2;
+      if (tongueTimerRef.current >= TONGUE_CADENCE && onTongueHiss) {
+        onTongueHiss();
+        tongueTimerRef.current = 0;
       }
 
-      // Wrap around borders for opponents
-      if (head.x < 0) head.x = GRID_WIDTH - 1;
-      if (head.x >= GRID_WIDTH) head.x = 0;
-      if (head.y < 0) head.y = GRID_HEIGHT - 1;
-      if (head.y >= GRID_HEIGHT) head.y = 0;
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width / dprRef.current, canvas.height / dprRef.current);
 
-      return {
-        ...opp,
-        segments: [head, ...opp.segments.slice(0, -1)],
-      };
-    });
-  }, []);
-
-  const updateGame = useCallback(() => {
-    setGameState(prev => {
-      const newSnake = { ...prev.snake };
-      newSnake.direction = newSnake.nextDirection;
-
-      // Move snake head
-      const head = { ...newSnake.segments[0] };
-      switch (newSnake.direction) {
-        case 'UP':
-          head.y -= 1;
-          break;
-        case 'DOWN':
-          head.y += 1;
-          break;
-        case 'LEFT':
-          head.x -= 1;
-          break;
-        case 'RIGHT':
-          head.x += 1;
-          break;
+      // Render starfield
+      if (starfieldRef.current) {
+        starfieldRef.current.render(ctx);
       }
 
-      // Check border collision
-      if (head.x < 0 || head.x >= GRID_WIDTH || head.y < 0 || head.y >= GRID_HEIGHT) {
-        const newState = { ...prev, isGameOver: true };
-        gameStateRef.current = newState;
-        setIsGameOver(true);
-        return newState;
-      }
-
-      // Check self collision
-      const hitSelf = newSnake.segments.some(seg => seg.x === head.x && seg.y === head.y);
-      if (hitSelf) {
-        const newState = { ...prev, isGameOver: true };
-        gameStateRef.current = newState;
-        setIsGameOver(true);
-        return newState;
-      }
-
-      // Check collisions with opponents (body-on-head elimination)
-      let eliminationCount = 0;
-      const updatedOpponents = prev.opponents.map(opp => {
-        if (!opp.isAlive) return opp;
-
-        const oppHead = opp.segments[0];
-        
-        // Check if player body hits opponent head
-        const playerBodyHitsOppHead = newSnake.segments.slice(1).some(
-          seg => seg.x === oppHead.x && seg.y === oppHead.y
-        );
-
-        if (playerBodyHitsOppHead) {
-          eliminationCount++;
-          spawnPointDrops(oppHead.x, oppHead.y, ELIMINATION_POINT_DROPS);
-          addScorePopup(oppHead.x * GRID_SIZE, oppHead.y * GRID_SIZE, POINTS_PER_ELIMINATION, '#ff0066');
-          if (onElimination) onElimination();
-          
-          // Respawn opponent
-          return createOpponentSnake(
-            opp.id,
-            Math.floor(Math.random() * (GRID_WIDTH - 10)) + 5,
-            Math.floor(Math.random() * (GRID_HEIGHT - 10)) + 5
-          );
-        }
-
-        // Check if opponent body hits player head
-        const oppBodyHitsPlayerHead = opp.segments.slice(1).some(
-          seg => seg.x === head.x && seg.y === head.y
-        );
-
-        if (oppBodyHitsPlayerHead) {
-          const newState = { ...prev, isGameOver: true };
-          gameStateRef.current = newState;
-          setIsGameOver(true);
-          return opp;
-        }
-
-        return opp;
-      });
-
-      // Update opponent movement
-      const movedOpponents = updateOpponents(updatedOpponents);
-
-      // Check collisions with obstacles
-      let scoreIncrease = 0;
-      let growthAmount = 0;
-      const updatedObstacles = prev.obstacles.map(obstacle => {
-        if (obstacle.velocity) {
-          const newPos = {
-            x: obstacle.position.x + obstacle.velocity.x,
-            y: obstacle.position.y + obstacle.velocity.y,
-          };
-          
-          if (obstacle.type === 'CROCODILE') {
-            return {
-              ...obstacle,
-              position: newPos,
-              animationFrame: (obstacle.animationFrame || 0) + 0.2,
-            };
-          }
-          
-          return { ...obstacle, position: newPos };
-        }
-        return obstacle;
-      }).filter(obstacle => {
-        const gridX = Math.floor(obstacle.position.x);
-        const gridY = Math.floor(obstacle.position.y);
-        
-        if (gridX === head.x && gridY === head.y) {
-          if (obstacle.type === 'UFO_WITH_COW') {
-            growthAmount += UFO_GROWTH_AMOUNT;
-            return false;
+      // Render game entities
+      const renderer = toonRendererRef.current;
+      if (renderer) {
+        // Obstacles
+        state.obstacles.forEach(obstacle => {
+          if (obstacle.type === 'UFO') {
+            renderUFO(renderer, ctx, obstacle, currentTime);
           } else if (obstacle.type === 'FLYING_COW') {
-            scoreIncrease += POINTS_PER_COW;
-            addScorePopup(gridX * GRID_SIZE, gridY * GRID_SIZE, POINTS_PER_COW, '#00ff88');
-            if (onCowEaten) onCowEaten();
-            return false;
-          } else if (obstacle.type === 'CROCODILE') {
-            scoreIncrease += POINTS_PER_CROCODILE;
-            addScorePopup(gridX * GRID_SIZE, gridY * GRID_SIZE, POINTS_PER_CROCODILE, '#ffaa00');
-            return false;
+            renderCow(renderer, ctx, obstacle);
           } else if (obstacle.type === 'POINT_DROP') {
-            scoreIncrease += obstacle.pointValue || POINTS_PER_POINT_DROP;
-            growthAmount += POINT_DROP_GROWTH_AMOUNT;
-            addScorePopup(gridX * GRID_SIZE, gridY * GRID_SIZE, obstacle.pointValue || POINTS_PER_POINT_DROP, '#00ddff');
-            return false;
+            renderPointDrop(renderer, ctx, obstacle, currentTime);
+          } else if (obstacle.type === 'CROCODILE') {
+            renderCrocodile(renderer, ctx, obstacle);
           }
+        });
+
+        // Boss
+        if (state.boss) {
+          renderPenguinBoss(renderer, ctx, state.boss);
         }
 
-        return obstacle.position.y < GRID_HEIGHT + 2 && obstacle.position.y > -3;
-      });
+        // Opponents
+        state.opponents.forEach(opponent => {
+          if (opponent.isAlive) {
+            renderOpponentSnake(renderer, ctx, opponent, currentTime);
+          }
+        });
 
-      // Check boss collision
-      let bossBonus = 0;
-      if (prev.boss && prev.boss.active) {
-        const bossGridX = Math.floor(prev.boss.position.x);
-        const bossGridY = Math.floor(prev.boss.position.y);
-        
-        if (bossGridX === head.x && bossGridY === head.y) {
-          bossBonus = POINTS_PER_PENGUIN;
-          addScorePopup(bossGridX * GRID_SIZE, bossGridY * GRID_SIZE, POINTS_PER_PENGUIN, '#ff00ff');
-        }
+        // Player snake
+        renderSnake(renderer, ctx, state.snake, currentTime, showTongue);
+
+        // VFX
+        state.lasers.forEach(laser => {
+          renderLaser(renderer, ctx, laser, currentTime);
+        });
+        state.explosions.forEach(explosion => {
+          renderExplosion(renderer, ctx, explosion, currentTime);
+        });
+        state.scorePopups.forEach(popup => {
+          renderScorePopup(renderer, ctx, popup, currentTime);
+        });
+
+        renderer.applyGlobalBrightness();
       }
 
-      // Update snake segments
-      newSnake.segments = [head, ...newSnake.segments.slice(0, -1)];
-      
-      // Grow snake if needed
-      if (growthAmount > 0) {
-        for (let i = 0; i < growthAmount; i++) {
-          const tail = newSnake.segments[newSnake.segments.length - 1];
-          newSnake.segments.push({ ...tail });
-        }
-      }
+      rafIdRef.current = requestAnimationFrame(loop);
+    };
 
-      // Clean up old VFX
-      const now = Date.now();
-      const activeLasers = prev.lasers.filter(l => now - l.createdAt < l.duration);
-      const activeExplosions = prev.explosions.filter(e => now - e.createdAt < e.duration);
-      const activePopups = prev.scorePopups.filter(p => now - p.createdAt < p.duration);
+    lastFrameTimeRef.current = performance.now();
+    rafIdRef.current = requestAnimationFrame(loop);
+  }, [canvasRef, onTongueHiss]);
 
-      const newState = {
-        ...prev,
-        snake: newSnake,
-        opponents: movedOpponents,
-        obstacles: updatedObstacles,
-        score: prev.score + scoreIncrease + bossBonus + (eliminationCount * POINTS_PER_ELIMINATION) + 1,
-        eliminations: prev.eliminations + eliminationCount,
-        lasers: activeLasers,
-        explosions: activeExplosions,
-        scorePopups: activePopups,
-      };
-      
-      gameStateRef.current = newState;
-      return newState;
-    });
-  }, [onCowEaten, onElimination, spawnPointDrops, addScorePopup, updateOpponents, createOpponentSnake]);
-
-  const renderGame = useCallback((ctx: CanvasRenderingContext2D, now: number) => {
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    if (starfieldRef.current) {
-      starfieldRef.current.render(ctx);
-    }
-
-    const currentState = gameStateRef.current;
-
-    if (spritesLoadedRef.current) {
-      // Render obstacles
-      currentState.obstacles.forEach(obstacle => {
-        const pixelX = obstacle.position.x * GRID_SIZE;
-        const pixelY = obstacle.position.y * GRID_SIZE;
-
-        if (obstacle.type === 'UFO_WITH_COW') {
-          renderUFO(ctx, pixelX + GRID_SIZE / 2, pixelY + GRID_SIZE / 2);
-        } else if (obstacle.type === 'FLYING_COW') {
-          renderCow(ctx, pixelX + GRID_SIZE / 2, pixelY + GRID_SIZE / 2);
-        } else if (obstacle.type === 'CROCODILE') {
-          renderCrocodile(ctx, obstacle.position, obstacle.animationFrame || 0);
-        } else if (obstacle.type === 'POINT_DROP') {
-          renderPointDrop(ctx, pixelX + GRID_SIZE / 2, pixelY + GRID_SIZE / 2);
-        }
-      });
-
-      // Render boss
-      if (currentState.boss && currentState.boss.active) {
-        const pixelX = currentState.boss.position.x * GRID_SIZE;
-        const pixelY = currentState.boss.position.y * GRID_SIZE;
-        renderPenguinBoss(ctx, pixelX + GRID_SIZE / 2, pixelY + GRID_SIZE / 2);
-      }
-
-      // Render VFX
-      currentState.lasers.forEach(laser => renderLaser(ctx, laser, now));
-      currentState.explosions.forEach(explosion => renderExplosion(ctx, explosion, now));
-      currentState.scorePopups.forEach(popup => renderScorePopup(ctx, popup, now));
-
-      // Render opponents
-      currentState.opponents.forEach(opp => {
-        if (opp.isAlive) {
-          renderOpponentSnake(ctx, opp.segments);
-        }
-      });
-
-      // Render player snake with tongue animation
-      const showTongue = (now - lastTongueRef.current) % TONGUE_CADENCE < 200;
-      renderSnake(ctx, currentState.snake.segments, showTongue);
-    } else {
-      // Fallback rendering
-      ctx.fillStyle = '#00ff00';
-      currentState.snake.segments.forEach(segment => {
-        ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
-      });
+  const stopLoop = useCallback(() => {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
     }
   }, []);
 
-  const gameLoop = useCallback(() => {
+  // Visibility/focus handling for pause/resume
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopLoop();
+      } else {
+        if (!gameStateRef.current.isPaused && !gameStateRef.current.isGameOver) {
+          startLoop();
+        }
+      }
+    };
+
+    const handleBlur = () => {
+      stopLoop();
+    };
+
+    const handleFocus = () => {
+      if (!gameStateRef.current.isPaused && !gameStateRef.current.isGameOver) {
+        startLoop();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [startLoop, stopLoop]);
+
+  // Initialize canvas with DPR scaling
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const logicalWidth = 1200;
+    const logicalHeight = 800;
+
+    dprRef.current = setupCanvasDpr({
+      canvas,
+      logicalWidth,
+      logicalHeight,
+    });
+
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const now = Date.now();
-    const delta = now - lastUpdateRef.current;
-    const currentState = gameStateRef.current;
-
-    if (!currentState.isPaused && !currentState.isGameOver) {
-      if (now - lastUFOSpawnRef.current >= UFO_SPAWN_INTERVAL) {
-        spawnUFOWithCow();
-        lastUFOSpawnRef.current = now;
-      }
-
-      if (now - lastCrocodileSpawnRef.current >= CROCODILE_SPAWN_INTERVAL) {
-        spawnCrocodile();
-        lastCrocodileSpawnRef.current = now;
-      }
-
-      if (!currentState.boss && currentState.level % BOSS_SPAWN_INTERVAL === 0 && currentState.level > 0) {
-        spawnPenguinBoss();
-      }
+    if (ctx) {
+      starfieldRef.current = new StarfieldRenderer(logicalWidth, logicalHeight);
+      toonRendererRef.current = new ToonRenderer(ctx, { quality: 'high', brightness: 1.2 });
     }
 
-    if (delta >= BASE_SPEED && !currentState.isPaused && !currentState.isGameOver) {
-      updateGame();
-      lastUpdateRef.current = now;
-    }
+    // Handle resize
+    const handleResize = () => {
+      dprRef.current = setupCanvasDpr({
+        canvas,
+        logicalWidth,
+        logicalHeight,
+      });
+    };
 
-    renderGame(ctx, now);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [canvasRef]);
 
-    if (!currentState.isGameOver && !currentState.isPaused) {
-      animationFrameRef.current = requestAnimationFrame(gameLoop);
-    }
-  }, [spawnUFOWithCow, spawnCrocodile, spawnPenguinBoss, updateGame, renderGame]);
+  // Load assets
+  useEffect(() => {
+    Promise.all([
+      loadAllSprites().catch(err => {
+        console.warn('Sprite loading failed (non-critical):', err);
+        return null;
+      }),
+      loadToonTextures().catch(err => {
+        console.warn('Toon texture loading failed (non-critical):', err);
+        return null;
+      }),
+    ])
+      .then(() => {
+        setSpritesLoaded(true);
+      })
+      .catch(err => {
+        console.error('Critical asset loading error:', err);
+        setSpriteLoadError(err.message || 'Unknown error');
+      });
+  }, []);
 
   const startGame = useCallback(() => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
+    const initialSnake = createInitialSnake();
+    const opponents: OpponentSnake[] = [];
+    
+    if (mode === 'multiplayer') {
+      opponents.push(createOpponentSnake('opp1', 10, 10));
+      opponents.push(createOpponentSnake('opp2', GRID_WIDTH - 10, GRID_HEIGHT - 10));
     }
 
-    const newState: GameState = {
-      snake: {
-        segments: createInitialSnake(),
-        direction: 'RIGHT',
-        nextDirection: 'RIGHT',
-        skinId: 0,
-        isAlive: true,
-      },
-      opponents: [
-        createOpponentSnake('opp1', Math.floor(GRID_WIDTH * 0.25), Math.floor(GRID_HEIGHT * 0.3)),
-        createOpponentSnake('opp2', Math.floor(GRID_WIDTH * 0.75), Math.floor(GRID_HEIGHT * 0.7)),
-      ],
+    const now = Date.now();
+    lastMoveTimeRef.current = now;
+    lastObstacleSpawnRef.current = now;
+
+    setGameState({
+      snake: initialSnake,
+      opponents,
       score: 0,
       level: 1,
       eliminations: 0,
@@ -593,108 +326,222 @@ export function useGameLoop(
       lasers: [],
       explosions: [],
       scorePopups: [],
-    };
-    setGameState(newState);
-    gameStateRef.current = newState;
-    setIsGameOver(false);
-    lastUpdateRef.current = Date.now();
-    lastUFOSpawnRef.current = Date.now();
-    lastCrocodileSpawnRef.current = Date.now();
-    lastTongueRef.current = Date.now();
-    
-    if (!starfieldRef.current && canvasRef.current) {
-      starfieldRef.current = new StarfieldRenderer(
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
-    }
-    
-    gameLoop();
-  }, [gameLoop, createOpponentSnake]);
+    });
+
+    tongueTimerRef.current = 0;
+    startLoop();
+  }, [mode, startLoop]);
 
   const pauseGame = useCallback(() => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-    setGameState(prev => {
-      const newState = { ...prev, isPaused: true };
-      gameStateRef.current = newState;
-      return newState;
-    });
-  }, []);
+    setGameState(prev => ({ ...prev, isPaused: true }));
+    stopLoop();
+  }, [stopLoop]);
 
   const resumeGame = useCallback(() => {
-    setGameState(prev => {
-      const newState = { ...prev, isPaused: false };
-      gameStateRef.current = newState;
-      return newState;
-    });
-    lastUpdateRef.current = Date.now();
-    gameLoop();
-  }, [gameLoop]);
+    setGameState(prev => ({ ...prev, isPaused: false }));
+    lastMoveTimeRef.current = Date.now();
+    startLoop();
+  }, [startLoop]);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    keysPressed.current.add(e.key);
-    
-    const currentState = gameStateRef.current;
-    if (currentState.isPaused || currentState.isGameOver) return;
+  // Keyboard controls
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    let newDirection: Direction | null = null;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const state = gameStateRef.current;
+      if (state.isPaused || state.isGameOver) return;
 
-    if (e.key === 'ArrowUp' && currentState.snake.direction !== 'DOWN') {
-      newDirection = 'UP';
-    } else if (e.key === 'ArrowDown' && currentState.snake.direction !== 'UP') {
-      newDirection = 'DOWN';
-    } else if (e.key === 'ArrowLeft' && currentState.snake.direction !== 'RIGHT') {
-      newDirection = 'LEFT';
-    } else if (e.key === 'ArrowRight' && currentState.snake.direction !== 'LEFT') {
-      newDirection = 'RIGHT';
-    }
+      const directionMap: { [key: string]: Direction } = {
+        ArrowUp: 'UP',
+        ArrowDown: 'DOWN',
+        ArrowLeft: 'LEFT',
+        ArrowRight: 'RIGHT',
+        w: 'UP',
+        s: 'DOWN',
+        a: 'LEFT',
+        d: 'RIGHT',
+      };
 
-    if (newDirection) {
-      setGameState(prev => {
-        const newState = {
-          ...prev,
-          snake: {
-            ...prev.snake,
-            nextDirection: newDirection!,
-          },
+      const newDirection = directionMap[e.key];
+      if (newDirection) {
+        e.preventDefault();
+        const opposites: { [key in Direction]: Direction } = {
+          UP: 'DOWN',
+          DOWN: 'UP',
+          LEFT: 'RIGHT',
+          RIGHT: 'LEFT',
         };
-        gameStateRef.current = newState;
-        return newState;
-      });
-    }
-  }, []);
 
-  const handleKeyUp = useCallback((e: KeyboardEvent) => {
-    keysPressed.current.delete(e.key);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [handleKeyDown, handleKeyUp]);
-
-  useEffect(() => {
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+        if (newDirection !== opposites[state.snake.direction]) {
+          setGameState(prev => ({ 
+            ...prev, 
+            snake: { ...prev.snake, nextDirection: newDirection }
+          }));
+        }
       }
     };
-  }, []);
+
+    canvas.addEventListener('keydown', handleKeyDown);
+    canvas.focus();
+
+    return () => {
+      canvas.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [canvasRef]);
+
+  // Game logic update loop
+  useEffect(() => {
+    if (gameState.isPaused || gameState.isGameOver || !spritesLoaded) return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const state = gameStateRef.current;
+
+      if (now - lastMoveTimeRef.current < BASE_SPEED / state.level) return;
+
+      // Move snake
+      const head = state.snake.segments[0];
+      let newHead: SnakeSegment;
+
+      const actualDirection = state.snake.nextDirection;
+
+      switch (actualDirection) {
+        case 'UP':
+          newHead = { x: head.x, y: head.y - 1 };
+          break;
+        case 'DOWN':
+          newHead = { x: head.x, y: head.y + 1 };
+          break;
+        case 'LEFT':
+          newHead = { x: head.x - 1, y: head.y };
+          break;
+        case 'RIGHT':
+          newHead = { x: head.x + 1, y: head.y };
+          break;
+      }
+
+      // Check wall collision
+      if (newHead.x < 0 || newHead.x >= GRID_WIDTH || newHead.y < 0 || newHead.y >= GRID_HEIGHT) {
+        setGameState(prev => ({ ...prev, isGameOver: true }));
+        stopLoop();
+        return;
+      }
+
+      // Check self collision
+      if (state.snake.segments.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
+        setGameState(prev => ({ ...prev, isGameOver: true }));
+        stopLoop();
+        return;
+      }
+
+      const newSegments = [newHead, ...state.snake.segments];
+      let grow = false;
+      let scoreGain = 0;
+      const newObstacles = [...state.obstacles];
+      const newScorePopups = [...state.scorePopups];
+
+      // Check obstacle collision
+      for (let i = newObstacles.length - 1; i >= 0; i--) {
+        const obs = newObstacles[i];
+        if (obs.position.x === newHead.x && obs.position.y === newHead.y) {
+          if (obs.type === 'UFO') {
+            grow = true;
+            for (let j = 0; j < UFO_GROWTH_AMOUNT; j++) {
+              newSegments.push(newSegments[newSegments.length - 1]);
+            }
+            scoreGain += 10;
+            newScorePopups.push({
+              id: `popup-${now}-${i}`,
+              x: newHead.x * GRID_SIZE,
+              y: newHead.y * GRID_SIZE,
+              amount: 10,
+              createdAt: now,
+              duration: 1000,
+              color: '#00ff88',
+            });
+          } else if (obs.type === 'FLYING_COW') {
+            scoreGain += POINTS_PER_COW;
+            newScorePopups.push({
+              id: `popup-${now}-${i}`,
+              x: newHead.x * GRID_SIZE,
+              y: newHead.y * GRID_SIZE,
+              amount: POINTS_PER_COW,
+              createdAt: now,
+              duration: 1000,
+              color: '#ff00ff',
+            });
+            if (onCowEaten) onCowEaten();
+          } else if (obs.type === 'POINT_DROP') {
+            grow = true;
+            for (let j = 0; j < POINT_DROP_GROWTH_AMOUNT; j++) {
+              newSegments.push(newSegments[newSegments.length - 1]);
+            }
+            scoreGain += POINTS_PER_POINT_DROP;
+            newScorePopups.push({
+              id: `popup-${now}-${i}`,
+              x: newHead.x * GRID_SIZE,
+              y: newHead.y * GRID_SIZE,
+              amount: POINTS_PER_POINT_DROP,
+              createdAt: now,
+              duration: 1000,
+              color: '#ffff00',
+            });
+          }
+          newObstacles.splice(i, 1);
+        }
+      }
+
+      if (!grow) {
+        newSegments.pop();
+      }
+
+      // Spawn obstacles
+      if (now - lastObstacleSpawnRef.current > UFO_SPAWN_INTERVAL) {
+        const x = Math.floor(Math.random() * GRID_WIDTH);
+        const y = Math.floor(Math.random() * GRID_HEIGHT);
+        const type = Math.random() > 0.7 ? 'FLYING_COW' : 'UFO';
+        newObstacles.push({ 
+          id: `obs-${now}`,
+          type, 
+          position: { x, y },
+          active: true,
+        });
+        lastObstacleSpawnRef.current = now;
+      }
+
+      // Update explosions and popups
+      const newExplosions = state.explosions.filter(exp => now - exp.createdAt < 500);
+      const filteredPopups = newScorePopups.filter(popup => now - popup.createdAt < 1000);
+
+      lastMoveTimeRef.current = now;
+
+      setGameState(prev => ({
+        ...prev,
+        snake: {
+          ...prev.snake,
+          segments: newSegments,
+          direction: actualDirection,
+        },
+        obstacles: newObstacles,
+        score: prev.score + scoreGain,
+        level: Math.floor((prev.score + scoreGain) / 100) + 1,
+        explosions: newExplosions,
+        scorePopups: filteredPopups,
+      }));
+    }, 16);
+
+    return () => clearInterval(interval);
+  }, [gameState.isPaused, gameState.isGameOver, spritesLoaded, onCowEaten, stopLoop]);
 
   return {
     gameState,
-    isGameOver,
+    isGameOver: gameState.isGameOver,
     startGame,
     pauseGame,
     resumeGame,
     spritesLoaded,
     spriteLoadError,
+    gameplayIntensity,
   };
 }

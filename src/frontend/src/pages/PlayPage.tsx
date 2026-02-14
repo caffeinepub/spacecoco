@@ -6,8 +6,9 @@ import { ArrowLeft, Pause, Play, Volume2, VolumeX, AlertCircle } from 'lucide-re
 import { useGameLoop } from '@/game/hooks/useGameLoop';
 import { ControlsHintOverlay } from '@/game/ui/ControlsHintOverlay';
 import { GameHUD } from '@/game/ui/GameHUD';
-import { useMusicTrack } from '@/game/audio/useMusicTrack';
-import { useSfx } from '@/game/audio/useSfx';
+import { useAudioContextMusic } from '@/game/audio/useAudioContextMusic';
+import { useBeatClock } from '@/game/audio/useBeatClock';
+import { useAudioContextSfx } from '@/game/audio/useAudioContextSfx';
 
 export default function PlayPage() {
   const navigate = useNavigate();
@@ -16,8 +17,10 @@ export default function PlayPage() {
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const activeLaserStopRef = useRef<(() => void) | null>(null);
   
-  const { playSfx } = useSfx(isMuted);
+  const { playHiss, playBoing, playLaserBuzz } = useAudioContextSfx(isMuted);
   
   const {
     gameState,
@@ -27,20 +30,68 @@ export default function PlayPage() {
     resumeGame,
     spritesLoaded,
     spriteLoadError,
+    gameplayIntensity,
   } = useGameLoop(
     canvasRef,
     search.mode || 'local',
     isMuted,
-    () => playSfx('pew', 100),
-    () => playSfx('muuuuh', 200),
-    () => playSfx('boom', 300)
+    () => {
+      // Laser fired
+      if (activeLaserStopRef.current) {
+        activeLaserStopRef.current();
+      }
+      const stopFn = playLaserBuzz(0.3);
+      activeLaserStopRef.current = stopFn;
+    },
+    () => {
+      // Cow eaten - no specific sound, covered by score
+    },
+    () => {
+      // Elimination
+      playBoing();
+    },
+    () => {
+      // Tongue hiss
+      playHiss(1000);
+    }
   );
 
-  useMusicTrack(isPlaying && !isPaused && !isGameOver, isMuted);
+  const { audioContext, unlockAudioContext, needsUnlock } = useAudioContextMusic(
+    isPlaying && !isPaused && !isGameOver,
+    isMuted,
+    gameplayIntensity,
+    0
+  );
+
+  const { beatPhase } = useBeatClock(
+    isPlaying && !isPaused && !isGameOver,
+    audioContext
+  );
+
+  // One-time user gesture handler to unlock audio on mobile
+  useEffect(() => {
+    if (audioUnlocked || !needsUnlock) return;
+
+    const unlockHandler = () => {
+      unlockAudioContext();
+      setAudioUnlocked(true);
+    };
+
+    // Listen for any user interaction
+    window.addEventListener('pointerdown', unlockHandler, { once: true });
+    window.addEventListener('touchstart', unlockHandler, { once: true });
+    window.addEventListener('keydown', unlockHandler, { once: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', unlockHandler);
+      window.removeEventListener('touchstart', unlockHandler);
+      window.removeEventListener('keydown', unlockHandler);
+    };
+  }, [audioUnlocked, needsUnlock, unlockAudioContext]);
 
   useEffect(() => {
     if (spritesLoaded && !isPlaying) {
-      console.log('🎮 Starting game after sprites loaded');
+      console.log('🎮 Starting game after assets loaded');
       startGame();
       setIsPlaying(true);
     }
@@ -184,6 +235,8 @@ export default function PlayPage() {
                 <li>• Catch flying cows for bonus points</li>
                 <li>• Hit opponent heads with your body to eliminate</li>
                 <li>• Collect dropped points to grow and score</li>
+                <li>• Music intensity rises with gameplay action</li>
+                <li>• Beat-synced audio feedback enhances immersion</li>
               </ul>
             </div>
           </div>

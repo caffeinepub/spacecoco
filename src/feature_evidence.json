@@ -2,55 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-upgrade-the-spacecoco-start-experience-home-screen-lobby-screen-to-a-high-motion-retro-cartoon-neon-presentation-add-an-animated-hero-splash-scene-with-ufos-aliens-flying-across-the-screen-and-bright-cows-firing-eye-lasers-while-keeping-the-game-name-and-core-navigation-intact",
-      "featureTitle": "Upgrade the Spacecoco start experience (Home screen + Lobby screen) to a high-motion, retro-cartoon neon presentation: add an animated hero/splash scene with UFOs/aliens flying across the screen and bright cows firing eye-lasers, while keeping the game name and core navigation intact.",
+      "featureId": "feature-initialize-webaudio-audiocontext-at-the-earliest-possible-time-in-the-play-screen-lifecycle-and-ensure-audio-playback-is-started-from-a-user-gesture-on-mobile-without-breaking-the-existing-mute-toggle-behavior",
+      "featureTitle": "Initialize WebAudio (AudioContext) at the earliest possible time in the Play screen lifecycle and ensure audio playback is started from a user gesture on mobile without breaking the existing mute toggle behavior.",
       "files": [
-        "frontend/src/components/start/NeonStartScene.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/HomePage.tsx",
-        "frontend/src/pages/LobbyPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-32"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-revamp-the-in-game-scoring-ui-hud-to-a-modern-arcade-retro-neon-style-with-large-digits-bright-neon-color-accents-purple-red-blue-green-as-primary-palette-and-high-clarity-readability-over-gameplay",
-      "featureTitle": "Revamp the in-game scoring UI (HUD) to a modern arcade retro-neon style with large digits, bright neon color accents (purple/red/blue/green as primary palette), and high-clarity readability over gameplay.",
-      "files": [
-        "frontend/src/game/ui/GameHUD.tsx",
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-33"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-an-updated-competitive-scoring-model-that-awards-points-when-the-snake-eats-objects-and-when-it-successfully-eliminates-an-opponent-with-on-screen-score-feedback-e-g-floating-neon-number-popups-that-clearly-communicates-how-many-points-were-gained",
-      "featureTitle": "Implement an updated competitive scoring model that awards points when the snake eats objects and when it successfully eliminates an opponent, with on-screen score feedback (e.g., floating neon number popups) that clearly communicates how many points were gained.",
-      "files": [
-        "frontend/src/game/hooks/useGameLoop.ts",
-        "frontend/src/game/render/vfx.ts",
-        "frontend/src/game/types.ts",
+        "frontend/src/game/audio/useAudioContextMusic.ts",
+        "frontend/src/game/audio/useAudioContextSfx.ts",
         "frontend/src/pages/PlayPage.tsx"
       ],
       "components": [
@@ -62,19 +18,59 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-34"
+        "REQ-48"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-the-competitive-elimination-rule-when-a-snake-hits-an-opponent-s-head-with-its-body-the-opponent-resets-back-to-the-normal-starting-size-and-the-winner-can-collect-dropped-point-items-to-gain-score-and-grow",
-      "featureTitle": "Add the competitive elimination rule: when a snake hits an opponent's head with its body, the opponent resets back to the normal starting size, and the winner can collect dropped point items to gain score and grow.",
+      "featureId": "feature-enforce-a-stable-60fps-game-loop-target-and-add-focus-visibility-handling-so-the-game-loop-is-paused-stopped-when-the-tab-app-loses-focus-and-is-resumed-when-focus-returns-without-causing-blank-renders-or-duplicated-loops",
+      "featureTitle": "Enforce a stable 60fps game loop target and add focus/visibility handling so the game loop is paused/stopped when the tab/app loses focus and is resumed when focus returns, without causing blank renders or duplicated loops.",
       "files": [
-        "frontend/src/game/constants.ts",
         "frontend/src/game/hooks/useGameLoop.ts",
-        "frontend/src/game/render/entities.ts",
+        "frontend/src/pages/PlayPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-49"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-make-play-screen-canvas-rendering-crisp-on-high-dpi-and-4k-displays-by-rendering-at-devicepixelratio-scaled-resolution-clamped-to-a-reasonable-maximum-such-as-2-and-applying-correct-image-smoothing-settings-for-vector-toon-rendering-vs-any-bitmap-textures-sprites-used",
+      "featureTitle": "Make Play screen canvas rendering crisp on high-DPI and 4K displays by rendering at devicePixelRatio-scaled resolution (clamped to a reasonable maximum such as 2) and applying correct image smoothing settings for vector/toon rendering vs any bitmap textures/sprites used.",
+      "files": [
+        "frontend/src/game/hooks/useGameLoop.ts",
+        "frontend/src/game/render/canvasDpr.ts",
+        "frontend/src/game/render/toonRenderer.ts",
+        "frontend/src/pages/PlayPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-50"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-replace-overly-generic-circle-blob-visuals-for-key-entities-penguin-boss-ufo-aliens-pilots-with-clearer-silhouettes-and-readable-character-details-while-keeping-the-existing-spacecoco-toon-renderer-style-and-gameplay-rules-intact",
+      "featureTitle": "Replace overly-generic ‘circle/blob’ visuals for key entities (Penguin boss, UFO, aliens/pilots) with clearer silhouettes and readable character details while keeping the existing Spacecoco toon renderer style and gameplay rules intact.",
+      "files": [
         "frontend/src/game/render/obstacles.ts",
-        "frontend/src/game/types.ts"
+        "frontend/src/game/render/toonMaterials.ts",
+        "frontend/src/game/render/toonRenderer.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -85,17 +81,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-35"
+        "REQ-51"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-increase-perceived-visual-quality-during-gameplay-using-web-feasible-rendering-techniques-without-changing-the-core-rules-add-a-brighter-more-expensive-neon-look-via-post-processing-like-effects-e-g-glow-bloom-styling-laser-trails-subtle-motion-blur-trailing-while-preserving-gameplay-readability-and-performance",
-      "featureTitle": "Increase perceived visual quality during gameplay using web-feasible rendering techniques without changing the core rules: add a brighter, more 'expensive' neon look via post-processing-like effects (e.g., glow/bloom styling, laser trails, subtle motion blur/trailing) while preserving gameplay readability and performance.",
+      "featureId": "feature-generate-and-include-new-high-detail-toon-textures-needed-to-support-the-improved-non-generic-entity-silhouettes-place-them-under-frontend-public-assets-generated-and-wire-them-into-the-existing-toon-texture-loader-rendering-pipeline",
+      "featureTitle": "Generate and include new high-detail toon textures needed to support the improved, non-generic entity silhouettes, place them under frontend/public/assets/generated, and wire them into the existing toon texture loader/rendering pipeline.",
       "files": [
-        "frontend/src/game/hooks/useGameLoop.ts",
-        "frontend/src/game/render/vfx.ts",
-        "frontend/src/index.css"
+        "frontend/src/game/render/obstacles.ts",
+        "frontend/src/game/render/toonMaterials.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -106,48 +101,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-36"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-upgrade-audio-polish-using-web-feasible-techniques-replace-or-improve-sfx-to-higher-quality-versions-and-add-stronger-gameplay-feedback-e-g-stereo-spatial-feel-filters-ducking-where-appropriate-while-keeping-mute-behavior-working-on-the-play-screen",
-      "featureTitle": "Upgrade audio polish using web-feasible techniques: replace or improve SFX to higher-quality versions and add stronger gameplay feedback (e.g., stereo/spatial feel, filters/ducking where appropriate), while keeping mute behavior working on the Play screen.",
-      "files": [
-        "frontend/src/game/audio/useSfx.ts",
-        "frontend/src/game/hooks/useGameLoop.ts",
-        "frontend/src/pages/PlayPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-37"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-generate-and-include-new-high-quality-retro-cartoon-neon-static-art-assets-and-sprite-sheets-needed-for-the-updated-start-menu-presentation-and-brighter-in-game-vfx-placed-under-frontend-public-assets-generated-and-loaded-directly-by-the-frontend-no-backend-image-serving",
-      "featureTitle": "Generate and include new high-quality retro-cartoon neon static art assets and sprite sheets needed for the updated start/menu presentation and brighter in-game VFX, placed under frontend/public/assets/generated and loaded directly by the frontend (no backend image serving).",
-      "files": [
-        "frontend/src/components/start/NeonStartScene.tsx",
-        "frontend/src/pages/HomePage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-38"
+        "REQ-52"
       ],
       "confidence": "high"
     }

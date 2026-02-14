@@ -1,89 +1,94 @@
-import { drawSprite } from './sprites';
-import type { SnakeSegment, Position } from '../types';
-import { GRID_SIZE } from '../constants';
+import { ToonRenderer, toonMaterials } from './toonRenderer';
+import type { Snake, OpponentSnake, Obstacle } from '../types';
+import { GRID_SIZE, TONGUE_CADENCE } from '../constants';
 
 export function renderSnake(
+  renderer: ToonRenderer,
   ctx: CanvasRenderingContext2D,
-  segments: SnakeSegment[],
-  showTongue: boolean = false
+  snake: Snake,
+  time: number,
+  showTongue: boolean
 ) {
-  if (segments.length === 0) return;
+  const material = toonMaterials.snake;
 
-  segments.forEach((segment, index) => {
-    const pixelX = segment.x * GRID_SIZE;
-    const pixelY = segment.y * GRID_SIZE;
-
-    if (index === 0) {
-      // Head with enhanced glow
-      ctx.save();
-      ctx.shadowColor = '#00ff88';
-      ctx.shadowBlur = 20;
-      // Snake sprite sheet: 256x256, 4x4 grid, 64px per frame
-      // Frame 0 = head
-      drawSprite(ctx, 'snake', 0, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
-      ctx.restore();
-      
-      if (showTongue) {
-        // Frame 3 = tongue
-        drawSprite(ctx, 'snake', 192, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
-      }
-    } else {
-      // Body with subtle glow
-      ctx.save();
-      ctx.shadowColor = '#00ff88';
-      ctx.shadowBlur = 10;
-      // Frame 1 = body
-      drawSprite(ctx, 'snake', 64, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
-      ctx.restore();
-    }
+  snake.segments.forEach((segment, index) => {
+    const x = segment.x * GRID_SIZE;
+    const y = segment.y * GRID_SIZE;
+    
+    // Undulating wave effect
+    const wave = Math.sin(index * 0.3 + time * 0.01) * 2;
+    
+    renderer.drawSnakeSegment(x, y, GRID_SIZE, material, wave);
   });
+
+  // Draw head with tongue
+  if (showTongue && snake.segments.length > 0) {
+    const head = snake.segments[0];
+    const x = head.x * GRID_SIZE + GRID_SIZE / 2;
+    const y = head.y * GRID_SIZE + GRID_SIZE / 2;
+
+    ctx.save();
+    ctx.strokeStyle = '#ff0000';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    let tongueX = x, tongueY = y;
+    switch (snake.direction) {
+      case 'UP':
+        tongueY -= GRID_SIZE;
+        break;
+      case 'DOWN':
+        tongueY += GRID_SIZE;
+        break;
+      case 'LEFT':
+        tongueX -= GRID_SIZE;
+        break;
+      case 'RIGHT':
+        tongueX += GRID_SIZE;
+        break;
+    }
+    
+    ctx.moveTo(x, y);
+    ctx.lineTo(tongueX, tongueY);
+    ctx.stroke();
+    ctx.restore();
+  }
 }
 
 export function renderOpponentSnake(
+  renderer: ToonRenderer,
   ctx: CanvasRenderingContext2D,
-  segments: SnakeSegment[]
+  opponent: OpponentSnake,
+  time: number
 ) {
-  if (segments.length === 0) return;
+  if (!opponent.isAlive) return;
 
-  segments.forEach((segment, index) => {
-    const pixelX = segment.x * GRID_SIZE;
-    const pixelY = segment.y * GRID_SIZE;
+  const material = toonMaterials.opponentSnake;
 
-    ctx.save();
-    // Red tint for opponents
-    ctx.shadowColor = '#ff0066';
-    ctx.shadowBlur = index === 0 ? 20 : 10;
-    ctx.globalAlpha = 0.9;
+  opponent.segments.forEach((segment, index) => {
+    const x = segment.x * GRID_SIZE;
+    const y = segment.y * GRID_SIZE;
     
-    if (index === 0) {
-      // Frame 0 = head
-      drawSprite(ctx, 'snake', 0, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
-    } else {
-      // Frame 1 = body
-      drawSprite(ctx, 'snake', 64, 0, 64, 64, pixelX, pixelY, GRID_SIZE, GRID_SIZE);
-    }
+    const wave = Math.sin(index * 0.3 + time * 0.01 + Math.PI) * 2;
     
-    // Add red overlay
-    ctx.globalCompositeOperation = 'multiply';
-    ctx.fillStyle = '#ff3366';
-    ctx.fillRect(pixelX, pixelY, GRID_SIZE, GRID_SIZE);
-    ctx.restore();
+    renderer.drawSnakeSegment(x, y, GRID_SIZE, material, wave);
   });
 }
 
 export function renderCrocodile(
+  renderer: ToonRenderer,
   ctx: CanvasRenderingContext2D,
-  position: Position,
-  animationFrame: number
+  obstacle: Obstacle
 ) {
-  const pixelX = position.x * GRID_SIZE;
-  const pixelY = position.y * GRID_SIZE;
-  const frameIndex = Math.floor(animationFrame) % 2;
+  const x = obstacle.position.x * GRID_SIZE;
+  const y = obstacle.position.y * GRID_SIZE;
+  const size = GRID_SIZE * 1.5;
 
-  ctx.save();
-  ctx.shadowColor = '#88ff00';
-  ctx.shadowBlur = 15;
-  // Crocodile sprite sheet: 256x128, 2 frames horizontally, 128px per frame
-  drawSprite(ctx, 'crocodile', frameIndex * 128, 0, 128, 128, pixelX, pixelY, GRID_SIZE * 2, GRID_SIZE);
-  ctx.restore();
+  const material = {
+    ...toonMaterials.snake,
+    baseColor: '#88ff00',
+    glowColor: '#88ff00',
+  };
+
+  renderer.drawRectEntity(x, y, size, size * 0.6, material);
 }

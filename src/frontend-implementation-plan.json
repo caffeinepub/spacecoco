@@ -1,257 +1,158 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Spacecoco neon start/menu animation, HUD + scoring/elimination revamp, brighter VFX, and audio polish (frontend-only)",
+  "title": "Play screen audio unlock, focus-safe 60fps loop, 4K-crisp DPR canvas, and upgraded toon silhouettes/textures",
   "requirements": [
     {
-      "id": "REQ-32",
-      "summary": "Upgrade Home + Lobby start experience to a high-motion retro-cartoon neon animated presentation while keeping Spacecoco name and navigation intact",
+      "id": "REQ-48",
+      "summary": "Initialize AudioContext immediately on Play mount and unlock/start audio via user gesture on mobile while preserving mute toggle behavior.",
       "acceptanceCriteria": [
-        "Home screen and/or Lobby screen includes a clearly animated scene (not just a static image) featuring moving UFO/alien elements and cow eye-laser effects.",
-        "All user-facing text remains in English (existing headings/buttons remain understandable and consistent).",
-        "Navigation to Lobby/Play/Skins/Leaderboard continues to work as before."
+        "When the Play screen mounts, an AudioContext is created (or prepared) immediately, but actual playback only starts after a user gesture if required by the platform/browser.",
+        "Toggling mute always silences music and SFX immediately and reliably, including on mobile where audio requires a user gesture to begin.",
+        "No audio-start logic is executed from a per-frame render loop; audio start/stop is triggered by lifecycle/state transitions (e.g., start/resume/pause/mute) rather than every frame."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/start/NeonStartScene.tsx",
-          "operation": "create",
-          "description": "Create a reusable animated start-scene component (retro-cartoon neon) that renders moving UFO/alien fly-bys and cow eye-laser bursts using the generated splash/banner + sprite-sheet assets; keep the game title and CTA slots available for existing copy. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/game/audio/useAudioContextMusic.ts",
+          "operation": "modify",
+          "description": "Create/prepare the AudioContext at hook initialization time (on mount) and add explicit user-gesture unlock support (e.g., resume) so playback start is driven by Play lifecycle/state transitions rather than any frame loop."
         },
         {
-          "path": "frontend/src/pages/HomePage.tsx",
+          "path": "frontend/src/game/audio/useAudioContextSfx.ts",
           "operation": "modify",
-          "description": "Replace the current mostly-static hero section background/hero image usage with the new NeonStartScene (keeping the SPACECOCO title text and existing navigation buttons intact and understandable in English). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/LobbyPage.tsx",
-          "operation": "modify",
-          "description": "Add the NeonStartScene (or a lighter-weight variant/prop configuration) as an animated banner/hero backdrop for the Lobby screen while preserving existing lobby controls and copy in English. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add global utility classes for neon glow overlays and performance-friendly animation helpers used by the animated start/menu presentation (no changes to user-facing text)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-33",
-      "summary": "Revamp the in-game HUD to a modern arcade retro-neon style with large readable digits and purple/red/blue/green accents",
-      "acceptanceCriteria": [
-        "Score and Level are displayed with larger, more prominent typography than the current HUD.",
-        "HUD styling is neon/retro and uses the requested bright palette (including purple/red/blue/green).",
-        "HUD remains readable against the playfield (no low-contrast text over bright effects)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/ui/GameHUD.tsx",
-          "operation": "modify",
-          "description": "Redesign HUD layout and styling: larger score/level digits, stronger neon contrast, and clear grouping; incorporate purple/red/blue/green accents while keeping the same displayed information (Score, Level, Planet, Gravity)."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add neon text styles (e.g., glow/shadow utilities) to ensure large HUD digits remain readable over bright gameplay visuals."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Extend Tailwind theme with additional neon utility tokens/animations (focused on purple/red/blue/green accent usage) needed for the updated HUD styling."
-        }
-      ]
-    },
-    {
-      "id": "REQ-34",
-      "summary": "Update scoring to award points for eating objects and for eliminations, with clear on-screen point-gain popups that do not obstruct gameplay",
-      "acceptanceCriteria": [
-        "Eating at least cows and penguins changes the score in a clearly visible way (HUD updates and an on-canvas or overlay popup appears).",
-        "When an elimination event occurs (see competitive rule requirement), the winner receives a clear points reward and an on-screen popup indicates the gain.",
-        "Score feedback animations do not block gameplay visibility (brief duration, positioned sensibly)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/types.ts",
-          "operation": "modify",
-          "description": "Add/extend types to support score feedback popups (position, amount, color/style, lifetime) and elimination score events while keeping existing game types compatible."
-        },
-        {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
-          "operation": "modify",
-          "description": "Adjust gameplay scoring logic so points are awarded on eating (at minimum cows and penguins) and on elimination wins; push score feedback popup events into state with brief lifetimes and sensible positioning so gameplay visibility is preserved."
-        },
-        {
-          "path": "frontend/src/game/render/vfx.ts",
-          "operation": "modify",
-          "description": "Implement rendering for floating neon score popups (e.g., +150) with short animation and glow; ensure popups are readable and fade out quickly without covering the playfield."
+          "description": "Add an explicit ‘prepare/init’ API to create the AudioContext immediately (without playing), and ensure mute immediately stops/avoids starting any active oscillators/sources."
         },
         {
           "path": "frontend/src/pages/PlayPage.tsx",
           "operation": "modify",
-          "description": "Ensure HUD + canvas VFX feedback remains visible together (no overlay conflicts) and that mute/pause UI continues to function with the updated scoring feedback."
+          "description": "Wire early audio preparation on Play mount and add a one-time user gesture handler (pointer/touch/keyboard) that unlocks audio contexts on mobile while keeping the existing mute toggle semantics intact."
         }
       ]
     },
     {
-      "id": "REQ-35",
-      "summary": "Add competitive elimination rule: body-on-opponent-head eliminates the opponent (reset to starting size) and spawns collectible point drops for growth/score",
+      "id": "REQ-49",
+      "summary": "Run a single focus-safe RAF loop targeting 60fps and pause/resume cleanly on visibility/focus changes without duplicated loops or blank renders.",
       "acceptanceCriteria": [
-        "A head-vs-body collision between two snakes triggers an elimination event for the head owner (not a full match reset).",
-        "The eliminated snake respawns/resets to the normal starting size as defined by the game initialization rules.",
-        "The elimination produces collectible point items on the playfield, and collecting them increases the winner's score and causes additional growth."
+        "The Play screen runs updates/renders via requestAnimationFrame with a 60fps target (where the browser allows).",
+        "On document visibility change (hidden) and/or window blur, the game loop stops (no accumulating RAF callbacks), and on visibility/focus return it resumes cleanly.",
+        "After multiple hide/show cycles, there is still exactly one active RAF loop and gameplay continues from the same paused/unpaused state as intended (no speedup, no freeze, no blank canvas)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/types.ts",
+          "path": "frontend/src/game/hooks/useGameLoop.ts",
           "operation": "modify",
-          "description": "Extend game state types to represent at least one opponent snake, elimination events, and dropped collectible point items (including metadata needed for scoring and growth)."
+          "description": "Refactor the RAF driver into explicit start/stop controls to guarantee exactly one active loop; add visibilitychange + blur/focus handling to stop the loop when hidden/unfocused and resume it safely (without spawning duplicate RAF callbacks), keeping state-consistent pause/resume behavior."
         },
         {
-          "path": "frontend/src/game/constants.ts",
+          "path": "frontend/src/pages/PlayPage.tsx",
           "operation": "modify",
-          "description": "Add constants for elimination rewards, drop counts/values, and respawn/reset behavior while keeping existing systems (planets/modifiers, bosses, spawning, crocodiles, power-ups) intact."
+          "description": "Ensure Play UI pause/resume controls integrate with the updated loop start/stop behavior (no duplicated loops across pause and focus cycles) and that a render occurs after resume to avoid any perceived blank canvas."
+        }
+      ]
+    },
+    {
+      "id": "REQ-50",
+      "summary": "Implement DPR-scaled (clamped) canvas backing resolution for crisp 4K/high-DPI rendering and apply correct image smoothing for toon primitives vs bitmap textures/sprites.",
+      "acceptanceCriteria": [
+        "On high-DPI displays, the canvas backing resolution scales with devicePixelRatio (with an upper clamp so performance stays stable), while CSS size remains consistent.",
+        "Toon/vector-style primitives remain smooth (no jagged edges) at high DPI.",
+        "If any bitmap textures/sprite images are rendered, the appropriate image smoothing setting is applied so they are not blurred unintentionally.",
+        "The visual result is measurably sharper than a non-DPR-scaled canvas (text and outlines are crisp, no ‘soft’ look)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/render/canvasDpr.ts",
+          "operation": "create",
+          "description": "Add a small utility to size the canvas backing store using devicePixelRatio with a clamp (e.g., max 2), keep CSS size stable, and provide a consistent drawing transform/setup for crisp high-DPI rendering."
+        },
+        {
+          "path": "frontend/src/pages/PlayPage.tsx",
+          "operation": "modify",
+          "description": "Apply DPR-aware canvas sizing on mount and on resize using the new canvas DPR utility so the displayed size stays consistent while the backing resolution is scaled/clamped for crisp 4K rendering."
         },
         {
           "path": "frontend/src/game/hooks/useGameLoop.ts",
           "operation": "modify",
-          "description": "Implement opponent snake simulation (sufficient to trigger head-vs-body collisions), detect body-on-opponent-head elimination, reset eliminated snake to INITIAL_SNAKE_LENGTH, spawn collectible point drops on the playfield, and apply score+growth when drops are collected."
+          "description": "Update draw initialization to respect DPR-scaled canvas sizing (logical vs backing dimensions) so the starfield and toon renderer render sharply and consistently after resizes."
         },
         {
-          "path": "frontend/src/game/render/entities.ts",
+          "path": "frontend/src/game/render/toonRenderer.ts",
           "operation": "modify",
-          "description": "Update rendering to draw opponent snake(s) distinctly from the player (e.g., tinted/glowing treatment) while preserving readability and performance."
+          "description": "Ensure toon/vector primitives keep high-quality smoothing enabled by default, and provide a safe way for callers to temporarily toggle smoothing when drawing bitmap/pixel assets as needed."
+        },
+        {
+          "path": "frontend/src/game/render/sprites.ts",
+          "operation": "modify",
+          "description": "When drawing any legacy bitmap sprites, temporarily set canvas image smoothing appropriately (typically disabled for pixel art) to prevent unintended blur on high-DPI canvases."
+        }
+      ]
+    },
+    {
+      "id": "REQ-51",
+      "summary": "Upgrade penguin boss, UFO, and alien/pilot visuals to readable silhouettes with clear toon details while preserving existing renderer style and gameplay.",
+      "acceptanceCriteria": [
+        "Penguin boss rendering is updated so it reads clearly as a penguin (distinct head/body separation, beak/eyes/flippers silhouette cues) rather than a single circle entity.",
+        "UFO rendering is updated so it reads clearly as a spacecraft (distinct hull/dome/lights cues) rather than a plain ellipse, while preserving the existing glow treatment and drift motion.",
+        "Alien presence is represented visually (e.g., an alien pilot visible in/near the UFO or as a distinct rendered feature) using original artwork (no third-party copyrighted characters).",
+        "Entities remain readable over the starfield and VFX; silhouettes are recognizable at typical gameplay zoom.",
+        "All user-facing UI text remains in English (no new Spanish UI text introduced)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/render/obstacles.ts",
+          "operation": "modify",
+          "description": "Replace the current generic UFO and penguin boss drawing with clearer multi-part silhouettes (hull+dome+lights for UFO; head/body/beak/eyes/flippers cues for penguin) while preserving existing glow treatment, drift motion, and gameplay hit rules."
+        },
+        {
+          "path": "frontend/src/game/render/toonMaterials.ts",
+          "operation": "modify",
+          "description": "Extend toon texture accessors/material definitions to support UFO decals/emissive accents and an alien pilot visual element used by the improved UFO rendering, with safe null fallbacks."
+        },
+        {
+          "path": "frontend/src/game/render/toonRenderer.ts",
+          "operation": "modify",
+          "description": "Add/adjust renderer helpers as needed to support drawing layered toon shapes plus optional texture overlays (e.g., decals/pilot) while keeping the overall Spacecoco toon style consistent."
+        }
+      ]
+    },
+    {
+      "id": "REQ-52",
+      "summary": "Add new 4K toon textures and wire them into the existing toon texture loader/rendering pipeline with resilient fallbacks (no blank screen if load fails).",
+      "acceptanceCriteria": [
+        "New/updated textures are added under frontend/public/assets/generated and load successfully via the existing texture loader paths used at runtime.",
+        "If textures fail to load, the game still renders (fallback rendering remains functional) and the Play screen is never fully blank.",
+        "No backend image serving is introduced; all new art is shipped as static frontend assets."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/ufo-toon-albedo-v2.dim_4096x4096.png",
+          "operation": "create",
+          "description": "Add the generated toon UFO exterior albedo texture asset at frontend/public/assets/generated/ufo-toon-albedo-v2.dim_4096x4096.png and ensure it is included in the build output."
+        },
+        {
+          "path": "frontend/public/assets/generated/penguin-toon-albedo-v2.dim_4096x4096.png",
+          "operation": "create",
+          "description": "Add the generated toon penguin boss albedo texture asset at frontend/public/assets/generated/penguin-toon-albedo-v2.dim_4096x4096.png and ensure it is included in the build output."
+        },
+        {
+          "path": "frontend/public/assets/generated/alien-pilot-toon-albedo.dim_4096x4096.png",
+          "operation": "create",
+          "description": "Add the generated toon alien pilot texture asset at frontend/public/assets/generated/alien-pilot-toon-albedo.dim_4096x4096.png and ensure it is included in the build output."
+        },
+        {
+          "path": "frontend/public/assets/generated/ufo-decals-emissive.dim_2048x2048.png",
+          "operation": "create",
+          "description": "Add the generated toon emissive decal sheet asset at frontend/public/assets/generated/ufo-decals-emissive.dim_2048x2048.png and ensure it is included in the build output."
+        },
+        {
+          "path": "frontend/src/game/render/toonMaterials.ts",
+          "operation": "modify",
+          "description": "Update the toon texture loader to load the new assets from frontend/public/assets/generated/ufo-toon-albedo-v2.dim_4096x4096.png, frontend/public/assets/generated/penguin-toon-albedo-v2.dim_4096x4096.png, frontend/public/assets/generated/alien-pilot-toon-albedo.dim_4096x4096.png, and frontend/public/assets/generated/ufo-decals-emissive.dim_2048x2048.png; keep robust error handling so rendering falls back to shape-only drawing if any texture fails."
         },
         {
           "path": "frontend/src/game/render/obstacles.ts",
           "operation": "modify",
-          "description": "Add rendering support for the new dropped point items (collectibles) so they are clearly visible and consistent with the neon style."
-        }
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "summary": "Increase perceived gameplay visual quality with brighter neon post-processing-like effects (glow/trails) while preserving performance and readability",
-      "acceptanceCriteria": [
-        "Lasers have a visible trailing/glow effect compared to the current thin beam rendering.",
-        "Overall gameplay presentation is noticeably brighter/neon without obscuring hazards, snake, or collectibles.",
-        "Game remains responsive (no obvious stutter introduced by the new effects) and core mechanics remain intact."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/render/vfx.ts",
-          "operation": "modify",
-          "description": "Enhance laser rendering with glow/trail treatment (web-feasible canvas techniques such as shadow blur/compositing and brief trail persistence) and incorporate neon spark particles where appropriate."
-        },
-        {
-          "path": "frontend/src/game/render/sprites.ts",
-          "operation": "modify",
-          "description": "Register/load the neon spark spritesheet asset for UI/VFX accents and ensure it can be drawn efficiently during gameplay."
-        },
-        {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
-          "operation": "modify",
-          "description": "Adjust render loop to support subtle trailing/motion persistence in a performance-friendly way (without obscuring hazards, snake, or collectibles) and keep core mechanics unchanged."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Tune canvas/container styling (e.g., subtle neon glow around the canvas) to reinforce the brighter 'expensive' look while maintaining contrast and clarity."
-        }
-      ]
-    },
-    {
-      "id": "REQ-37",
-      "summary": "Upgrade audio polish: higher-quality SFX and add cinematic feedback (e.g., stereo feel/filters) while keeping Play mute behavior working",
-      "acceptanceCriteria": [
-        "The existing mute toggle on PlayPage continues to mute both music and SFX.",
-        "Laser firing and cow-eating SFX are upgraded in quality and remain clearly audible with appropriate mixing.",
-        "At least one additional cinematic-feel audio enhancement is present (e.g., positional panning on laser, filtered explosion tail, or dynamic volume shaping) without breaking browser autoplay constraints."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/audio/useSfx.ts",
-          "operation": "modify",
-          "description": "Upgrade SFX playback to support higher-quality assets and at least one cinematic enhancement (e.g., stereo panning for lasers and/or filtered tails on explosions) while preserving throttle behavior and fully respecting the existing isMuted flag."
-        },
-        {
-          "path": "frontend/src/game/hooks/useGameLoop.ts",
-          "operation": "modify",
-          "description": "Trigger additional gameplay feedback SFX events as needed (e.g., elimination, point-drop pickup, explosion moments) and pass enough context to enable spatial/cinematic mixing without impacting gameplay performance."
-        },
-        {
-          "path": "frontend/src/pages/PlayPage.tsx",
-          "operation": "modify",
-          "description": "Keep the current mute toggle behavior intact across music and SFX with the upgraded audio system; ensure no new autoplay-breaking behavior is introduced."
-        },
-        {
-          "path": "frontend/public/assets/audio/spacecoco-pew.wav",
-          "operation": "create",
-          "description": "Add improved high-quality laser firing SFX asset (used by the updated SFX system)."
-        },
-        {
-          "path": "frontend/public/assets/audio/spacecoco-muuuuh.wav",
-          "operation": "create",
-          "description": "Add improved high-quality cow-eating SFX asset (used by the updated SFX system)."
-        },
-        {
-          "path": "frontend/public/assets/audio/spacecoco-boom.wav",
-          "operation": "create",
-          "description": "Add an explosion/elimination-impact SFX asset to support stronger cinematic feedback (used by the updated SFX system)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-38",
-      "summary": "Include new retro-cartoon neon static art assets and sprite sheets under frontend/public/assets/generated and wire them into the start/menu and in-game VFX",
-      "acceptanceCriteria": [
-        "New images/sprite sheets are present under frontend/public/assets/generated and referenced via correct absolute paths (e.g., /assets/generated/...).",
-        "The start/menu presentation uses the newly generated assets (not placeholders).",
-        "No backend endpoints are introduced for serving images."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/assets/generated/spacecoco-splash-neon.dim_3840x2160.png",
-          "operation": "create",
-          "description": "Add generated retro-cartoon neon splash/hero illustration asset for the upgraded start/menu presentation."
-        },
-        {
-          "path": "frontend/public/assets/generated/spacecoco-menu-banner-neon.dim_2560x900.png",
-          "operation": "create",
-          "description": "Add generated wide retro-cartoon neon banner asset for Home/Lobby animated presentation."
-        },
-        {
-          "path": "frontend/public/assets/generated/spacecoco-menu-ufo-sprites.dim_1024x256.png",
-          "operation": "create",
-          "description": "Add generated UFO/alien fly-by sprite sheet for menu/start animation."
-        },
-        {
-          "path": "frontend/public/assets/generated/spacecoco-menu-cow-laser-sprites.dim_1024x256.png",
-          "operation": "create",
-          "description": "Add generated bright cow eye-laser firing sprite sheet for menu/start animation."
-        },
-        {
-          "path": "frontend/public/assets/generated/spacecoco-neon-sparks-sprites.dim_512x512.png",
-          "operation": "create",
-          "description": "Add generated neon glow particle/spark spritesheet for UI/gameplay VFX accents."
-        },
-        {
-          "path": "frontend/public/assets/generated/spacecoco-hero-neon-cartoon.dim_1600x600.png",
-          "operation": "create",
-          "description": "Add edited high-contrast neon-cartoon hero image replacing the previous hero art for compatible use in layouts where a static fallback is needed."
-        },
-        {
-          "path": "frontend/src/components/start/NeonStartScene.tsx",
-          "operation": "modify",
-          "description": "Wire the new generated assets into the animated start scene (splash/banner backgrounds + UFO and cow-laser sprite sheets). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/HomePage.tsx",
-          "operation": "modify",
-          "description": "Update Home hero to reference the new generated assets (including the edited hero image as a fallback) so the start/menu presentation uses non-placeholder art. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/render/sprites.ts",
-          "operation": "modify",
-          "description": "Ensure the new neon spark spritesheet is loadable via the sprite manager and referenced via the correct absolute path under frontend/public/assets/generated."
+          "description": "Wire the new textures into the UFO/penguin rendering paths (using safe null checks and existing shape fallbacks) so the Play screen never becomes blank if assets fail to load."
         }
       ]
     }

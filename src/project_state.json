@@ -1,24 +1,25 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
-  "summary": "Build a decentralized web game on Internet Computer named \"Spacecoco\": a fast, absurd, addictive multiplayer (up to 8 players) Snake-style game with multi-input controls, ICP wallet-based cosmetic skins, dynamic planet modifiers, bosses, power-ups, and an on-chain leaderboard — now targeting a high-quality retro-cartoon neon visual style (very bright, “expensive” look) with an animated, highly dynamic start/menu presentation (UFOs/aliens/vacas with lasers), upgraded modern arcade-neon scoring UI, improved competitive mechanics (head/body elimination with score drop pickup), and upgraded SFX/audio polish using web-feasible rendering/audio techniques (no Vulkan/true RT/HDR10).",
+  "projectStateVersion": 17,
+  "summary": "Build a decentralized web game on Internet Computer named \"Spacecoco\": a fast, absurd, addictive multiplayer (up to 8 players) Snake-style game with multi-input controls, ICP wallet-based cosmetic skins, dynamic planet modifiers, bosses, power-ups, and an on-chain leaderboard — now pivoting to a full visual/audio overhaul that completely replaces the prior pixel-art retro-neon look with a vector/toon-shaded, high-end 4K/60fps presentation (glow, motion blur, fake-PBR gradients, skeletal/spline-like animation where feasible) and a continuously looping lo-fi futuristic soundtrack with beat-synced SFX and AudioContext-driven dynamics.",
   "architectural_notes": [
     "Project pivot: replace used-items marketplace with a Snake-style multiplayer web game on Internet Computer called \"Spacecoco\".",
     "Multiplayer target: up to 8 players with real-time state synchronization.",
     "Use ICP wallet integration for cosmetic skin selection/switching.",
     "Leaderboard should be stored/validated on-chain.",
-    "User-approved scope change: replace (not just add) existing sprite/visual assets with a new arcade pixel-art style (neon snake, UFO/cow, starfield, VFX).",
-    "User-approved scope change: replace existing music direction/system content with more modern, high-energy tracks (\"GTA V\" vibe).",
     "Gameplay tweak requested: snake should always be in motion; growth primarily from eating UFOs; cows/penguins provide bonus points; add animated crocodile entities.",
     "New art direction request: move from arcade pixel-art replacement to a higher-detail retro-cartoon neon look (very bright/‘expensive’) using web-feasible rendering (WebGL/WebGPU postprocessing; no Vulkan/true ray tracing/HDR10).",
     "New UX request: highly animated splash/home/menu presentation with UFOs/aliens and cows firing lasers for an immediate ‘wow’ effect.",
-    "New gameplay request: competitive elimination—body hits opponent head => opponent resets to normal size; winner can collect dropped points to grow/score."
+    "New gameplay request: competitive elimination—body hits opponent head => opponent resets to normal size; winner can collect dropped points to grow/score.",
+    "User-approved scope change: replace the current pixel-art/sprite-based arcade-neon visuals entirely with a shader-capable vector/toon-styled renderer (web-feasible via Three.js/R3F + postprocessing) including outlines, glow, motion blur, parallax, and fake-PBR gradients targeting 4K/60fps.",
+    "User-approved scope change: replace the current music direction/system with a continuous perfectly-looping lo-fi futuristic soundtrack plus beat-synced SFX using AudioContext (GainNode dynamics and scheduled playback)."
   ],
   "known_issues": [
-    "Production build (Version 4) shows a blank screen: game does not render anything and there is no movement."
+    "Production build (Version 4) shows a blank screen: game does not render anything and there is no movement.",
+    "Current character visuals are perceived as overly generic (circles/blobs) and need clearer silhouettes/details so entities read as penguins/aliens/UFOs/laser action."
   ],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Retro-cartoon neon splash/hero illustration with UFOs, aliens, bright cows, and eye-laser action (spacecoco-splash-neon.dim_3840x2160.png)\n- Wide retro-cartoon neon banner scene with UFO flyovers and laser chaos (spacecoco-menu-banner-neon.dim_2560x900.png)\n- Sprite sheet of multiple UFO/alien fly-by frames for menu animation (spacecoco-menu-ufo-sprites.dim_1024x256.png)\n- Sprite sheet of bright cow eye-laser firing frames for menu animation (spacecoco-menu-cow-laser-sprites.dim_1024x256.png)\n- Neon glow particle/spark spritesheet for UI/VFX accents (spacecoco-neon-sparks-sprites.dim_512x512.png)\n\n## Edit Images\n- Increase detail/contrast and shift to high-quality retro-cartoon neon look with brighter UFO/cow/laser elements (spacecoco-hero.dim_1600x600.png > spacecoco-hero-neon-cartoon.dim_1600x600.png)",
+  "imageRequirements": "## Required Images\n- Toon-style UFO exterior texture with clear hull + dome + accent lights (ufo-toon-albedo-v2.dim_4096x4096.png)\n- Toon-style penguin boss texture with clear beak/eyes/flippers silhouette cues (penguin-toon-albedo-v2.dim_4096x4096.png)\n- Toon-style alien pilot/character texture (alien-pilot-toon-albedo.dim_4096x4096.png)\n- Toon-style emissive light accents/decals sheet for UFO windows/controls (ufo-decals-emissive.dim_2048x2048.png)\n\n## Edit Images\n- Improve silhouette/detail while preserving toon shading (ufo-toon-albedo.dim_4096x4096.png > ufo-toon-albedo-v2.dim_4096x4096.png)\n- Improve silhouette/detail while preserving toon shading (penguin-toon-albedo.dim_4096x4096.png > penguin-toon-albedo-v2.dim_4096x4096.png)",
   "existing_features": [
     {
       "id": "feature-create-the-product-s-overall-visual-theme-and-apply-it-consistently-across-the-ui-for-the-gatos-use-items-used-items-marketplace-theme-must-be-a-coherent-distinct-style-colors-typography-spacing-components-suitable-for-a-trusted-second-hand-marketplace-and-must-avoid-default-generic-styling",
@@ -307,6 +308,118 @@
         "REQ-38"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-pixel-art-canvas-sprite-based-in-game-rendering-style-with-a-fully-new-high-end-vector-toon-shaded-presentation-across-the-play-screen-including-toon-shading-outlines-glow-fake-pbr-gradient-lighting-subtle-motion-blur-trails-and-parallax-layers-while-preserving-existing-gameplay-rules-and-hud-readability",
+      "title": "Replace the current pixel-art/canvas sprite-based in-game rendering style with a fully new high-end vector/toon-shaded presentation across the Play screen, including toon shading, outlines, glow, fake-PBR gradient lighting, subtle motion blur/trails, and parallax layers, while preserving existing gameplay rules and HUD readability.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-play-screen-rendering-pipeline-to-support-4k-friendly-output-and-smooth-60fps-animation-where-possible-render-at-devicepixelratio-scaled-resolution-keep-the-visual-output-sharp-and-avoid-introducing-blank-empty-renders-during-initialization-or-asset-loading-failures",
+      "title": "Update the Play screen rendering pipeline to support 4K-friendly output and smooth 60fps animation where possible: render at devicePixelRatio-scaled resolution, keep the visual output sharp, and avoid introducing blank/empty renders during initialization or asset loading failures.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-requested-space-background-vfx-on-the-play-screen-black-space-background-star-twinkle-that-matches-the-provided-formula-twinkle-sin-millis-0-02-0-8-0-2-with-per-star-alpha-and-shooting-stars-every-7-seconds-with-a-white-line-and-a-fading-trail-trailopacity-decreases-by-0-02-per-frame-tick",
+      "title": "Implement the requested space background VFX on the Play screen: black space background; star twinkle that matches the provided formula (twinkle = sin(millis() * 0.02) * 0.8 + 0.2) with per-star alpha; and shooting stars every 7 seconds with a white line and a fading trail (trailOpacity decreases by 0.02 per frame/tick).",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-ufo-visual-treatment-as-a-2d-sprite-graphic-with-a-prominent-glow-e-g-drawglow-radius-40-with-orange-like-glow-color-and-animate-ufo-movement-consistent-with-slow-descent-plus-subtle-lateral-drift",
+      "title": "Implement UFO visual treatment as a 2D sprite/graphic with a prominent glow (e.g., drawGlow radius 40 with orange-like glow color), and animate UFO movement consistent with slow descent plus subtle lateral drift.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-global-visual-brightness-lighting-polish-to-the-play-screen-rendering-e-g-overall-brightness-1-2-equivalent-and-ambient-lighting-without-reducing-gameplay-readability",
+      "title": "Add global visual ‘brightness/lighting’ polish to the Play screen rendering (e.g., overall brightness ~1.2 equivalent and ambient lighting), without reducing gameplay readability.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-current-background-music-approach-htmlaudioelement-loop-in-the-play-screen-with-an-audiocontext-based-system-that-plays-a-continuous-lo-fi-futuristic-chill-electronic-loop-with-seamless-looping-no-audible-cuts-starts-at-low-volume-and-ramps-intensity-volume-during-intense-gameplay-using-a-gainnode-driven-envelope-tied-to-a-pulse-beat",
+      "title": "Replace the current background music approach (HTMLAudioElement loop in the Play screen) with an AudioContext-based system that plays a continuous lo-fi futuristic/chill electronic loop with seamless looping (no audible cuts), starts at low volume, and ramps intensity/volume during intense gameplay using a GainNode-driven envelope tied to a pulse/beat.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-beat-synchronized-audio-feedback-so-gameplay-hits-sfx-triggers-and-or-visual-accent-beats-align-with-a-consistent-pulse-e-g-500ms-beat-grid-as-referenced-using-audiocontext-scheduling-to-keep-timing-stable",
+      "title": "Implement beat-synchronized audio feedback so gameplay ‘hits’ (SFX triggers and/or visual accent beats) align with a consistent pulse (e.g., 500ms beat grid as referenced), using AudioContext scheduling to keep timing stable.",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-and-wire-the-requested-new-sfx-set-using-the-audiocontext-system-1-a-realistic-snake-hiss-triggered-when-the-snake-performs-its-hiss-gesture-map-to-an-existing-snake-animation-moment-such-as-tongue-display-cadence-2-a-soft-boing-triggered-on-a-defined-in-game-jump-like-event-use-opponent-respawn-reset-after-elimination-as-the-event-and-3-an-extending-laser-buzz-sound-when-the-laser-vfx-is-present-active-with-audible-lengthening-continuation-while-the-laser-persists",
+      "title": "Add and wire the requested new SFX set using the AudioContext system: (1) a realistic snake hiss triggered when the snake performs its ‘hiss’ gesture (map to an existing snake animation moment such as tongue display cadence), (2) a soft “boing” triggered on a defined in-game ‘jump-like’ event (use opponent respawn/reset after elimination as the event), and (3) an extending laser buzz sound when the laser VFX is present/active, with audible lengthening/continuation while the laser persists.",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-any-play-screen-instructional-text-that-no-longer-matches-the-new-rules-audio-interactions-while-keeping-all-user-facing-text-in-english",
+      "title": "Update any Play screen instructional text that no longer matches the new rules/audio interactions, while keeping all user-facing text in English.",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-initialize-webaudio-audiocontext-at-the-earliest-possible-time-in-the-play-screen-lifecycle-and-ensure-audio-playback-is-started-from-a-user-gesture-on-mobile-without-breaking-the-existing-mute-toggle-behavior",
+      "title": "Initialize WebAudio (AudioContext) at the earliest possible time in the Play screen lifecycle and ensure audio playback is started from a user gesture on mobile without breaking the existing mute toggle behavior.",
+      "reqIds": [
+        "REQ-48"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enforce-a-stable-60fps-game-loop-target-and-add-focus-visibility-handling-so-the-game-loop-is-paused-stopped-when-the-tab-app-loses-focus-and-is-resumed-when-focus-returns-without-causing-blank-renders-or-duplicated-loops",
+      "title": "Enforce a stable 60fps game loop target and add focus/visibility handling so the game loop is paused/stopped when the tab/app loses focus and is resumed when focus returns, without causing blank renders or duplicated loops.",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-play-screen-canvas-rendering-crisp-on-high-dpi-and-4k-displays-by-rendering-at-devicepixelratio-scaled-resolution-clamped-to-a-reasonable-maximum-such-as-2-and-applying-correct-image-smoothing-settings-for-vector-toon-rendering-vs-any-bitmap-textures-sprites-used",
+      "title": "Make Play screen canvas rendering crisp on high-DPI and 4K displays by rendering at devicePixelRatio-scaled resolution (clamped to a reasonable maximum such as 2) and applying correct image smoothing settings for vector/toon rendering vs any bitmap textures/sprites used.",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-overly-generic-circle-blob-visuals-for-key-entities-penguin-boss-ufo-aliens-pilots-with-clearer-silhouettes-and-readable-character-details-while-keeping-the-existing-spacecoco-toon-renderer-style-and-gameplay-rules-intact",
+      "title": "Replace overly-generic ‘circle/blob’ visuals for key entities (Penguin boss, UFO, aliens/pilots) with clearer silhouettes and readable character details while keeping the existing Spacecoco toon renderer style and gameplay rules intact.",
+      "reqIds": [
+        "REQ-51"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-new-high-detail-toon-textures-needed-to-support-the-improved-non-generic-entity-silhouettes-place-them-under-frontend-public-assets-generated-and-wire-them-into-the-existing-toon-texture-loader-rendering-pipeline",
+      "title": "Generate and include new high-detail toon textures needed to support the improved, non-generic entity silhouettes, place them under frontend/public/assets/generated, and wire them into the existing toon texture loader/rendering pipeline.",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -459,6 +572,42 @@
     {
       "id": "AR-33",
       "summary": "Improve SFX/audio polish with higher-quality sounds and stronger gameplay feedback (e.g., spatialization/filters where feasible in web) to increase clarity and addictiveness.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Fully replace the current pixel-art/2D sprite renderer with a shader-capable web renderer (e.g., Three.js/React Three Fiber) to support toon shading, outlines, glow, fake-PBR gradients, motion blur, parallax layers, and a high-end vector-like 2D look across the game.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Add a continuous lo-fi futuristic (chill electronic) background music system that loops perfectly with no pauses/cuts and dynamically ramps intensity/volume using AudioContext (GainNode) based on gameplay intensity and/or beat/pulse.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Implement beat-synchronized audio feedback: real snake hiss SFX, soft 'boing' for monkey jump events, and an extending laser buzz, with timing aligned to the music pulse (AudioContext scheduling).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Upgrade background VFX: black space with per-star twinkle animation and periodic shooting stars with fade trails (timed spawns), matching the new high-end toon/vector aesthetic.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-38",
+      "summary": "Update audio initialization to use AudioContext from the start, ensure mobile user-gesture requirements are handled without breaking mute behavior, and start playback during setup/init rather than per-frame.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "Improve visual fidelity and character readability: ensure penguins/aliens/UFOs/laser VFX look like distinct characters (not generic circles/stacked blobs), with crisp rendering at high DPI/4K and smooth animation.",
       "reqIds": [],
       "status": "pending"
     }
