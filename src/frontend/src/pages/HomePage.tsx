@@ -2,20 +2,35 @@ import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Gamepad2, Users, Zap, Trophy, Sparkles } from 'lucide-react';
+import { HomeHeroThreeOverlay } from '@/components/start/HomeHeroThreeOverlay';
 
 export default function HomePage() {
   const navigate = useNavigate();
 
   return (
     <div className="space-y-16 pb-16">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-[500px]">
-        <div className="container-custom py-16 md:py-24 relative z-10">
+      {/* Hero Section with Static Retro-Neon Background + 3D Cows & UFOs */}
+      <section className="relative overflow-hidden min-h-[600px] md:min-h-[700px]">
+        {/* Static retro-neon sci-fi background image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/assets/generated/spacecoco-portada-bg.dim_3840x2160.png"
+            alt="Spacecoco Retro Neon Cover"
+            className="w-full h-full object-cover"
+          />
+          {/* Readability overlay for hero text */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+        </div>
+
+        {/* 3D Overlay with Cows and UFOs */}
+        <HomeHeroThreeOverlay />
+
+        {/* Content */}
+        <div className="container-custom py-16 md:py-24 relative z-30">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6 backdrop-blur-sm bg-black/30 p-8 rounded-2xl border border-accent/30">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-black tracking-tight">
-                <span className="block text-accent animate-pulse-glow neon-text-glow">MOTOR SNAKE 3D</span>
-                <span className="block text-foreground text-3xl md:text-4xl mt-2">Quantum Physics Chaos</span>
+            <div className="space-y-6 backdrop-blur-sm bg-black/50 p-8 rounded-2xl border border-accent/30 mt-32 md:mt-48">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-black tracking-wider neon-text-glow">
+                Galaxy Snake
               </h1>
               <p className="text-lg text-muted-foreground max-w-xl">
                 Navigate a hollow sphere with fluctuating gravity, wind portals, acid rain, and anomalies. Survive the ghost that hunts you!
@@ -30,13 +45,6 @@ export default function HomePage() {
                   Leaderboard
                 </Button>
               </div>
-            </div>
-            <div className="relative hidden lg:block">
-              <img
-                src="/assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png"
-                alt="Motor Snake 3D"
-                className="w-full h-auto rounded-2xl shadow-neon-strong border-2 border-accent/50 object-cover max-h-[600px]"
-              />
             </div>
           </div>
         </div>

@@ -1,13 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { useInputState } from './inputState';
 
 export function useAnalogInput() {
-  const [analogVector, setAnalogVector] = useState(new THREE.Vector2(0, 0));
-  const [acceleration, setAcceleration] = useState(0);
-  const [brake, setBrake] = useState(false);
-  const [shake, setShake] = useState(false);
+  const { analogVector, acceleration, brake, shake, setAnalogVector, setAcceleration, setBrake, setShake } = useInputState();
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+  const tiltSupportedRef = useRef(false);
 
-  // Keyboard input (desktop fallback)
   useEffect(() => {
     const keys: Record<string, boolean> = {};
 
@@ -15,9 +14,11 @@ export function useAnalogInput() {
       keys[e.key.toLowerCase()] = true;
 
       if (e.key === ' ') {
+        e.preventDefault();
         setBrake(true);
       }
       if (e.key.toLowerCase() === 's' && e.shiftKey) {
+        e.preventDefault();
         setShake(true);
       }
     };
@@ -61,18 +62,47 @@ export function useAnalogInput() {
       window.removeEventListener('keyup', handleKeyUp);
       clearInterval(interval);
     };
-  }, []);
+  }, [setAnalogVector, setAcceleration, setBrake, setShake]);
 
-  const setJoystickInput = useCallback((x: number, y: number, accel: number) => {
-    setAnalogVector(new THREE.Vector2(x, y));
-    setAcceleration(accel);
-  }, []);
+  useEffect(() => {
+    if (typeof DeviceOrientationEvent !== 'undefined' && 
+        typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+      tiltSupportedRef.current = true;
+    } else if (typeof DeviceOrientationEvent !== 'undefined') {
+      tiltSupportedRef.current = true;
+    }
+
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      if (!tiltSupportedRef.current) return;
+      
+      const beta = event.beta || 0;
+      const gamma = event.gamma || 0;
+      
+      const tiltX = Math.max(-1, Math.min(1, gamma / 30));
+      const tiltY = Math.max(-1, Math.min(1, (beta - 45) / 30));
+      
+      const tiltVec = new THREE.Vector2(tiltX, tiltY);
+      if (tiltVec.length() > 0.1) {
+        setAnalogVector(tiltVec);
+        setAcceleration(Math.min(1, tiltVec.length()));
+      }
+    };
+
+    if (tiltSupportedRef.current) {
+      window.addEventListener('deviceorientation', handleOrientation);
+    }
+
+    return () => {
+      if (tiltSupportedRef.current) {
+        window.removeEventListener('deviceorientation', handleOrientation);
+      }
+    };
+  }, [setAnalogVector, setAcceleration]);
 
   return {
     analogVector,
     acceleration,
     brake,
     shake,
-    setJoystickInput,
   };
 }

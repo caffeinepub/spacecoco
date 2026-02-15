@@ -59,12 +59,12 @@ export function NeonStartCoverOverlay() {
   }, []);
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
       {/* Static cover image with motion animation */}
       <div className="absolute inset-0 animate-neon-cover-drift">
         <img
-          src="/assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png"
-          alt="Spacecoco Cover"
+          src="/assets/generated/galaxy-snake-cover.dim_3840x2160.png"
+          alt="Galaxy Snake Cover"
           className="w-full h-full object-cover"
         />
       </div>

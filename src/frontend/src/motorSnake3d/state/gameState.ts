@@ -23,6 +23,15 @@ export interface Enemy {
   active: boolean;
 }
 
+export interface Competitor {
+  id: string;
+  position: THREE.Vector3;
+  velocity: THREE.Vector3;
+  tailSegments: TailSegment[];
+  score: number;
+  color: string;
+}
+
 export interface Anomaly {
   id: string;
   type: 'blackhole' | 'star' | 'mirror';
@@ -42,42 +51,29 @@ export interface BabyPenguin {
 }
 
 export interface GameState {
-  // Player
   player: PlayerState;
   tailSegments: TailSegment[];
-  
-  // World
+  competitors: Competitor[];
   worldMode: 'inside' | 'outside';
   abyssMode: boolean;
   coreIntact: boolean;
-  
-  // Environment
   gravityMultiplier: number;
   gravityCycleTime: number;
   windPortals: Array<{ position: THREE.Vector3; active: boolean }>;
   fogIntensity: number;
   acidRainActive: boolean;
   shieldActive: boolean;
-  
-  // Enemies & Anomalies
   enemies: Enemy[];
   anomalies: Anomaly[];
   babyPenguins: BabyPenguin[];
-  
-  // Power-ups
   activePowerUp: ActivePowerUp | null;
-  
-  // Ghost
   ghostActive: boolean;
   ghostInfluence: number;
   ghostReplaced: boolean;
   deathCount: number;
-  
-  // Gameplay
   speed: number;
   score: number;
   
-  // Actions
   setPlayerPosition: (position: THREE.Vector3) => void;
   setPlayerVelocity: (velocity: THREE.Vector3) => void;
   setWorldMode: (mode: 'inside' | 'outside') => void;
@@ -89,6 +85,9 @@ export interface GameState {
   setShieldActive: (active: boolean) => void;
   addEnemy: (enemy: Enemy) => void;
   removeEnemy: (id: string) => void;
+  addCompetitor: (competitor: Competitor) => void;
+  updateCompetitor: (id: string, updates: Partial<Competitor>) => void;
+  removeCompetitor: (id: string) => void;
   addAnomaly: (anomaly: Anomaly) => void;
   removeAnomaly: (id: string) => void;
   setActivePowerUp: (powerUp: ActivePowerUp | null) => void;
@@ -113,9 +112,12 @@ const initialPlayerState: PlayerState = {
 };
 
 export const useGameState = create<GameState>((set) => ({
-  // Initial state
   player: initialPlayerState,
-  tailSegments: [],
+  tailSegments: [
+    { position: new THREE.Vector3(-1, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: 1 },
+    { position: new THREE.Vector3(-2, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: 1 },
+  ],
+  competitors: [],
   worldMode: 'inside',
   abyssMode: false,
   coreIntact: true,
@@ -136,7 +138,6 @@ export const useGameState = create<GameState>((set) => ({
   speed: 5,
   score: 0,
 
-  // Actions
   setPlayerPosition: (position) => set((state) => ({
     player: { ...state.player, position: position.clone() }
   })),
@@ -159,6 +160,20 @@ export const useGameState = create<GameState>((set) => ({
   
   removeEnemy: (id) => set((state) => ({
     enemies: state.enemies.filter(e => e.id !== id)
+  })),
+  
+  addCompetitor: (competitor) => set((state) => ({
+    competitors: [...state.competitors, competitor]
+  })),
+  
+  updateCompetitor: (id, updates) => set((state) => ({
+    competitors: state.competitors.map(c => 
+      c.id === id ? { ...c, ...updates } : c
+    )
+  })),
+  
+  removeCompetitor: (id) => set((state) => ({
+    competitors: state.competitors.filter(c => c.id !== id)
   })),
   
   addAnomaly: (anomaly) => set((state) => ({
@@ -198,7 +213,11 @@ export const useGameState = create<GameState>((set) => ({
   
   reset: () => set({
     player: initialPlayerState,
-    tailSegments: [],
+    tailSegments: [
+      { position: new THREE.Vector3(-1, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: 1 },
+      { position: new THREE.Vector3(-2, 0, 0), rotation: new THREE.Euler(0, 0, 0), scale: 1 },
+    ],
+    competitors: [],
     worldMode: 'inside',
     abyssMode: false,
     coreIntact: true,

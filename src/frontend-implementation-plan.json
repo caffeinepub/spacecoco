@@ -1,126 +1,104 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Motor Snake 3D: Swap enemy primitives for textured 3D models with subtle per-enemy animation, scale tuning, and shadows",
+  "title": "Smooth non-overlapping flying cows with UFO impulse pushes and spotlights in existing 3D hero scene",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Replace enemy primitive meshes (ufo/cow/crocodile/penguin) with locally hosted textured 3D models while keeping the existing 3D scene/camera/view intact.",
+      "id": "REQ-6",
+      "summary": "Make all hero-scene cows drift smoothly in continuous motion across the visible area while maintaining non-overlap (no cow-vs-cow collisions) and preserving the existing neon/space look.",
       "acceptanceCriteria": [
-        "When enemies spawn, each of the four types renders as a 3D model (not the current sphere/box/cone/cylinder primitives).",
-        "Enemy rendering changes are isolated to enemy visuals (e.g., EnemyEntity3D / model loading); the overall PlayPage + MotorSnakeGameRoot scene/camera setup remains unchanged.",
-        "All required assets are stored as static files in the frontend (e.g., under frontend/public) and loaded at runtime (no backend involvement)."
+        "Cows move with smooth, continuous motion across the visible intro scene area (no jittery/teleporting movement).",
+        "Cows do not intersect/overlap each other during runtime (visual non-collision between cows).",
+        "Existing intro scene theme/style remains intact (no broad color/theme redesign)."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/models/enemies/ufo.glb",
+          "path": "frontend/src/components/start/heroDynamicsBus.ts",
           "operation": "create",
-          "description": "Add a realistic textured UFO GLB model as a static asset to be loaded at runtime."
+          "description": "Create a tiny in-memory shared state/bus for the hero 3D scene to exchange current cow positions and UFO positions between components (no backend, no persistence)."
         },
         {
-          "path": "frontend/public/assets/models/enemies/cow.glb",
-          "operation": "create",
-          "description": "Add a realistic textured cow GLB model as a static asset to be loaded at runtime."
-        },
-        {
-          "path": "frontend/public/assets/models/enemies/crocodile.glb",
-          "operation": "create",
-          "description": "Add a realistic textured crocodile GLB model as a static asset to be loaded at runtime."
-        },
-        {
-          "path": "frontend/public/assets/models/enemies/penguin.glb",
-          "operation": "create",
-          "description": "Add a realistic textured penguin GLB model as a static asset to be loaded at runtime."
-        },
-        {
-          "path": "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
-          "operation": "create",
-          "description": "Create a small catalog mapping enemy.type to local GLB asset paths and per-type default transforms (scale/rotation offsets) for consistent loading and placement."
-        },
-        {
-          "path": "frontend/src/motorSnake3d/render/useEnemyModelCache.ts",
-          "operation": "create",
-          "description": "Implement a lightweight GLB loader/cache utility for enemy models (shared across instances) that supports cloning scenes per enemy and exposes model+animation data."
-        },
-        {
-          "path": "frontend/src/motorSnake3d/render/EnemiesLayer3D.tsx",
+          "path": "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
           "operation": "modify",
-          "description": "Preload the four enemy GLB assets when the layer mounts to ensure enemies render as models immediately on spawn (avoid showing primitives as a fallback)."
+          "description": "Replace static cow placement with a time-based, delta-stable steering update that: (1) maintains per-cow velocity, (2) wraps/clamps cows inside the hero camera-visible bounds, and (3) applies a separation steering force so cows never overlap (no cow-vs-cow collision response). Also publish current cow positions into the shared heroDynamicsBus each frame."
         },
         {
-          "path": "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+          "path": "frontend/src/components/start/HomeHeroThreeOverlay.tsx",
           "operation": "modify",
-          "description": "Replace primitive geometry rendering with per-enemy GLB scene instances loaded from the local static assets; keep existing positioning/hover/rotation behaviors but apply them to the model root instead of primitives."
+          "description": "Update the hero overlay wiring so VFX/other components reference the live cow positions from the shared heroDynamicsBus (instead of the current fixed cowPositions array), preserving the current scene composition."
         }
       ]
     },
     {
-      "id": "REQ-2",
-      "summary": "Add per-enemy visual styling and lightweight animation behaviors for the loaded 3D models (UFO blink, cow tail idle, crocodile look, penguin idle walk when near-stationary).",
+      "id": "REQ-7",
+      "summary": "Add UFO dart/pass events that can impulsively push cows into new directions (UFO-only interactions), without enabling cow-vs-cow collision behavior.",
       "acceptanceCriteria": [
-        "UFO model uses a metallic-looking material response (metalness/roughness) and a visible blue emissive element that periodically blinks/pulses.",
-        "Cow model includes a subtle, continuous tail animation (via GLB animation clip or bone/mesh transform) and retains existing hover motion if present.",
-        "Crocodile model is clearly identifiable as a crocodile with green scaly look, open mouth, and visible white teeth.",
-        "Penguin model is clearly identifiable (black/white body, orange beak) and shows a slow idle walk cycle when its in-game velocity is near zero.",
-        "All animations run smoothly and do not introduce noticeable frame stutter on typical settings."
+        "UFOs have occasional fast pass-through/dart motion events that bring them close enough to affect cows.",
+        "When a UFO pass intersects a cow’s influence/collision radius, that cow’s trajectory changes immediately via an impulse-like push (direction and magnitude feel physical rather than scripted snapping).",
+        "Cow-vs-cow interaction remains disabled (cows never push/bounce off each other)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/motorSnake3d/render/enemyModelRigging.ts",
-          "operation": "create",
-          "description": "Add helper functions to locate important sub-objects (e.g., UFO emissive parts, cow tail bone/mesh) within loaded GLB scenes and to apply per-type material overrides (e.g., UFO metallic + emissive blue)."
+          "path": "frontend/src/components/start/HeroUfoField3D.tsx",
+          "operation": "modify",
+          "description": "Add periodic dart/pass behavior to each background UFO (short bursts of high speed along a deterministic path), and publish each UFO’s world position (and optionally an instantaneous velocity estimate) into heroDynamicsBus each frame."
         },
         {
-          "path": "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+          "path": "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
           "operation": "modify",
-          "description": "Add per-type animation handling: drive UFO emissive blinking/pulsing over time; use AnimationMixer clips when present (cow tail idle, penguin walk), and if clips are absent apply small bone/mesh transforms (e.g., tail swish) as a fallback; gate penguin walk cycle by enemy.velocity magnitude (near zero => idle walk)."
+          "description": "Consume published UFO positions/velocity from heroDynamicsBus and implement UFO→cow impulse pushes when a UFO enters a cow influence radius: apply an impulse to the cow’s velocity (mass/damping tuned for a physical feel), while explicitly keeping cow-vs-cow collision responses disabled. Ensure the impulse logic is time-based (uses delta) and does not cause snapping/teleporting."
+        },
+        {
+          "path": "frontend/src/components/start/heroDynamicsBus.ts",
+          "operation": "modify",
+          "description": "Extend the shared bus types/utilities as needed to support: (1) multiple UFO position feeds, (2) per-frame timestamps, and (3) reading live cow positions for aiming/interaction, keeping the module minimal and hero-scene-scoped."
         }
       ]
     },
     {
-      "id": "REQ-3",
-      "summary": "Tune enemy model scale, depth, and subtle idle motion so models read well in perspective and match the existing world/snake proportions.",
+      "id": "REQ-8",
+      "summary": "Add a stable ~3-second cadence cow ‘reaction’ behavior that layers on top of flight motion and UFO impulses.",
       "acceptanceCriteria": [
-        "Each enemy type appears at a reasonable, consistent size compared to the snake and does not clip excessively into the world sphere.",
-        "Enemy models have visible 3D depth and a subtle rotation/idle motion that is perceptible during gameplay.",
-        "No enemy model renders as an unlit flat-looking object (e.g., missing normals/lighting response)."
+        "A clearly visible cow reaction animation/behavior triggers on an approximately 3-second cadence during the intro scene.",
+        "Reactions do not break the cows’ smooth flight motion (they layer on top of the base movement).",
+        "Reactions remain stable under varying frame rates (timing based on elapsed time, not frame count)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
+          "path": "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
           "operation": "modify",
-          "description": "Adjust per-enemy default scale and orientation offsets (and any pivot correction) so each model matches gameplay proportions relative to the player snake and world sphere."
+          "description": "Implement a reaction scheduler (elapsed-time based) that triggers approximately every 3 seconds (global or per-cow, but consistent), setting per-cow reaction parameters (e.g., reactionStartTime/intensity) on the cow group userData (or via the shared bus) without interrupting base movement/velocity integration."
         },
         {
-          "path": "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+          "path": "frontend/src/components/start/HeroFlyingCowPBR.tsx",
           "operation": "modify",
-          "description": "Apply a consistent model-root transform pipeline (position + tuned scale + subtle idle rotation/sway) without changing spawning/collision logic; ensure loaded meshes use lit materials (MeshStandardMaterial/physical) so they respond to scene lights."
+          "description": "Layer a visible secondary reaction animation on top of the existing smooth flight pose updates by reading reaction state (e.g., from groupRef.userData): add temporary wobbles/roll/pitch exaggeration, tail flick, or brief squash/stretch with eased decay. Ensure reaction timing uses elapsed time and composes with existing abduction intensity behavior."
         }
       ]
     },
     {
-      "id": "REQ-4",
-      "summary": "Enable/adjust basic lighting and shadow casting/receiving for the new enemy models with performance safeguards and minimal scene impact.",
+      "id": "REQ-9",
+      "summary": "Add high-contrast white front and underside lights for each UFO, oriented toward nearby cows, producing clean readable 3D contrast without changing the scene’s existing neon/space theme.",
       "acceptanceCriteria": [
-        "Enemy models are lit with scene lighting (not full-bright/unlit), and the scene includes shadow support that visibly improves model grounding (cast/receive where appropriate).",
-        "Shadows/lighting changes do not significantly reduce performance (no obvious lag spikes attributable to model/shadow settings).",
-        "If shadows must be limited for performance, the implementation uses reasonable quality safeguards (e.g., reduced shadow map size or selective shadow casting) while keeping a clear visual improvement."
+        "Each UFO has at least two white light sources (front + underside) that visibly illuminate cows when aimed toward them.",
+        "The added lights create strong, readable contrast between the UFO body and the lit cow surfaces (no washed-out or imperceptible lighting).",
+        "The added lights do not materially change the overall scene theme/palette beyond the requested white spotlights (existing neon/space style remains)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+          "path": "frontend/src/components/start/HeroUfoField3D.tsx",
           "operation": "modify",
-          "description": "Enable renderer shadow support on the existing Three.js canvas (e.g., Canvas shadows and conservative shadow settings) without altering camera/view composition."
+          "description": "Add two white lights per background UFO (front + underside). Update their transforms each frame to stay attached to the UFO and aim toward a nearby cow target derived from heroDynamicsBus cow positions (e.g., nearest cow or centroid), tuning intensity/angle/distance for high-contrast illumination without washing out existing neon accents."
         },
         {
-          "path": "frontend/src/motorSnake3d/render/SphereWorld.tsx",
+          "path": "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
           "operation": "modify",
-          "description": "Adjust lighting minimally so models are properly lit and grounded: ensure there is non-zero ambient fill, configure one primary light to cast shadows with performance-friendly shadow map settings, and set the world sphere material/mesh to receive shadows where appropriate."
+          "description": "Add two white lights (front + underside) to the choreographed UFO group. Each frame, aim them toward an appropriate cow target (nearest cow and/or currently abducted cow) and tune for strong, readable contrast on cow PBR materials while keeping the existing theme intact."
         },
         {
-          "path": "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+          "path": "frontend/src/components/start/HomeHeroThreeOverlay.tsx",
           "operation": "modify",
-          "description": "Configure loaded enemy model meshes to cast and receive shadows selectively (e.g., only the main body meshes cast) to improve grounding while avoiding performance regressions."
+          "description": "Adjust only hero-scene-local lighting composition if needed (e.g., minor intensity balancing) so the new UFO white spotlights read clearly against the UFO body and cows, without broad palette/theme changes."
         }
       ]
     }

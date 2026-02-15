@@ -26,14 +26,18 @@ export function FlyingCowPBR({
     '/assets/generated/cow-pbr-roughness.dim_4096x4096.png',
   ]);
 
+  // Balloon-plastic PBR material matching hero cows
   const material = useMemo(() => {
-    return new THREE.MeshStandardMaterial({
+    return new THREE.MeshPhysicalMaterial({
       map: baseColorMap,
       normalMap: normalMap,
       roughnessMap: roughnessMap,
-      roughness: 0.6,
-      metalness: 0.1,
-      envMapIntensity: 1.5,
+      roughness: 0.15,
+      metalness: 0.05,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.1,
+      envMapIntensity: 2.5,
+      reflectivity: 1.0,
     });
   }, [baseColorMap, normalMap, roughnessMap]);
 

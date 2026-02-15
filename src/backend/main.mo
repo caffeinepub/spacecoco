@@ -2,7 +2,6 @@ import Map "mo:core/Map";
 import Array "mo:core/Array";
 import Text "mo:core/Text";
 import List "mo:core/List";
-import Iter "mo:core/Iter";
 import Time "mo:core/Time";
 import Principal "mo:core/Principal";
 import Int "mo:core/Int";
@@ -11,8 +10,6 @@ import Runtime "mo:core/Runtime";
 import Nat "mo:core/Nat";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
-
-
 
 actor {
   type UserProfile = {

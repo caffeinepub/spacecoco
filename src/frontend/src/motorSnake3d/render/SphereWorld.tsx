@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { NEON_COLORS } from './neonStyle';
 
 interface SphereWorldProps {
   worldMode: 'inside' | 'outside';
@@ -12,116 +11,79 @@ interface SphereWorldProps {
 export function SphereWorld({ worldMode, abyssMode, fogIntensity }: SphereWorldProps) {
   const sphereRef = useRef<THREE.Mesh>(null);
   const coreRef = useRef<THREE.Mesh>(null);
-  const shadowDecalsRef = useRef<THREE.Group>(null);
-  const directionalLightRef = useRef<THREE.DirectionalLight>(null);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const time = state.clock.elapsedTime;
-
-    // Pulsing core
+    
     if (coreRef.current) {
-      coreRef.current.rotation.y += delta * 0.5;
-      const pulse = Math.sin(time * 2) * 0.5 + 0.5;
-      const scale = 1 + pulse * 0.1;
-      coreRef.current.scale.set(scale, scale, scale);
-
-      if (coreRef.current.material instanceof THREE.MeshStandardMaterial) {
-        coreRef.current.material.emissiveIntensity = (abyssMode ? 3 : 2) + pulse;
-      }
+      const pulse = Math.sin(time * 2) * 0.1 + 1.0;
+      coreRef.current.scale.setScalar(pulse);
     }
-
-    // Breathing sphere
+    
     if (sphereRef.current) {
-      const breathe = Math.sin(time * 1.5) * 0.5 + 0.5;
-      if (sphereRef.current.material instanceof THREE.MeshStandardMaterial) {
-        sphereRef.current.material.opacity = 0.7 + breathe * 0.15;
-      }
-    }
-
-    // Dancing shadows
-    if (shadowDecalsRef.current) {
-      shadowDecalsRef.current.children.forEach((decal, i) => {
-        const phase = (i / shadowDecalsRef.current!.children.length) * Math.PI * 2;
-        decal.position.y = Math.sin(time * 2 + phase) * 2;
-        decal.rotation.z = Math.sin(time + phase) * 0.3;
-      });
+      const breathe = Math.sin(time * 0.5) * 0.02 + 1.0;
+      sphereRef.current.scale.setScalar(breathe);
     }
   });
 
   return (
-    <>
-      {/* Enhanced lighting with shadow support */}
-      <ambientLight intensity={0.3} color="#222222" />
+    <group>
+      {/* Enhanced lighting for PBR */}
+      <ambientLight intensity={0.3} />
       
-      {/* Main directional light with shadows */}
       <directionalLight
-        ref={directionalLightRef}
-        position={[10, 15, 10]}
-        intensity={1.2}
-        color={NEON_COLORS.acidGreen}
+        position={[10, 10, 5]}
+        intensity={1.5}
         castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-far={50}
-        shadow-camera-left={-20}
-        shadow-camera-right={20}
-        shadow-camera-top={20}
-        shadow-camera-bottom={-20}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-far={100}
+        shadow-camera-left={-30}
+        shadow-camera-right={30}
+        shadow-camera-top={30}
+        shadow-camera-bottom={-30}
         shadow-bias={-0.0001}
       />
       
-      {/* Fill lights */}
-      <pointLight position={[-10, -10, -10]} intensity={0.8} color={NEON_COLORS.hotPink} />
-      <pointLight position={[0, 15, 0]} intensity={0.6} color={NEON_COLORS.neonOrange} />
-
-      {/* Fog - black space */}
-      <fog attach="fog" args={['#000000', 15, 60 * (1 + fogIntensity)]} />
-
-      {/* Hollow Sphere with breathing - receives shadows */}
+      <pointLight position={[-10, 5, -10]} intensity={0.8} color="#00ffaa" castShadow />
+      <pointLight position={[10, -5, 10]} intensity={0.8} color="#ff00ff" castShadow />
+      
+      {/* Hollow sphere */}
       <mesh ref={sphereRef} receiveShadow>
         <sphereGeometry args={[30, 64, 64]} />
-        <meshStandardMaterial
-          color={abyssMode ? '#0a0a0a' : '#000000'}
-          side={worldMode === 'inside' ? THREE.BackSide : THREE.FrontSide}
-          wireframe={false}
+        <meshPhysicalMaterial
+          color="#1a1a2e"
+          side={THREE.DoubleSide}
           transparent
-          opacity={0.7}
+          opacity={0.3}
+          roughness={0.2}
+          metalness={0.8}
+          clearcoat={1.0}
+          clearcoatRoughness={0.1}
         />
       </mesh>
-
-      {/* Pulsing Core */}
-      <mesh ref={coreRef} position={[0, 0, 0]} castShadow>
+      
+      {/* Pulsing core */}
+      <mesh ref={coreRef} castShadow>
         <sphereGeometry args={[2, 32, 32]} />
-        <meshStandardMaterial
-          color={NEON_COLORS.hotPink}
-          emissive={NEON_COLORS.hotPink}
-          emissiveIntensity={abyssMode ? 3 : 2}
+        <meshPhysicalMaterial
+          color="#ff00ff"
+          emissive="#ff00ff"
+          emissiveIntensity={3.0}
+          roughness={0.1}
+          metalness={0.9}
+          clearcoat={1.0}
         />
       </mesh>
-
-      {/* Dancing shadow decals */}
-      <group ref={shadowDecalsRef}>
-        {[...Array(6)].map((_, i) => {
-          const angle = (i / 6) * Math.PI * 2;
-          const x = Math.cos(angle) * 25;
-          const z = Math.sin(angle) * 25;
-          
-          return (
-            <mesh key={i} position={[x, 0, z]} rotation={[0, -angle, 0]} receiveShadow>
-              <planeGeometry args={[3, 3]} />
-              <meshBasicMaterial
-                color="#000000"
-                transparent
-                opacity={0.4}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          );
-        })}
-      </group>
-
-      {/* Grid helper for reference */}
-      <gridHelper args={[100, 20, '#111111', '#050505']} />
-    </>
+      
+      {/* Shadow-receiving ground plane */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -30, 0]} receiveShadow>
+        <planeGeometry args={[100, 100]} />
+        <shadowMaterial opacity={0.3} />
+      </mesh>
+      
+      {/* Fog */}
+      <fog attach="fog" args={['#000000', 20, 60 + fogIntensity * 20]} />
+    </group>
   );
 }

@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
+import { getCyclingAccentColor } from '../start/ufoAccentPalette';
 
 interface Glint {
   id: string;
@@ -37,8 +38,18 @@ export function UfoField3D() {
 
     // Rotate UFOs
     if (groupRef.current) {
-      groupRef.current.children.slice(0, ufoPositions.length).forEach((ufo, i) => {
-        ufo.rotation.y += delta * 2;
+      groupRef.current.children.slice(0, ufoPositions.length).forEach((ufoGroup, i) => {
+        ufoGroup.rotation.y += delta * 2;
+        
+        // Update rim light colors
+        const rimLights = ufoGroup.children.slice(2, 10);
+        rimLights.forEach((light, j) => {
+          if (light instanceof THREE.Mesh && light.material instanceof THREE.MeshStandardMaterial) {
+            const color = getCyclingAccentColor(time, i * 8 + j, 0.3);
+            light.material.color.set(color);
+            light.material.emissive.set(color);
+          }
+        });
       });
     }
 
@@ -106,16 +117,37 @@ export function UfoField3D() {
   return (
     <group ref={groupRef}>
       {ufoPositions.map((pos, i) => (
-        <mesh key={i} position={pos}>
-          <cylinderGeometry args={[2, 1, 0.5, 32]} />
-          <meshStandardMaterial
-            color="#00ffff"
-            emissive="#00ffff"
-            emissiveIntensity={1.5}
-            metalness={0.8}
-            roughness={0.2}
-          />
-        </mesh>
+        <group key={i} position={pos}>
+          <mesh>
+            <cylinderGeometry args={[2, 1, 0.5, 32]} />
+            <meshStandardMaterial
+              color="#4488ff"
+              emissive="#4488ff"
+              emissiveIntensity={2.0}
+              metalness={0.95}
+              roughness={0.1}
+            />
+          </mesh>
+
+          {/* Rim lights with cycling colors */}
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((j) => {
+            const angle = (j / 8) * Math.PI * 2;
+            const x = Math.cos(angle) * 1.5;
+            const z = Math.sin(angle) * 1.5;
+            return (
+              <mesh key={j} position={[x, -0.25, z]}>
+                <sphereGeometry args={[0.12, 16, 16]} />
+                <meshStandardMaterial
+                  color="#00ffff"
+                  emissive="#00ffff"
+                  emissiveIntensity={3}
+                  metalness={1}
+                  roughness={0}
+                />
+              </mesh>
+            );
+          })}
+        </group>
       ))}
     </group>
   );

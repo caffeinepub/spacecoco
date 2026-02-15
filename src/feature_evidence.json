@@ -2,13 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-replace-the-current-primitive-geometry-rendering-for-enemy-entities-ufo-cow-crocodile-penguin-with-realistic-textured-3d-models-loaded-from-local-static-assets-while-keeping-the-existing-three-js-scene-structure-camera-view-intact",
-      "featureTitle": "Replace the current primitive geometry rendering for enemy entities (ufo, cow, crocodile, penguin) with realistic textured 3D models loaded from local static assets, while keeping the existing Three.js scene structure/camera/view intact.",
+      "featureId": "feature-update-the-existing-intro-hero-3d-scene-so-that-all-cows-drift-smoothly-across-the-screen-in-continuous-motion-and-never-collide-with-or-overlap-each-other-while-preserving-the-current-scene-theme-and-overall-look",
+      "featureTitle": "Update the existing intro/hero 3D scene so that all cows drift smoothly across the screen in continuous motion and never collide with (or overlap) each other, while preserving the current scene/theme and overall look.",
       "files": [
-        "frontend/src/motorSnake3d/render/EnemiesLayer3D.tsx",
-        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
-        "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
-        "frontend/src/motorSnake3d/render/useEnemyModelCache.ts"
+        "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+        "frontend/src/components/start/HomeHeroThreeOverlay.tsx",
+        "frontend/src/components/start/heroDynamicsBus.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -19,16 +18,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-6"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-per-enemy-visual-styling-and-lightweight-animation-behaviors-for-the-loaded-models-ufo-appears-metallic-gray-with-blue-neon-lights-that-blink-cow-appears-realistic-with-black-eyes-and-a-subtle-tail-swish-idle-crocodile-appears-scaly-green-with-open-mouth-and-white-teeth-penguin-appears-black-white-with-orange-beak-and-a-slow-idle-walk-in-place-when-not-moving",
-      "featureTitle": "Implement per-enemy visual styling and lightweight animation behaviors for the loaded models: UFO appears metallic gray with blue neon lights that blink; Cow appears realistic with black eyes and a subtle tail-swish idle; Crocodile appears scaly green with open mouth and white teeth; Penguin appears black/white with orange beak and a slow idle walk-in-place when not moving.",
+      "featureId": "feature-implement-ufo-to-cow-interactions-in-the-existing-intro-hero-3d-scene-so-that-ufos-are-the-only-objects-that-can-collide-with-cows-ufos-dart-through-quickly-and-physically-push-cows-into-new-directions-with-a-realistic-feeling-impulse-response-without-enabling-cow-vs-cow-collisions",
+      "featureTitle": "Implement UFO-to-cow interactions in the existing intro/hero 3D scene so that UFOs are the only objects that can ‘collide’ with cows: UFOs dart through quickly and physically push cows into new directions with a realistic-feeling impulse response, without enabling cow-vs-cow collisions.",
       "files": [
-        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
-        "frontend/src/motorSnake3d/render/enemyModelRigging.ts"
+        "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+        "frontend/src/components/start/HeroUfoField3D.tsx",
+        "frontend/src/components/start/heroDynamicsBus.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -39,16 +39,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-2"
+        "REQ-7"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-ensure-upgraded-enemy-models-have-correct-scale-depth-and-presence-in-the-existing-scene-they-must-not-appear-flat-they-should-have-slight-rotation-idle-motion-that-reads-in-perspective-and-their-size-should-be-consistent-relative-to-the-player-snake-and-world",
-      "featureTitle": "Ensure upgraded enemy models have correct scale, depth, and presence in the existing scene: they must not appear flat; they should have slight rotation/idle motion that reads in perspective, and their size should be consistent relative to the player snake and world.",
+      "featureId": "feature-add-periodic-cow-reaction-behavior-to-the-intro-hero-3d-scene-approximately-every-3-seconds-per-cow-or-globally-but-consistently-timed-visible-as-secondary-animation-pose-response-to-the-ongoing-motion-and-or-recent-ufo-pushes",
+      "featureTitle": "Add periodic ‘cow reaction’ behavior to the intro/hero 3D scene approximately every 3 seconds (per cow or globally, but consistently timed), visible as secondary animation/pose response to the ongoing motion and/or recent UFO pushes.",
       "files": [
-        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
-        "frontend/src/motorSnake3d/render/enemyModelCatalog.ts"
+        "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+        "frontend/src/components/start/HeroFlyingCowPBR.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -59,17 +59,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-3"
+        "REQ-8"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-adjust-basic-lighting-and-shadows-so-that-the-new-enemy-models-cast-and-receive-shadows-appropriately-where-supported-by-the-existing-renderer-setup-without-degrading-performance-or-altering-the-overall-look-of-the-existing-scene",
-      "featureTitle": "Add/adjust basic lighting and shadows so that the new enemy models cast and receive shadows appropriately (where supported by the existing renderer setup), without degrading performance or altering the overall look of the existing scene.",
+      "featureId": "feature-enhance-ufo-lighting-in-the-intro-hero-3d-scene-by-adding-high-contrast-white-lights-positioned-at-the-front-and-underside-of-each-ufo-oriented-toward-nearby-cows-and-ensure-the-lighting-reads-as-high-quality-3d-clean-contrast-against-the-ufo-body-without-changing-the-existing-game-theme",
+      "featureTitle": "Enhance UFO lighting in the intro/hero 3D scene by adding high-contrast white lights positioned at the front and underside of each UFO, oriented toward nearby cows, and ensure the lighting reads as high-quality 3D (clean contrast against the UFO body) without changing the existing game theme.",
       "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
-        "frontend/src/motorSnake3d/render/SphereWorld.tsx"
+        "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+        "frontend/src/components/start/HeroUfoField3D.tsx",
+        "frontend/src/components/start/HomeHeroThreeOverlay.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -80,7 +80,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-4"
+        "REQ-9"
       ],
       "confidence": "high"
     }

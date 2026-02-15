@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { useGameState } from '../state/gameState';
 import { EnemyEntity3D } from './EnemyEntity3D';
 import { useEnemyModelCache } from './useEnemyModelCache';
 import { ENEMY_MODEL_CATALOG } from './enemyModelCatalog';
+import { updateNeonUfoGlowMaterials } from './neonUfoGlowMaterial';
 
 export function EnemiesLayer3D() {
   const gameState = useGameState();
@@ -14,14 +16,14 @@ export function EnemiesLayer3D() {
 
   useEffect(() => {
     if (error) {
-      console.error('Failed to load enemy models:', error);
+      console.warn('Enemy models not available, using fallback primitives:', error);
     }
   }, [error]);
 
-  // Don't render enemies until models are loaded
-  if (isLoading) {
-    return null;
-  }
+  // Update shared neon material system once per frame
+  useFrame((state) => {
+    updateNeonUfoGlowMaterials(state.clock.elapsedTime);
+  });
 
   return (
     <group>
@@ -30,6 +32,7 @@ export function EnemiesLayer3D() {
           key={enemy.id} 
           enemy={enemy}
           loadedModels={loadedModels}
+          forceGLB={!isLoading}
         />
       ))}
     </group>

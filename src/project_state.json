@@ -1,43 +1,42 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "3D Snake game: keep existing 3D view/models unless replaced for specific entities; implement requested gameplay mechanics (movement, scoring, collisions, enemy behavior/spawning, UI) and upgrade enemy entities (UFO/cow/crocodile/penguin) to realistic textured/animated 3D models with proper lighting/shadows and performance constraints, using a standard React+TypeScript+Three.js project structure with assets in project folders.",
+  "summary": "Add integrated 3D intro scene mechanics: cows drift smoothly across screen without colliding; UFOs dart through and physically push cows, triggering realistic cow reactions every ~3 seconds; add high-contrast white spotlights from the front/bottom of UFOs aimed at cows, maintaining existing game theme/scene.",
   "architectural_notes": [
-    "Use standard project structure (React + TypeScript) and Three.js/WebGL for 3D rendering as needed.",
-    "3D assets (e.g., .glb models/textures) should be stored as project assets (e.g., public/assets) rather than embedded as base64 due to size/performance."
+    "Integrate new intro mechanics into the existing scene without altering previously completed content/theme."
   ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-replace-the-current-primitive-geometry-rendering-for-enemy-entities-ufo-cow-crocodile-penguin-with-realistic-textured-3d-models-loaded-from-local-static-assets-while-keeping-the-existing-three-js-scene-structure-camera-view-intact",
-      "title": "Replace the current primitive geometry rendering for enemy entities (ufo, cow, crocodile, penguin) with realistic textured 3D models loaded from local static assets, while keeping the existing Three.js scene structure/camera/view intact.",
+      "id": "feature-update-the-existing-intro-hero-3d-scene-so-that-all-cows-drift-smoothly-across-the-screen-in-continuous-motion-and-never-collide-with-or-overlap-each-other-while-preserving-the-current-scene-theme-and-overall-look",
+      "title": "Update the existing intro/hero 3D scene so that all cows drift smoothly across the screen in continuous motion and never collide with (or overlap) each other, while preserving the current scene/theme and overall look.",
       "reqIds": [
-        "REQ-1"
+        "REQ-6"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-per-enemy-visual-styling-and-lightweight-animation-behaviors-for-the-loaded-models-ufo-appears-metallic-gray-with-blue-neon-lights-that-blink-cow-appears-realistic-with-black-eyes-and-a-subtle-tail-swish-idle-crocodile-appears-scaly-green-with-open-mouth-and-white-teeth-penguin-appears-black-white-with-orange-beak-and-a-slow-idle-walk-in-place-when-not-moving",
-      "title": "Implement per-enemy visual styling and lightweight animation behaviors for the loaded models: UFO appears metallic gray with blue neon lights that blink; Cow appears realistic with black eyes and a subtle tail-swish idle; Crocodile appears scaly green with open mouth and white teeth; Penguin appears black/white with orange beak and a slow idle walk-in-place when not moving.",
+      "id": "feature-implement-ufo-to-cow-interactions-in-the-existing-intro-hero-3d-scene-so-that-ufos-are-the-only-objects-that-can-collide-with-cows-ufos-dart-through-quickly-and-physically-push-cows-into-new-directions-with-a-realistic-feeling-impulse-response-without-enabling-cow-vs-cow-collisions",
+      "title": "Implement UFO-to-cow interactions in the existing intro/hero 3D scene so that UFOs are the only objects that can ‘collide’ with cows: UFOs dart through quickly and physically push cows into new directions with a realistic-feeling impulse response, without enabling cow-vs-cow collisions.",
       "reqIds": [
-        "REQ-2"
+        "REQ-7"
       ],
       "version": 1
     },
     {
-      "id": "feature-ensure-upgraded-enemy-models-have-correct-scale-depth-and-presence-in-the-existing-scene-they-must-not-appear-flat-they-should-have-slight-rotation-idle-motion-that-reads-in-perspective-and-their-size-should-be-consistent-relative-to-the-player-snake-and-world",
-      "title": "Ensure upgraded enemy models have correct scale, depth, and presence in the existing scene: they must not appear flat; they should have slight rotation/idle motion that reads in perspective, and their size should be consistent relative to the player snake and world.",
+      "id": "feature-add-periodic-cow-reaction-behavior-to-the-intro-hero-3d-scene-approximately-every-3-seconds-per-cow-or-globally-but-consistently-timed-visible-as-secondary-animation-pose-response-to-the-ongoing-motion-and-or-recent-ufo-pushes",
+      "title": "Add periodic ‘cow reaction’ behavior to the intro/hero 3D scene approximately every 3 seconds (per cow or globally, but consistently timed), visible as secondary animation/pose response to the ongoing motion and/or recent UFO pushes.",
       "reqIds": [
-        "REQ-3"
+        "REQ-8"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-adjust-basic-lighting-and-shadows-so-that-the-new-enemy-models-cast-and-receive-shadows-appropriately-where-supported-by-the-existing-renderer-setup-without-degrading-performance-or-altering-the-overall-look-of-the-existing-scene",
-      "title": "Add/adjust basic lighting and shadows so that the new enemy models cast and receive shadows appropriately (where supported by the existing renderer setup), without degrading performance or altering the overall look of the existing scene.",
+      "id": "feature-enhance-ufo-lighting-in-the-intro-hero-3d-scene-by-adding-high-contrast-white-lights-positioned-at-the-front-and-underside-of-each-ufo-oriented-toward-nearby-cows-and-ensure-the-lighting-reads-as-high-quality-3d-clean-contrast-against-the-ufo-body-without-changing-the-existing-game-theme",
+      "title": "Enhance UFO lighting in the intro/hero 3D scene by adding high-contrast white lights positioned at the front and underside of each UFO, oriented toward nearby cows, and ensure the lighting reads as high-quality 3D (clean contrast against the UFO body) without changing the existing game theme.",
       "reqIds": [
-        "REQ-4"
+        "REQ-9"
       ],
       "version": 1
     }
@@ -45,31 +44,31 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Adjust Snake mechanics: arrow-key movement with diagonal when holding two keys; collisions (wall/self) cause game over; enemy contact resets snake size but keeps score; growth on collecting enemy; restart button without losing accumulated score; smooth/no lag; keep existing 3D camera/view and models unchanged where possible.",
+      "summary": "Cows fly smoothly across the screen without touching each other (integrated into existing intro scene).",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Scoring system: +100 points per second while playing (constant even if not moving) and collectible-specific points (UFO +1000, cow +2000, crocodile +3000, penguin +5000); persistent score display large at top; score persists across restarts/game-overs as specified.",
+      "summary": "UFOs pass quickly and are the only objects that collide with cows, pushing them to a new direction with realistic physics.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Enemy/collectible spawning: spawn UFO/cow/crocodile/penguin randomly around the map sequentially and never overlapping; on touch enemy disappears and snake grows slightly; ensure proper interactions with player/enemies per rules.",
+      "summary": "Add periodic realistic cow reactions/animations approximately every 3 seconds.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Upgrade enemy entities visuals: replace simple shapes with realistic 3D models/textures (GLB) and light animations (UFO metallic with blue neon blink; cow realistic with tail swish; crocodile scaly green with open mouth/white teeth; penguin black/white with orange beak and slow idle walk), with shadows, basic lighting, proper scale, slight rotation/perspective (not flat), and good performance (no lag).",
+      "summary": "Add white lights on the front and underside of UFOs aimed at cows with strong contrast and high-quality 3D look, without changing the game theme.",
       "reqIds": [],
       "status": "pending"
     }
   ],
   "gameProjectType": "3d",
-  "projectName": "Replace enemy primitives with realistic textured 3D models (UFO/Cow/Crocodile/Penguin) without changing the existing 3D game view",
+  "projectName": "Integrate smooth flying cows, UFO push interactions, and UFO spotlights into existing 3D intro scene",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

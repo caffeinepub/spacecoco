@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T04:02:44.417Z",
+  "generatedAt": "2026-02-15T08:08:11.039Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,65 +11,61 @@
     "implemented": 4,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Replace the current primitive geometry rendering for enemy entities (ufo, cow, crocodile, penguin) with realistic textured 3D models loaded from local static assets, while keeping the existing Three.js scene structure/camera/view intact.",
+        "id": "REQ-6",
+        "summary": "Update the existing intro/hero 3D scene so that all cows drift smoothly across the screen in continuous motion and never collide with (or overlap) each other, while preserving the current scene/theme and overall look.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/public/assets/models/enemies/ufo.glb",
-          "frontend/public/assets/models/enemies/cow.glb",
-          "frontend/public/assets/models/enemies/crocodile.glb",
-          "frontend/public/assets/models/enemies/penguin.glb",
-          "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
-          "frontend/src/motorSnake3d/render/useEnemyModelCache.ts",
-          "frontend/src/motorSnake3d/render/EnemiesLayer3D.tsx",
-          "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+          "frontend/src/components/start/heroDynamicsBus.ts",
+          "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+          "frontend/src/components/start/HomeHeroThreeOverlay.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
-          "frontend/src/motorSnake3d/render/useEnemyModelCache.ts",
-          "frontend/src/motorSnake3d/render/EnemiesLayer3D.tsx",
-          "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+          "frontend/src/components/start/heroDynamicsBus.ts",
+          "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+          "frontend/src/components/start/HomeHeroThreeOverlay.tsx"
         ]
       },
       {
-        "id": "REQ-2",
-        "summary": "Implement per-enemy visual styling and lightweight animation behaviors for the loaded models: UFO appears metallic gray with blue neon lights that blink; Cow appears realistic with black eyes and a subtle tail-swish idle; Crocodile appears scaly green with open mouth and white teeth; Penguin appears black/white with orange beak and a slow idle walk-in-place when not moving.",
+        "id": "REQ-7",
+        "summary": "Implement UFO-to-cow interactions in the existing intro/hero 3D scene so that UFOs are the only objects that can ‘collide’ with cows: UFOs dart through quickly and physically push cows into new directions with a realistic-feeling impulse response, without enabling cow-vs-cow collisions.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/motorSnake3d/render/enemyModelRigging.ts",
-          "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+          "frontend/src/components/start/HeroUfoField3D.tsx",
+          "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+          "frontend/src/components/start/heroDynamicsBus.ts"
         ],
         "matchedFiles": [
-          "frontend/src/motorSnake3d/render/enemyModelRigging.ts",
-          "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+          "frontend/src/components/start/HeroUfoField3D.tsx",
+          "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+          "frontend/src/components/start/heroDynamicsBus.ts"
         ]
       },
       {
-        "id": "REQ-3",
-        "summary": "Ensure upgraded enemy models have correct scale, depth, and presence in the existing scene: they must not appear flat; they should have slight rotation/idle motion that reads in perspective, and their size should be consistent relative to the player snake and world.",
+        "id": "REQ-8",
+        "summary": "Add periodic ‘cow reaction’ behavior to the intro/hero 3D scene approximately every 3 seconds (per cow or globally, but consistently timed), visible as secondary animation/pose response to the ongoing motion and/or recent UFO pushes.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
-          "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+          "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+          "frontend/src/components/start/HeroFlyingCowPBR.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
-          "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+          "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+          "frontend/src/components/start/HeroFlyingCowPBR.tsx"
         ]
       },
       {
-        "id": "REQ-4",
-        "summary": "Add/adjust basic lighting and shadows so that the new enemy models cast and receive shadows appropriately (where supported by the existing renderer setup), without degrading performance or altering the overall look of the existing scene.",
+        "id": "REQ-9",
+        "summary": "Enhance UFO lighting in the intro/hero 3D scene by adding high-contrast white lights positioned at the front and underside of each UFO, oriented toward nearby cows, and ensure the lighting reads as high-quality 3D (clean contrast against the UFO body) without changing the existing game theme.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-          "frontend/src/motorSnake3d/render/SphereWorld.tsx",
-          "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+          "frontend/src/components/start/HeroUfoField3D.tsx",
+          "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+          "frontend/src/components/start/HomeHeroThreeOverlay.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-          "frontend/src/motorSnake3d/render/SphereWorld.tsx",
-          "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+          "frontend/src/components/start/HeroUfoField3D.tsx",
+          "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+          "frontend/src/components/start/HomeHeroThreeOverlay.tsx"
         ]
       }
     ]
@@ -79,13 +75,11 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-    "frontend/src/motorSnake3d/render/EnemiesLayer3D.tsx",
-    "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
-    "frontend/src/motorSnake3d/render/SphereWorld.tsx",
-    "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
-    "frontend/src/motorSnake3d/render/enemyModelRigging.ts",
-    "frontend/src/motorSnake3d/render/useEnemyModelCache.ts",
+    "frontend/src/components/start/HeroAbductionChoreography3D.tsx",
+    "frontend/src/components/start/HeroFlyingCowPBR.tsx",
+    "frontend/src/components/start/HeroUfoField3D.tsx",
+    "frontend/src/components/start/HomeHeroThreeOverlay.tsx",
+    "frontend/src/components/start/heroDynamicsBus.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -9,15 +9,14 @@ import { useBeatClock } from '@/game/audio/useBeatClock';
 import { AudioDirector } from '@/motorSnake3d/audio/AudioDirector';
 import { VfxBus } from '@/motorSnake3d/vfx/VfxBus';
 import { useMatchEvents } from '@/multiplayer/useMatchEvents';
-import { NeonStartCoverOverlay } from '@/components/start/NeonStartCoverOverlay';
 
 export default function PlayPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: '/play' }) as { mode?: string; lobbyId?: string };
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const [showAudioPrompt, setShowAudioPrompt] = useState(true);
   const [gameplayIntensity, setGameplayIntensity] = useState(0);
 
   const lobbyId = search.lobbyId ? BigInt(search.lobbyId) : null;
@@ -26,13 +25,13 @@ export default function PlayPage() {
   const audioDirectorRef = useRef<AudioDirector | null>(null);
 
   const { audioContext, unlockAudioContext } = useAudioContextMusic(
-    isPlaying && !isPaused,
+    !isPaused,
     isMuted,
     gameplayIntensity,
     0
   );
 
-  const { beatPhase } = useBeatClock(isPlaying && !isPaused, audioContext);
+  const { beatPhase } = useBeatClock(!isPaused, audioContext);
 
   useEffect(() => {
     audioDirectorRef.current = new AudioDirector((state) => {
@@ -40,17 +39,10 @@ export default function PlayPage() {
     });
   }, []);
 
-  const handleUserGesture = async () => {
-    if (!audioUnlocked) {
-      await unlockAudioContext();
-      setAudioUnlocked(true);
-    }
-  };
-
-  const handleStartGame = async () => {
-    await handleUserGesture();
-    setIsPlaying(true);
-    setIsPaused(false);
+  const handleEnableSound = async () => {
+    await unlockAudioContext();
+    setAudioUnlocked(true);
+    setShowAudioPrompt(false);
   };
 
   const handlePause = () => {
@@ -58,7 +50,10 @@ export default function PlayPage() {
   };
 
   const handleResume = async () => {
-    await handleUserGesture();
+    if (!audioUnlocked) {
+      await unlockAudioContext();
+      setAudioUnlocked(true);
+    }
     setIsPaused(false);
   };
 
@@ -99,54 +94,44 @@ export default function PlayPage() {
               {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
             </Button>
 
-            {isPlaying && (
-              <Button
-                variant="outline"
-                onClick={isPaused ? handleResume : handlePause}
-                className="gap-2 neon-button-outline"
-              >
-                {isPaused ? (
-                  <>
-                    <Play className="h-4 w-4" />
-                    Resume
-                  </>
-                ) : (
-                  <>
-                    <Pause className="h-4 w-4" />
-                    Pause
-                  </>
-                )}
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              onClick={isPaused ? handleResume : handlePause}
+              className="gap-2 neon-button-outline"
+            >
+              {isPaused ? (
+                <>
+                  <Play className="h-4 w-4" />
+                  Resume
+                </>
+              ) : (
+                <>
+                  <Pause className="h-4 w-4" />
+                  Pause
+                </>
+              )}
+            </Button>
           </div>
         </div>
 
         <Card className="relative overflow-hidden p-0 neon-card h-[800px]">
-          {!isPlaying && (
-            <div className="absolute inset-0 z-50">
-              <NeonStartCoverOverlay />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="text-center space-y-6 pointer-events-auto">
-                  <h2 className="text-4xl md:text-5xl font-display font-bold text-primary neon-text-glow drop-shadow-2xl">
-                    Motor Snake 3D
-                  </h2>
-                  <p className="text-lg text-foreground max-w-md mx-auto drop-shadow-lg backdrop-blur-sm bg-black/30 p-4 rounded-xl border border-accent/30">
-                    Navigate a hollow sphere, survive extreme physics, collect anomalies, and escape the ghost!
-                  </p>
-                  <Button
-                    size="lg"
-                    onClick={handleStartGame}
-                    className="neon-button text-lg px-8 py-6 shadow-2xl"
-                  >
-                    Start Game
-                  </Button>
-                </div>
-              </div>
+          {/* Audio unlock prompt - non-blocking, positioned to not interfere with swipe */}
+          {showAudioPrompt && !audioUnlocked && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+              <Button
+                size="lg"
+                onClick={handleEnableSound}
+                className="neon-button text-lg px-8 py-4 shadow-2xl animate-pulse"
+              >
+                <Volume2 className="h-5 w-5 mr-2" />
+                Enable Sound
+              </Button>
             </div>
           )}
 
-          {isPaused && isPlaying && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
+          {/* Pause overlay - blocks interaction when paused */}
+          {isPaused && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 pointer-events-auto">
               <div className="text-center space-y-6">
                 <h2 className="text-4xl font-display font-bold text-primary neon-text-glow">
                   Paused
@@ -162,6 +147,7 @@ export default function PlayPage() {
             </div>
           )}
 
+          {/* Game always renders and is interactable when not paused */}
           <MotorSnakeGameRoot
             isPaused={isPaused}
             onIntensityChange={handleIntensityChange}
@@ -172,14 +158,15 @@ export default function PlayPage() {
         <Card className="mt-6 p-6 space-y-4 neon-card">
           <h3 className="text-lg font-display font-bold text-primary">Motor Snake 3D Controls</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• <strong>Desktop:</strong> Arrow keys or WASD for analog movement</li>
-            <li>• <strong>Mobile:</strong> Virtual joystick (bottom-left)</li>
+            <li>• <strong>Desktop:</strong> Arrow keys or WASD for movement</li>
+            <li>• <strong>Mobile:</strong> Swipe anywhere on screen (horizontal/vertical/diagonal) or use virtual joystick</li>
+            <li>• <strong>Tilt:</strong> Device orientation (if available and permitted)</li>
             <li>• <strong>Brake:</strong> Spacebar (triggers tail whip)</li>
             <li>• <strong>Shake:</strong> Shift+S (removes baby penguins)</li>
-            <li>• Navigate inside/outside the hollow sphere</li>
+            <li>• Navigate inside/outside the hollow sphere with ultra-realistic PBR rendering</li>
             <li>• Survive gravity cycles, wind portals, fog, and acid rain</li>
             <li>• Collect anomalies for power-ups with tradeoffs</li>
-            <li>• Beware the ghost that grows stronger over time</li>
+            <li>• Compete against AI snakes to eat UFOs and grow!</li>
           </ul>
         </Card>
       </div>
