@@ -1,110 +1,36 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Build a new 3D 'Motor Snake' game structure with extreme physics/effects and a hollow spherical world (inside/outside), replacing prior mechanics; include async/event-based multiplayer up to 10 players and first address/fix errors from the previous project (including prior deployment error).",
+  "summary": "Project now includes creating and integrating a new full-screen animated neon-glow cover image (game start screen) replacing the current cover artwork.",
   "architectural_notes": [
-    "Project direction: replace prior gameplay mechanics entirely with new 'Motor Snake 3D' extreme-mechanics design; start by building the foundational structure/scaffolding.",
-    "Multiplayer constraint: implement as non-real-time (async/event-synced) but support up to 10 players.",
-    "World topology: hollow sphere with inside/outside traversal as a core world assumption."
+    "Start screen cover art should be replaced entirely with a new generated image asset.",
+    "Cover image should support full-screen display plus animated motion and neon glow effects (UI/scene-level animation/shader)."
   ],
-  "known_issues": [
-    "Prior deployment error encountered; requires investigation/fix as part of stabilizing the project."
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Hyperreal modern-cartoon cinematic neon cover art featuring: colossal neon green/purple snake biting a splitting silver UFO with a screaming green alien inside; foreground stampede of smaller snakes with glowing trails; flying cow with red laser eyes and smoky beams; rotating starfield; sparks/fire/explosive colors; volumetric lighting; depth of field; long shadows (game-cover-neon-snake-ufo.dim_3840x2160.png)",
   "existing_features": [
     {
-      "id": "feature-fix-the-previous-deployment-failure-so-the-project-builds-and-deploys-successfully-again-local-build-canister-deploy-identify-the-root-cause-and-apply-the-minimal-code-config-change-needed-to-restore-reliable-deployments",
-      "title": "Fix the previous deployment failure so the project builds and deploys successfully again (local build + canister deploy). Identify the root cause and apply the minimal code/config change needed to restore reliable deployments.",
+      "id": "feature-generate-a-new-hyperreal-modern-cartoon-cinematic-neon-cover-image-matching-the-user-s-provided-scene-description-colossal-neon-green-purple-snake-biting-a-splitting-silver-ufo-with-a-screaming-green-alien-inside-smaller-snakes-stampeding-in-the-foreground-with-glowing-trails-a-flying-cow-on-the-right-shooting-red-laser-beams-with-smoke-rotating-starfield-background-sparks-fire-color-explosions-volumetric-lighting-depth-of-field-long-shadows-save-it-as-a-static-asset-in-the-frontend-public-generated-assets-folder",
+      "title": "Generate a new hyperreal modern-cartoon, cinematic neon cover image matching the user’s provided scene description (colossal neon green/purple snake biting a splitting silver UFO with a screaming green alien inside; smaller snakes stampeding in the foreground with glowing trails; a flying cow on the right shooting red laser beams with smoke; rotating starfield background; sparks/fire/color explosions; volumetric lighting; depth of field; long shadows). Save it as a static asset in the frontend public generated assets folder.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-replace-the-existing-snake-game-mechanics-with-a-new-motor-snake-3d-foundation-that-supports-extreme-physics-a-hollow-spherical-world-inside-outside-traversal-anomaly-based-power-ups-reactive-tail-behavior-enemy-collision-events-and-a-persistent-ghost-concept-this-should-be-delivered-as-a-playable-inspectable-scaffold-systems-wired-together-with-placeholder-tuning-rather-than-a-fully-balanced-game",
-      "title": "Replace the existing snake game mechanics with a new 'Motor Snake 3D' foundation that supports: extreme physics, a hollow spherical world (inside/outside traversal), anomaly-based power-ups, reactive tail behavior, enemy collision events, and a persistent ghost concept. This should be delivered as a playable/inspectable scaffold (systems wired together with placeholder tuning) rather than a fully balanced game.",
+      "id": "feature-replace-the-current-start-cover-artwork-with-the-new-cover-image-and-present-it-as-a-full-screen-start-overlay-on-the-play-page-the-cover-must-fill-the-viewport-cover-sizing-and-include-a-subtle-animated-neon-glow-motion-treatment-e-g-slow-parallax-drift-zoom-hue-shift-shimmer-and-or-animated-light-sweep-while-keeping-ui-readable-and-clickable",
+      "title": "Replace the current start/cover artwork with the new cover image and present it as a full-screen start overlay on the Play page. The cover must fill the viewport (cover sizing), and include a subtle animated neon glow + motion treatment (e.g., slow parallax drift/zoom, hue-shift shimmer, and/or animated light sweep) while keeping UI readable and clickable.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-a-hollow-spherical-world-foundation-player-movement-constrained-to-the-inside-surface-of-a-sphere-with-the-ability-to-transition-to-the-exterior-surface-include-a-red-core-object-at-the-center-and-a-placeholder-core-break-event-that-transitions-to-an-abyss-state-e-g-distinct-environment-lighting-and-a-return-respawn-mechanic",
-      "title": "Implement a hollow spherical world foundation: player movement constrained to the inside surface of a sphere, with the ability to transition to the exterior surface. Include a red core object at the center and a placeholder 'core break' event that transitions to an 'abyss' state (e.g., distinct environment/lighting and a return/respawn mechanic).",
+      "id": "feature-update-the-home-page-hero-artwork-to-use-the-new-cover-image-instead-of-the-current-generated-hero-image-keeping-responsive-layout-intact",
+      "title": "Update the Home page hero artwork to use the new cover image instead of the current generated hero image, keeping responsive layout intact.",
       "reqIds": [
         "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-an-environment-physics-system-scaffold-that-supports-time-varying-gravity-fluctuates-every-5-seconds-between-0x-and-3x-radial-wind-bursts-from-invisible-portals-fog-that-distorts-perception-and-acid-rain-that-can-remove-tail-segments-unless-a-shield-is-active",
-      "title": "Add an environment/physics system scaffold that supports time-varying gravity (fluctuates every 5 seconds between 0x and 3x), radial wind bursts from invisible portals, fog that distorts perception, and acid rain that can remove tail segments unless a shield is active.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-analog-joystick-input-for-controlling-the-snake-in-3d-smooth-input-should-result-in-stable-elegant-motion-abrupt-input-should-produce-more-aggressive-twisting-spring-like-movement-include-a-tail-reaction-scaffold-where-sudden-head-braking-causes-the-tail-to-coil-and-impart-a-whip-like-impulse",
-      "title": "Implement analog joystick input for controlling the snake in 3D. Smooth input should result in stable, elegant motion; abrupt input should produce more aggressive twisting/spring-like movement. Include a tail reaction scaffold where sudden head braking causes the tail to coil and impart a whip-like impulse.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-an-enemy-collision-event-framework-with-three-enemy-archetypes-and-their-signature-collision-outcomes-1-flying-cow-impact-creates-a-white-freeze-dome-10m-radius-that-freezes-entities-temporarily-and-spawns-floating-shards-that-become-projectiles-2-ufo-impact-triggers-a-map-fold-pulse-that-teleports-the-player-to-the-sphere-centerline-defined-center-position-and-leaves-spark-trails-3-kamikaze-penguin-impact-creates-a-ring-of-fire-and-spawns-baby-penguins-that-attach-to-the-tail-and-slow-the-player-until-shaken-off",
-      "title": "Create an enemy/collision event framework with three enemy archetypes and their signature collision outcomes: (1) Flying cow impact creates a white freeze dome (10m radius) that freezes entities temporarily and spawns floating shards that become projectiles; (2) UFO impact triggers a 'map fold' pulse that teleports the player to the sphere centerline/defined center position and leaves spark trails; (3) Kamikaze penguin impact creates a ring of fire and spawns baby penguins that attach to the tail and slow the player until shaken off.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-an-anomaly-based-power-up-framework-where-power-ups-spawn-as-anomalies-not-standard-drops-and-implement-three-power-ups-1-mini-black-hole-grants-enemy-suction-at-distance-but-has-a-self-suction-risk-if-held-too-long-2-shooting-star-sets-the-snake-on-fire-phases-through-obstacles-enemies-burns-enemies-but-shortens-melts-the-snake-over-time-3-mirror-makes-the-snake-intangible-for-2-seconds-and-reverses-the-player-s-view-controls-during-that-duration",
-      "title": "Create an anomaly-based power-up framework where power-ups spawn as anomalies (not standard drops) and implement three power-ups: (1) Mini black hole: grants enemy suction at distance but has a self-suction risk if held too long; (2) Shooting star: sets the snake on fire, phases through obstacles/enemies, burns enemies, but shortens/melts the snake over time; (3) Mirror: makes the snake intangible for 2 seconds and reverses the player’s view/controls during that duration.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-persistent-ghost-system-scaffold-upon-player-death-spawn-a-ghost-version-that-follows-the-player-in-subsequent-runs-and-delivers-the-voice-line-you-are-not-you-anymore-it-s-me-now-include-a-growth-pressure-mechanic-where-ignoring-the-ghost-increases-its-influence-culminating-in-a-placeholder-replacement-state-e-g-ghost-takes-over-visual-identity-and-has-higher-speed-with-clear-ui-indication",
-      "title": "Add a persistent 'ghost' system scaffold: upon player death, spawn a ghost version that follows the player in subsequent runs and delivers the voice line: \"You are not you anymore, it's me now\". Include a growth/pressure mechanic where ignoring the ghost increases its influence, culminating in a placeholder 'replacement' state (e.g., ghost takes over visual identity and has higher speed) with clear UI indication.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-async-event-synced-multiplayer-scaffolding-for-up-to-10-players-non-real-time-add-backend-support-for-creating-joining-a-lobby-listing-lobby-participants-starting-a-match-and-submitting-player-input-actions-as-ordered-events-update-the-lobby-page-ui-to-enable-creating-and-joining-lobbies-showing-player-count-up-to-10-and-starting-the-match-when-ready",
-      "title": "Implement async/event-synced multiplayer scaffolding for up to 10 players (non-real-time). Add backend support for creating/joining a lobby, listing lobby participants, starting a match, and submitting player input/actions as ordered events. Update the Lobby page UI to enable creating and joining lobbies, showing player count up to 10, and starting the match when ready.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-vfx-audio-cue-pipeline-scaffold-for-the-new-mechanics-particles-lights-screen-distortion-hooks-that-can-be-triggered-by-the-environment-system-collisions-and-power-ups-and-adaptive-electro-orchestral-music-intensity-changes-e-g-strings-on-danger-bass-on-attack-silence-before-an-explosion-use-existing-audio-hooks-where-possible-and-ensure-graceful-behavior-when-audio-is-locked-muted",
-      "title": "Add a VFX + audio cue pipeline scaffold for the new mechanics: particles/lights/screen distortion hooks that can be triggered by the environment system, collisions, and power-ups; and adaptive electro-orchestral music intensity changes (e.g., strings on danger, bass on attack, silence before an explosion). Use existing audio hooks where possible and ensure graceful behavior when audio is locked/muted.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-user-facing-ui-copy-across-the-home-lobby-play-flow-to-reflect-the-new-motor-snake-3d-experience-extreme-physics-hollow-sphere-anomalies-removing-references-that-contradict-the-new-mechanics-ensure-all-user-facing-text-is-in-english",
-      "title": "Update user-facing UI copy across the Home/Lobby/Play flow to reflect the new Motor Snake 3D experience (extreme physics, hollow sphere, anomalies), removing references that contradict the new mechanics. Ensure all user-facing text is in English.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-adopt-a-consistent-distinctive-visual-theme-for-the-new-motor-snake-3d-ui-overlay-hud-menus-lobby-that-matches-the-new-apocalyptic-anomaly-tone-while-keeping-text-readable-over-the-3d-scene-avoid-blue-purple-as-the-primary-palette",
-      "title": "Adopt a consistent, distinctive visual theme for the new Motor Snake 3D UI overlay (HUD, menus, lobby) that matches the new 'apocalyptic anomaly' tone while keeping text readable over the 3D scene. Avoid blue/purple as the primary palette.",
-      "reqIds": [
-        "REQ-12"
       ],
       "version": 1
     }
@@ -112,61 +38,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Create new 3D project structure for 'Motor Snake 3D' (core scaffolding replacing previous mechanics)",
-      "reqIds": [],
-      "status": "in_progress"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Implement hollow spherical world foundation (interior/exterior traversal)",
+      "summary": "Generate hyperreal modern-cartoon cinematic neon cover art and integrate it as a full-screen animated, glowing start-screen image replacing the existing cover.",
       "reqIds": [],
       "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Add dynamic physics/environment system scaffold (fluctuating gravity, radial wind portals, fog/visual distortion, acid rain + shield interaction)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Add collision/enemy interaction framework (flying cow freeze dome + shards, UFO map-fold pulse/teleport, kamikaze penguin fire ring + baby penguin slow)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Add anomaly-based power-up framework (mini black hole suction risk, meteor fire/phase-through + melting, mirror reverse-view + intangibility)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Add persistent 'ghost' system concept scaffold (post-death follower that can replace player over time)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Async/event-synced multiplayer support for up to 10 players (non-real-time)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Visual/audio effects pipeline scaffold (particles/lights/screen distortion, adaptive electro-orchestral music cues)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-9",
-      "summary": "Fix errors from previous project, including deployment error, before/while integrating new structure",
-      "reqIds": [],
-      "status": "in_progress"
     }
   ],
-  "gameProjectType": "3d",
-  "projectName": "Motor Snake 3D",
+  "projectName": "Generate and integrate a full-screen animated neon cover image for the game start screen",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

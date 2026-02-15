@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -9,7 +9,12 @@ interface StarData {
   size: number;
 }
 
-export function NeonSpaceStars({ count = 200 }: { count?: number }) {
+interface NeonSpaceStarsProps {
+  count?: number;
+  onPositionsUpdate?: (positions: THREE.Vector3[]) => void;
+}
+
+export function NeonSpaceStars({ count = 200, onPositionsUpdate }: NeonSpaceStarsProps) {
   const pointsRef = useRef<THREE.Points>(null);
   
   const { geometry, material, starData } = useMemo(() => {
@@ -76,6 +81,8 @@ export function NeonSpaceStars({ count = 200 }: { count?: number }) {
     const sizes = pointsRef.current.geometry.attributes.size.array as Float32Array;
     const time = state.clock.elapsedTime;
 
+    const currentPositions: THREE.Vector3[] = [];
+
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
       const star = starData[i];
@@ -90,6 +97,8 @@ export function NeonSpaceStars({ count = 200 }: { count?: number }) {
       positions[i3 + 1] = star.position.y;
       positions[i3 + 2] = star.position.z;
 
+      currentPositions.push(star.position.clone());
+
       // Twinkling effect
       const twinkle = Math.sin(time * 3 + star.phase) * 0.5 + 0.5;
       sizes[i] = star.size * (0.5 + twinkle * 0.5);
@@ -97,6 +106,11 @@ export function NeonSpaceStars({ count = 200 }: { count?: number }) {
 
     pointsRef.current.geometry.attributes.position.needsUpdate = true;
     pointsRef.current.geometry.attributes.size.needsUpdate = true;
+
+    // Notify parent of current positions
+    if (onPositionsUpdate) {
+      onPositionsUpdate(currentPositions);
+    }
   });
 
   return <points ref={pointsRef} geometry={geometry} material={material} />;

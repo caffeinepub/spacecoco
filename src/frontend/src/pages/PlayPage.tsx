@@ -9,6 +9,7 @@ import { useBeatClock } from '@/game/audio/useBeatClock';
 import { AudioDirector } from '@/motorSnake3d/audio/AudioDirector';
 import { VfxBus } from '@/motorSnake3d/vfx/VfxBus';
 import { useMatchEvents } from '@/multiplayer/useMatchEvents';
+import { NeonStartCoverOverlay } from '@/components/start/NeonStartCoverOverlay';
 
 export default function PlayPage() {
   const navigate = useNavigate();
@@ -122,21 +123,24 @@ export default function PlayPage() {
 
         <Card className="relative overflow-hidden p-0 neon-card h-[800px]">
           {!isPlaying && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
-              <div className="text-center space-y-6">
-                <h2 className="text-4xl font-display font-bold text-primary neon-text-glow">
-                  Motor Snake 3D
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                  Navigate a hollow sphere, survive extreme physics, collect anomalies, and escape the ghost!
-                </p>
-                <Button
-                  size="lg"
-                  onClick={handleStartGame}
-                  className="neon-button text-lg px-8 py-6"
-                >
-                  Start Game
-                </Button>
+            <div className="absolute inset-0 z-50">
+              <NeonStartCoverOverlay />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-center space-y-6 pointer-events-auto">
+                  <h2 className="text-4xl md:text-5xl font-display font-bold text-primary neon-text-glow drop-shadow-2xl">
+                    Motor Snake 3D
+                  </h2>
+                  <p className="text-lg text-foreground max-w-md mx-auto drop-shadow-lg backdrop-blur-sm bg-black/30 p-4 rounded-xl border border-accent/30">
+                    Navigate a hollow sphere, survive extreme physics, collect anomalies, and escape the ghost!
+                  </p>
+                  <Button
+                    size="lg"
+                    onClick={handleStartGame}
+                    className="neon-button text-lg px-8 py-6 shadow-2xl"
+                  >
+                    Start Game
+                  </Button>
+                </div>
               </div>
             </div>
           )}

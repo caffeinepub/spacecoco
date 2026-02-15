@@ -1,249 +1,92 @@
 {
   "kind": "build_request",
-  "title": "Replace prior gameplay with new Motor Snake 3D structure + fix deployment and add async multiplayer (up to 10)",
-  "priority": "high",
+  "title": "Generate and integrate a full-screen animated neon cover image for the game start screen",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the previous deployment failure so the project builds and deploys successfully again (local build + canister deploy). Identify the root cause and apply the minimal code/config change needed to restore reliable deployments.",
-      "target": "both",
+      "text": "Generate a new hyperreal modern-cartoon, cinematic neon cover image matching the user’s provided scene description (colossal neon green/purple snake biting a splitting silver UFO with a screaming green alien inside; smaller snakes stampeding in the foreground with glowing trails; a flying cow on the right shooting red laser beams with smoke; rotating starfield background; sparks/fire/color explosions; volumetric lighting; depth of field; long shadows). Save it as a static asset in the frontend public generated assets folder.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-12"
+          "msg-user-1"
         ],
         "quotes": [
-          "🙏 Encountered a deployment error",
-          "arregla errores del anterior"
+          "Portada hiperrealista en estilo caricatura moderna, ultra detallada, con render cinematográfico... Resolución 8K, ultra cinematográfica.",
+          "agregalo a mi juego",
+          "que la imagine cubra toda la pantalla, que se mueva y brille con colores neon  y que remplace la imagen que ya esta",
+          "comienza ya"
         ]
       },
       "acceptanceCriteria": [
-        "Running the standard build command(s) completes without errors.",
-        "Running canister deploy completes without errors.",
-        "The app loads in the browser and routes '/' '/lobby' '/play' render without runtime exceptions."
+        "A new image file exists at frontend/public/assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png.",
+        "The image visually includes all key elements described by the user (snake + UFO split + alien, foreground smaller snakes with trails, flying cow with red lasers + smoke, rotating starfield feel, sparks/fire/explosive color, cinematic lighting/DOF).",
+        "The asset is referenced via a plain static URL path starting with /assets/generated/ (no backend image serving)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Replace the existing snake game mechanics with a new 'Motor Snake 3D' foundation that supports: extreme physics, a hollow spherical world (inside/outside traversal), anomaly-based power-ups, reactive tail behavior, enemy collision events, and a persistent ghost concept. This should be delivered as a playable/inspectable scaffold (systems wired together with placeholder tuning) rather than a fully balanced game.",
+      "text": "Replace the current start/cover artwork with the new cover image and present it as a full-screen start overlay on the Play page. The cover must fill the viewport (cover sizing), and include a subtle animated neon glow + motion treatment (e.g., slow parallax drift/zoom, hue-shift shimmer, and/or animated light sweep) while keeping UI readable and clickable.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2",
-          "msg-14",
-          "msg-15"
+          "msg-user-1"
         ],
         "quotes": [
-          "cambia la mecánica completamente a lo que te dije",
-          "si empieza con la estructura nueva",
-          "ya comienza"
+          "que la imagine cubra toda la pantalla, que se mueva y brille con colores neon  y que remplace la imagen que ya esta"
         ]
       },
       "acceptanceCriteria": [
-        "The Play page runs the new 3D game scaffold (not the old 2D grid/canvas gameplay).",
-        "The new scaffold exposes clear modules/systems for world, physics/environment, collisions, power-ups, and ghost behavior (even if simplified).",
-        "No remnants of the prior gameplay loop are required for the new run-path (the old loop may remain only as unused/deprecated code)."
+        "On /play when the game has not started yet, the user sees a full-viewport cover background using /assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png.",
+        "The cover is animated (visible motion over time) and has a neon glow/shimmer effect; animation does not block button interactions.",
+        "Existing start UI (title/description/start button) remains readable on top of the cover via an overlay/gradient/backdrop treatment.",
+        "The previous start/cover background used in this state is no longer visible."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Implement a hollow spherical world foundation: player movement constrained to the inside surface of a sphere, with the ability to transition to the exterior surface. Include a red core object at the center and a placeholder 'core break' event that transitions to an 'abyss' state (e.g., distinct environment/lighting and a return/respawn mechanic).",
+      "text": "Update the Home page hero artwork to use the new cover image instead of the current generated hero image, keeping responsive layout intact.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-user-1"
         ],
         "quotes": [
-          "El mundo no es plano: es una esfera hueca. Puedes rodar por dentro, salir al exterior... Y si rompes el núcleo —un punto rojo en el centro—, el planeta se parte, y caes a un abismo..."
+          "que ... remplace la imagen que ya esta"
         ]
       },
       "acceptanceCriteria": [
-        "The 3D scene renders a sphere world with an interior traversal mode.",
-        "A player-controlled snake can move along the interior surface without leaving the surface unintentionally.",
-        "A transition mechanism exists to move from inside to outside traversal (even if via a debug key/button).",
-        "A red core is visible at the center, and triggering 'core break' transitions to an abyss presentation and then returns the player back to normal gameplay state (via a deterministic rule)."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Add an environment/physics system scaffold that supports time-varying gravity (fluctuates every 5 seconds between 0x and 3x), radial wind bursts from invisible portals, fog that distorts perception, and acid rain that can remove tail segments unless a shield is active.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "gravedad que fluctúa cada cinco segundos entre cero y triple, viento radial que sale de portales invisibles, lluvia ácida que derrite segmentos de cola si no tienes escudo, niebla que distorsiona la vista"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A 5-second gravity cycle is observable in-game (HUD/debug readout is acceptable).",
-        "Wind portal events can be triggered/spawned and apply a radial force effect to the player snake.",
-        "Fog/distortion is visible and can be toggled/varied by environment intensity.",
-        "Acid rain events occur (or can be triggered) and remove tail segments when shield is inactive; with shield active, segments are not removed."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Implement analog joystick input for controlling the snake in 3D. Smooth input should result in stable, elegant motion; abrupt input should produce more aggressive twisting/spring-like movement. Include a tail reaction scaffold where sudden head braking causes the tail to coil and impart a whip-like impulse.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "El jugador usa joystick analógico... cuanto más suave mueves... cuanto más brusco... La cola no solo sigue, reacciona: si la cabeza frena, la cola se enrolla y te lanza como látigo."
-        ]
-      },
-      "acceptanceCriteria": [
-        "On touch devices, a virtual analog joystick is available; on desktop, a fallback control scheme exists (e.g., mouse/keys mapped to an analog vector).",
-        "Movement response differs between low vs high joystick acceleration (observable difference in turning stability and oscillation).",
-        "Triggering a brake/deceleration event causes a noticeable tail-coil/whip impulse effect on the snake (simplified physics is acceptable)."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Create an enemy/collision event framework with three enemy archetypes and their signature collision outcomes: (1) Flying cow impact creates a white freeze dome (10m radius) that freezes entities temporarily and spawns floating shards that become projectiles; (2) UFO impact triggers a 'map fold' pulse that teleports the player to the sphere centerline/defined center position and leaves spark trails; (3) Kamikaze penguin impact creates a ring of fire and spawns baby penguins that attach to the tail and slow the player until shaken off.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Colisiones son arte: vaca voladora... domo blanco que congela... cristales... Ovni... mapa se pliegue... teletransportándote... Pingüino kamikaze... anillo de fuego... pingüinos bebés... se pegan a tu cola, ralentizándote hasta que los sacudas."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Each archetype exists as a spawnable entity in the world.",
-        "Colliding with each archetype triggers its respective event sequence (freeze dome + shards, fold pulse + teleport, fire ring + baby attachments).",
-        "Baby penguin attachments visibly reduce movement speed and can be removed via a deliberate 'shake' input/action."
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Create an anomaly-based power-up framework where power-ups spawn as anomalies (not standard drops) and implement three power-ups: (1) Mini black hole: grants enemy suction at distance but has a self-suction risk if held too long; (2) Shooting star: sets the snake on fire, phases through obstacles/enemies, burns enemies, but shortens/melts the snake over time; (3) Mirror: makes the snake intangible for 2 seconds and reverses the player’s view/controls during that duration.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Power-ups: no caen, aparecen como anomalías... agujero negro... estrella fugaz... espejo... intangible dos segundos, pero ves todo al revés."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Power-ups spawn via an 'anomaly spawner' system distinct from enemy spawning.",
-        "Each of the three power-ups can be acquired and has an observable active state with a duration and clear tradeoff.",
-        "Mirror power-up reverses the player’s view or controls for 2 seconds and makes collisions non-lethal/non-blocking during that window."
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Add a persistent 'ghost' system scaffold: upon player death, spawn a ghost version that follows the player in subsequent runs and delivers the voice line: \"You are not you anymore, it's me now\". Include a growth/pressure mechanic where ignoring the ghost increases its influence, culminating in a placeholder 'replacement' state (e.g., ghost takes over visual identity and has higher speed) with clear UI indication.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Y el fantasma: cada vez que mueres... te habla. \"Ya no eres tú, soy yo ahora\", y si lo dejas crecer, te reemplaza por completo..."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Dying once causes a ghost to appear in later gameplay sessions without requiring a page reload.",
-        "The ghost speaks the required line in English as on-screen subtitle and/or audio.",
-        "A measurable ghost influence meter increases over time when the ghost is not countered; reaching the threshold triggers a 'replacement' mode with a noticeable gameplay change (e.g., increased speed) and UI label."
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "text": "Implement async/event-synced multiplayer scaffolding for up to 10 players (non-real-time). Add backend support for creating/joining a lobby, listing lobby participants, starting a match, and submitting player input/actions as ordered events. Update the Lobby page UI to enable creating and joining lobbies, showing player count up to 10, and starting the match when ready.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-6",
-          "msg-9",
-          "msg-12"
-        ],
-        "quotes": [
-          "si multijugados de asta 10 personas",
-          "Modo multijugador: hasta cuatro serpientes",
-          "si empieza con la estructura nueva"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Lobby creation returns a join code/id and persists on the backend.",
-        "Players can join a lobby until it reaches 10 participants; the UI shows current participants and remaining slots.",
-        "A match can be started, and clients can submit actions as events that are stored and retrievable in order (polling-based).",
-        "No WebSocket or real-time assumptions are introduced; the game runs correctly under polling/event sync constraints."
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "text": "Add a VFX + audio cue pipeline scaffold for the new mechanics: particles/lights/screen distortion hooks that can be triggered by the environment system, collisions, and power-ups; and adaptive electro-orchestral music intensity changes (e.g., strings on danger, bass on attack, silence before an explosion). Use existing audio hooks where possible and ensure graceful behavior when audio is locked/muted.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Todo visual: cada efecto tiene su partícula, su sonido, su luz. La pantalla parpadea, se distorsiona... La música es orquesta electrónica... silencio absoluto antes de una explosión."
-        ]
-      },
-      "acceptanceCriteria": [
-        "There are callable VFX triggers for: gravity shift, freeze dome, fold pulse teleport, fire ring, black hole, shooting star, mirror.",
-        "Music intensity responds to a gameplay intensity signal and supports at least: 'danger', 'attack', and 'pre-explosion silence' states (simplified mapping is acceptable).",
-        "Muting stops/avoids ongoing looped SFX and does not cause errors; audio unlock remains gesture-gated."
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "text": "Update user-facing UI copy across the Home/Lobby/Play flow to reflect the new Motor Snake 3D experience (extreme physics, hollow sphere, anomalies), removing references that contradict the new mechanics. Ensure all user-facing text is in English.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-0"
-        ],
-        "quotes": [
-          "Use English for any user-facing text in the build request."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Home page hero/subtitle and feature cards do not mention the previous cow/UFO/laser-only loop as the primary premise; copy reflects the new mechanics at a high level.",
-        "Lobby multiplayer section references up to 10 players (not 8) and no longer shows 'Coming Soon' for the implemented lobby actions.",
-        "All modified/new user-visible strings are in English."
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "text": "Adopt a consistent, distinctive visual theme for the new Motor Snake 3D UI overlay (HUD, menus, lobby) that matches the new 'apocalyptic anomaly' tone while keeping text readable over the 3D scene. Avoid blue/purple as the primary palette.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Esto no es un juego... Esto es una experiencia..."
-        ]
-      },
-      "acceptanceCriteria": [
-        "A single coherent theme is applied across Lobby/Play/HUD (colors, typography usage, panels).",
-        "Primary palette is not blue/purple; readability over the 3D scene is maintained (sufficient contrast for body text and buttons)."
+        "frontend/src/pages/HomePage.tsx no longer references /assets/generated/spacecoco-hero-neon-cartoon.dim_1600x600.png.",
+        "The Home page hero image displays /assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png and remains properly styled (no layout break on desktop)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit files under frontend/immutablePaths (compose existing hooks/components instead).",
-    "Multiplayer must be implemented as async/event-synced (polling/turn-like), not real-time (no WebSockets)."
+    "Do not modify any files under frontend/src/components/ui (read-only shadcn components).",
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (immutable paths).",
+    "Do not route generated images through the backend; serve them as static assets from frontend/public/assets/generated."
   ],
   "nonGoals": [
-    "Implementing true real-time 10-player action networking.",
-    "Fully tuning/balancing all mechanics to final gameplay quality (this request is for structure/scaffolding).",
-    "Integrating third-party auth providers beyond Internet Identity."
+    "Do not change gameplay mechanics, scoring, spawning, or physics.",
+    "Do not add new authentication providers beyond Internet Identity.",
+    "Do not implement real-time networking changes (WebSockets, etc.)."
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Hyperreal modern-cartoon cinematic neon cover art featuring: colossal neon green/purple snake biting a splitting silver UFO with a screaming green alien inside; foreground stampede of smaller snakes with glowing trails; flying cow with red laser eyes and smoky beams; rotating starfield; sparks/fire/explosive colors; volumetric lighting; depth of field; long shadows (game-cover-neon-snake-ufo.dim_3840x2160.png)"
+    ],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [
+      "Use English for user-facing text in the app."
+    ],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

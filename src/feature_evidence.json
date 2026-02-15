@@ -2,12 +2,9 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-previous-deployment-failure-so-the-project-builds-and-deploys-successfully-again-local-build-canister-deploy-identify-the-root-cause-and-apply-the-minimal-code-config-change-needed-to-restore-reliable-deployments",
-      "featureTitle": "Fix the previous deployment failure so the project builds and deploys successfully again (local build + canister deploy). Identify the root cause and apply the minimal code/config change needed to restore reliable deployments.",
-      "files": [
-        "frontend/src/components/background/NeonBackgroundLayer.tsx",
-        "frontend/src/pages/PlayPage.tsx"
-      ],
+      "featureId": "feature-generate-a-new-hyperreal-modern-cartoon-cinematic-neon-cover-image-matching-the-user-s-provided-scene-description-colossal-neon-green-purple-snake-biting-a-splitting-silver-ufo-with-a-screaming-green-alien-inside-smaller-snakes-stampeding-in-the-foreground-with-glowing-trails-a-flying-cow-on-the-right-shooting-red-laser-beams-with-smoke-rotating-starfield-background-sparks-fire-color-explosions-volumetric-lighting-depth-of-field-long-shadows-save-it-as-a-static-asset-in-the-frontend-public-generated-assets-folder",
+      "featureTitle": "Generate a new hyperreal modern-cartoon, cinematic neon cover image matching the user’s provided scene description (colossal neon green/purple snake biting a splitting silver UFO with a screaming green alien inside; smaller snakes stampeding in the foreground with glowing trails; a flying cow on the right shooting red laser beams with smoke; rotating starfield background; sparks/fire/color explosions; volumetric lighting; depth of field; long shadows). Save it as a static asset in the frontend public generated assets folder.",
+      "files": [],
       "components": [
         "authorization@4.0.0",
         "core-infrastructure@1.0.2",
@@ -22,16 +19,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-replace-the-existing-snake-game-mechanics-with-a-new-motor-snake-3d-foundation-that-supports-extreme-physics-a-hollow-spherical-world-inside-outside-traversal-anomaly-based-power-ups-reactive-tail-behavior-enemy-collision-events-and-a-persistent-ghost-concept-this-should-be-delivered-as-a-playable-inspectable-scaffold-systems-wired-together-with-placeholder-tuning-rather-than-a-fully-balanced-game",
-      "featureTitle": "Replace the existing snake game mechanics with a new 'Motor Snake 3D' foundation that supports: extreme physics, a hollow spherical world (inside/outside traversal), anomaly-based power-ups, reactive tail behavior, enemy collision events, and a persistent ghost concept. This should be delivered as a playable/inspectable scaffold (systems wired together with placeholder tuning) rather than a fully balanced game.",
+      "featureId": "feature-replace-the-current-start-cover-artwork-with-the-new-cover-image-and-present-it-as-a-full-screen-start-overlay-on-the-play-page-the-cover-must-fill-the-viewport-cover-sizing-and-include-a-subtle-animated-neon-glow-motion-treatment-e-g-slow-parallax-drift-zoom-hue-shift-shimmer-and-or-animated-light-sweep-while-keeping-ui-readable-and-clickable",
+      "featureTitle": "Replace the current start/cover artwork with the new cover image and present it as a full-screen start overlay on the Play page. The cover must fill the viewport (cover sizing), and include a subtle animated neon glow + motion treatment (e.g., slow parallax drift/zoom, hue-shift shimmer, and/or animated light sweep) while keeping UI readable and clickable.",
       "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/state/gameState.ts",
-        "frontend/src/motorSnake3d/systems/AnomalyPowerUpSystem.ts",
-        "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
-        "frontend/src/motorSnake3d/systems/EnvironmentSystem.ts",
-        "frontend/src/motorSnake3d/systems/GhostSystem.ts",
-        "frontend/src/motorSnake3d/systems/WorldSystem.ts",
+        "frontend/src/components/start/NeonStartCoverOverlay.tsx",
+        "frontend/src/index.css",
         "frontend/src/pages/PlayPage.tsx"
       ],
       "components": [
@@ -48,13 +40,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-a-hollow-spherical-world-foundation-player-movement-constrained-to-the-inside-surface-of-a-sphere-with-the-ability-to-transition-to-the-exterior-surface-include-a-red-core-object-at-the-center-and-a-placeholder-core-break-event-that-transitions-to-an-abyss-state-e-g-distinct-environment-lighting-and-a-return-respawn-mechanic",
-      "featureTitle": "Implement a hollow spherical world foundation: player movement constrained to the inside surface of a sphere, with the ability to transition to the exterior surface. Include a red core object at the center and a placeholder 'core break' event that transitions to an 'abyss' state (e.g., distinct environment/lighting and a return/respawn mechanic).",
+      "featureId": "feature-update-the-home-page-hero-artwork-to-use-the-new-cover-image-instead-of-the-current-generated-hero-image-keeping-responsive-layout-intact",
+      "featureTitle": "Update the Home page hero artwork to use the new cover image instead of the current generated hero image, keeping responsive layout intact.",
       "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/render/SphereWorld.tsx",
-        "frontend/src/motorSnake3d/systems/WorldSystem.ts",
-        "frontend/src/motorSnake3d/ui/DebugWorldControls.tsx"
+        "frontend/src/pages/HomePage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -66,209 +55,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-an-environment-physics-system-scaffold-that-supports-time-varying-gravity-fluctuates-every-5-seconds-between-0x-and-3x-radial-wind-bursts-from-invisible-portals-fog-that-distorts-perception-and-acid-rain-that-can-remove-tail-segments-unless-a-shield-is-active",
-      "featureTitle": "Add an environment/physics system scaffold that supports time-varying gravity (fluctuates every 5 seconds between 0x and 3x), radial wind bursts from invisible portals, fog that distorts perception, and acid rain that can remove tail segments unless a shield is active.",
-      "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/systems/EnvironmentSystem.ts",
-        "frontend/src/motorSnake3d/systems/TailSystem.ts",
-        "frontend/src/motorSnake3d/ui/EnvironmentDebugPanel.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-analog-joystick-input-for-controlling-the-snake-in-3d-smooth-input-should-result-in-stable-elegant-motion-abrupt-input-should-produce-more-aggressive-twisting-spring-like-movement-include-a-tail-reaction-scaffold-where-sudden-head-braking-causes-the-tail-to-coil-and-impart-a-whip-like-impulse",
-      "featureTitle": "Implement analog joystick input for controlling the snake in 3D. Smooth input should result in stable, elegant motion; abrupt input should produce more aggressive twisting/spring-like movement. Include a tail reaction scaffold where sudden head braking causes the tail to coil and impart a whip-like impulse.",
-      "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/input/VirtualJoystick.tsx",
-        "frontend/src/motorSnake3d/input/useAnalogInput.ts",
-        "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
-        "frontend/src/motorSnake3d/systems/TailSystem.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-an-enemy-collision-event-framework-with-three-enemy-archetypes-and-their-signature-collision-outcomes-1-flying-cow-impact-creates-a-white-freeze-dome-10m-radius-that-freezes-entities-temporarily-and-spawns-floating-shards-that-become-projectiles-2-ufo-impact-triggers-a-map-fold-pulse-that-teleports-the-player-to-the-sphere-centerline-defined-center-position-and-leaves-spark-trails-3-kamikaze-penguin-impact-creates-a-ring-of-fire-and-spawns-baby-penguins-that-attach-to-the-tail-and-slow-the-player-until-shaken-off",
-      "featureTitle": "Create an enemy/collision event framework with three enemy archetypes and their signature collision outcomes: (1) Flying cow impact creates a white freeze dome (10m radius) that freezes entities temporarily and spawns floating shards that become projectiles; (2) UFO impact triggers a 'map fold' pulse that teleports the player to the sphere centerline/defined center position and leaves spark trails; (3) Kamikaze penguin impact creates a ring of fire and spawns baby penguins that attach to the tail and slow the player until shaken off.",
-      "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
-        "frontend/src/motorSnake3d/systems/EnemySpawnerSystem.ts",
-        "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
-        "frontend/src/motorSnake3d/ui/DebugSpawnPanel.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-an-anomaly-based-power-up-framework-where-power-ups-spawn-as-anomalies-not-standard-drops-and-implement-three-power-ups-1-mini-black-hole-grants-enemy-suction-at-distance-but-has-a-self-suction-risk-if-held-too-long-2-shooting-star-sets-the-snake-on-fire-phases-through-obstacles-enemies-burns-enemies-but-shortens-melts-the-snake-over-time-3-mirror-makes-the-snake-intangible-for-2-seconds-and-reverses-the-player-s-view-controls-during-that-duration",
-      "featureTitle": "Create an anomaly-based power-up framework where power-ups spawn as anomalies (not standard drops) and implement three power-ups: (1) Mini black hole: grants enemy suction at distance but has a self-suction risk if held too long; (2) Shooting star: sets the snake on fire, phases through obstacles/enemies, burns enemies, but shortens/melts the snake over time; (3) Mirror: makes the snake intangible for 2 seconds and reverses the player’s view/controls during that duration.",
-      "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/systems/AnomalyPowerUpSystem.ts",
-        "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
-        "frontend/src/motorSnake3d/ui/PowerUpStatusHUD.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-persistent-ghost-system-scaffold-upon-player-death-spawn-a-ghost-version-that-follows-the-player-in-subsequent-runs-and-delivers-the-voice-line-you-are-not-you-anymore-it-s-me-now-include-a-growth-pressure-mechanic-where-ignoring-the-ghost-increases-its-influence-culminating-in-a-placeholder-replacement-state-e-g-ghost-takes-over-visual-identity-and-has-higher-speed-with-clear-ui-indication",
-      "featureTitle": "Add a persistent 'ghost' system scaffold: upon player death, spawn a ghost version that follows the player in subsequent runs and delivers the voice line: \"You are not you anymore, it's me now\". Include a growth/pressure mechanic where ignoring the ghost increases its influence, culminating in a placeholder 'replacement' state (e.g., ghost takes over visual identity and has higher speed) with clear UI indication.",
-      "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/systems/GhostSystem.ts",
-        "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
-        "frontend/src/motorSnake3d/ui/GhostOverlayHUD.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-8"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-async-event-synced-multiplayer-scaffolding-for-up-to-10-players-non-real-time-add-backend-support-for-creating-joining-a-lobby-listing-lobby-participants-starting-a-match-and-submitting-player-input-actions-as-ordered-events-update-the-lobby-page-ui-to-enable-creating-and-joining-lobbies-showing-player-count-up-to-10-and-starting-the-match-when-ready",
-      "featureTitle": "Implement async/event-synced multiplayer scaffolding for up to 10 players (non-real-time). Add backend support for creating/joining a lobby, listing lobby participants, starting a match, and submitting player input/actions as ordered events. Update the Lobby page UI to enable creating and joining lobbies, showing player count up to 10, and starting the match when ready.",
-      "files": [
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/multiplayer/MultiplayerBridge.ts",
-        "frontend/src/multiplayer/useLobby.ts",
-        "frontend/src/multiplayer/useMatchEvents.ts",
-        "frontend/src/pages/LobbyPage.tsx",
-        "frontend/src/pages/PlayPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-9"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-vfx-audio-cue-pipeline-scaffold-for-the-new-mechanics-particles-lights-screen-distortion-hooks-that-can-be-triggered-by-the-environment-system-collisions-and-power-ups-and-adaptive-electro-orchestral-music-intensity-changes-e-g-strings-on-danger-bass-on-attack-silence-before-an-explosion-use-existing-audio-hooks-where-possible-and-ensure-graceful-behavior-when-audio-is-locked-muted",
-      "featureTitle": "Add a VFX + audio cue pipeline scaffold for the new mechanics: particles/lights/screen distortion hooks that can be triggered by the environment system, collisions, and power-ups; and adaptive electro-orchestral music intensity changes (e.g., strings on danger, bass on attack, silence before an explosion). Use existing audio hooks where possible and ensure graceful behavior when audio is locked/muted.",
-      "files": [
-        "frontend/src/game/audio/useAudioContextMusic.ts",
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/audio/AudioDirector.ts",
-        "frontend/src/motorSnake3d/vfx/VfxBus.ts",
-        "frontend/src/motorSnake3d/vfx/VfxLayer3D.tsx",
-        "frontend/src/pages/PlayPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-10"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-user-facing-ui-copy-across-the-home-lobby-play-flow-to-reflect-the-new-motor-snake-3d-experience-extreme-physics-hollow-sphere-anomalies-removing-references-that-contradict-the-new-mechanics-ensure-all-user-facing-text-is-in-english",
-      "featureTitle": "Update user-facing UI copy across the Home/Lobby/Play flow to reflect the new Motor Snake 3D experience (extreme physics, hollow sphere, anomalies), removing references that contradict the new mechanics. Ensure all user-facing text is in English.",
-      "files": [
-        "frontend/src/game/ui/ControlsHintOverlay.tsx",
-        "frontend/src/pages/HomePage.tsx",
-        "frontend/src/pages/LobbyPage.tsx",
-        "frontend/src/pages/PlayPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-11"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-adopt-a-consistent-distinctive-visual-theme-for-the-new-motor-snake-3d-ui-overlay-hud-menus-lobby-that-matches-the-new-apocalyptic-anomaly-tone-while-keeping-text-readable-over-the-3d-scene-avoid-blue-purple-as-the-primary-palette",
-      "featureTitle": "Adopt a consistent, distinctive visual theme for the new Motor Snake 3D UI overlay (HUD, menus, lobby) that matches the new 'apocalyptic anomaly' tone while keeping text readable over the 3D scene. Avoid blue/purple as the primary palette.",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/LobbyPage.tsx",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-12"
       ],
       "confidence": "high"
     }

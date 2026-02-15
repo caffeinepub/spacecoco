@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
+import { CowNeonTrail } from './CowNeonTrail';
 
 interface FlyingCowPBRProps {
   position: [number, number, number];
@@ -17,6 +18,7 @@ export function FlyingCowPBR({
 }: FlyingCowPBRProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const groupRef = useRef<THREE.Group>(null);
+  const worldPositionRef = useRef(new THREE.Vector3());
   
   const [baseColorMap, normalMap, roughnessMap] = useLoader(THREE.TextureLoader, [
     '/assets/generated/cow-pbr-basecolor.dim_4096x4096.png',
@@ -36,6 +38,7 @@ export function FlyingCowPBR({
   }, [baseColorMap, normalMap, roughnessMap]);
 
   const initialPhase = useMemo(() => Math.random() * Math.PI * 2, []);
+  const trailColor = useMemo(() => ['#ff00ff', '#00ffff', '#00ff00'][Math.floor(Math.random() * 3)], []);
 
   useFrame((state, delta) => {
     if (!groupRef.current || !meshRef.current) return;
@@ -53,31 +56,39 @@ export function FlyingCowPBR({
     
     // Bobbing animation
     meshRef.current.position.y = Math.sin(time * 2) * 0.2;
+
+    // Update world position for trail
+    groupRef.current.getWorldPosition(worldPositionRef.current);
   });
 
   return (
-    <group ref={groupRef}>
-      <mesh ref={meshRef} castShadow receiveShadow material={material} scale={scale}>
-        {/* Cow body */}
-        <boxGeometry args={[2, 1.2, 1.5]} />
-      </mesh>
-      
-      {/* Head */}
-      <mesh position={[1.2, 0.2, 0]} castShadow material={material} scale={scale}>
-        <boxGeometry args={[0.8, 0.8, 0.8]} />
-      </mesh>
-      
-      {/* Legs */}
-      {[
-        [-0.5, -0.8, 0.5],
-        [-0.5, -0.8, -0.5],
-        [0.5, -0.8, 0.5],
-        [0.5, -0.8, -0.5],
-      ].map((pos, i) => (
-        <mesh key={i} position={pos as [number, number, number]} castShadow material={material} scale={scale}>
-          <cylinderGeometry args={[0.15, 0.15, 0.6, 8]} />
+    <>
+      <group ref={groupRef}>
+        <mesh ref={meshRef} castShadow receiveShadow material={material} scale={scale}>
+          {/* Cow body */}
+          <boxGeometry args={[2, 1.2, 1.5]} />
         </mesh>
-      ))}
-    </group>
+        
+        {/* Head */}
+        <mesh position={[1.2, 0.2, 0]} castShadow material={material} scale={scale}>
+          <boxGeometry args={[0.8, 0.8, 0.8]} />
+        </mesh>
+        
+        {/* Legs */}
+        {[
+          [-0.5, -0.8, 0.5],
+          [-0.5, -0.8, -0.5],
+          [0.5, -0.8, 0.5],
+          [0.5, -0.8, -0.5],
+        ].map((pos, i) => (
+          <mesh key={i} position={pos as [number, number, number]} castShadow material={material} scale={scale}>
+            <cylinderGeometry args={[0.15, 0.15, 0.6, 8]} />
+          </mesh>
+        ))}
+      </group>
+      
+      {/* Neon trail */}
+      <CowNeonTrail targetPosition={worldPositionRef.current} color={trailColor} />
+    </>
   );
 }

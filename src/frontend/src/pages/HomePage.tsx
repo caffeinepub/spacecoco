@@ -33,9 +33,9 @@ export default function HomePage() {
             </div>
             <div className="relative hidden lg:block">
               <img
-                src="/assets/generated/spacecoco-hero-neon-cartoon.dim_1600x600.png"
+                src="/assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png"
                 alt="Motor Snake 3D"
-                className="w-full h-auto rounded-2xl shadow-neon-strong border-2 border-accent/50"
+                className="w-full h-auto rounded-2xl shadow-neon-strong border-2 border-accent/50 object-cover max-h-[600px]"
               />
             </div>
           </div>

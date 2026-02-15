@@ -1,158 +1,43 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T23:21:45.319Z",
-  "summary": "Diff adds substantial Motor Snake 3D scaffolding (R3F scene, sphere world, systems for environment/enemies/anomalies/ghost, HUD/debug panels) plus some backend lobby/match data structures. However, several acceptance-critical behaviors are missing or only placeholders (multiplayer event storage APIs, inside-surface movement, wind portal UI, mirror/control reversal + intangibility, detailed enemy collision sequences, ghost persistence across runs without reload, and full audio/VFX pipeline wiring). Also, unrelated marketplace/listings functionality appears present/expanded beyond the BuildRequest.",
+  "generatedAt": "2026-02-15T00:09:49.588Z",
+  "summary": "Diff adds a NeonStartCoverOverlay component that references the requested static image path and provides animated shimmer/glow overlays, and HomePage now uses the new cover image. However, the actual PNG asset is not shown as added, and PlayPage changes are truncated such that integration/conditional full-screen overlay behavior cannot be confirmed from the provided diff summary.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Fix the previous deployment failure so the project builds and deploys successfully again (local build + canister deploy), with '/' '/lobby' '/play' rendering without runtime exceptions.",
-      "reason": "The diff shows a new migration module and backend actor changes, but does not provide evidence of the specific deployment root cause, the minimal fix applied, or any build/deploy configuration changes. Runtime stability for all routes cannot be verified from the truncated diff.",
+      "requirement": "Add the generated cover image file at frontend/public/assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png and reference it via /assets/generated/...",
+      "reason": "The diff summary does not show any new file added under frontend/public/assets/generated, so existence of the required PNG asset cannot be verified.",
       "evidence": [
-        "backend/migration.mo",
-        "backend/main.mo (truncated)",
-        "frontend/src/pages/HomePage.tsx (truncated)",
-        "frontend/src/pages/LobbyPage.tsx (truncated)",
-        "frontend/src/pages/PlayPage.tsx (truncated)"
+        "ADDED FILES list only shows frontend/src/components/start/NeonStartCoverOverlay.tsx; no frontend/public/assets/generated/... file listed"
       ]
     },
     {
-      "id": "REQ-3",
-      "requirement": "Player movement constrained to the inside surface of a sphere (with ability to transition outside), red core, and a core-break event that transitions to an abyss state then deterministically returns/respawns.",
-      "reason": "WorldSystem only clamps when distance is beyond an inner boundary (distance > radius-1) and does not enforce staying on the inner surface; PlayerMotorSystem moves freely in a plane (z oscillation) and can remain near the center. Core-break is only a UI toggle in DebugWorldControls; CollisionSystem only triggers a VFX event on near-core but does not switch abyss/coreIntact state. Abyss return/respawn is only partially implemented (comments indicate missing timer/state).",
+      "id": "REQ-2",
+      "requirement": "On /play before the game starts, show a full-viewport start overlay using the new cover image with subtle animated neon glow/motion, keeping UI readable and clickable, and ensuring previous cover is no longer visible.",
+      "reason": "NeonStartCoverOverlay is created and imported in PlayPage, but the PlayPage diff is truncated before showing render logic. There is no visible evidence that the overlay is actually rendered conditionally when the game has not started, fills the viewport, or replaces the prior start/cover background.",
       "evidence": [
-        "frontend/src/motorSnake3d/systems/WorldSystem.ts",
-        "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
-        "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
-        "frontend/src/motorSnake3d/ui/DebugWorldControls.tsx",
-        "frontend/src/motorSnake3d/render/SphereWorld.tsx"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "requirement": "Environment/physics scaffold includes time-varying gravity, radial wind bursts from invisible portals, fog distortion, and acid rain removing tail segments unless shield active.",
-      "reason": "Gravity cycle, fog parameterization, and acid rain + shield gating are present, but wind portals are only implemented as a method (spawnWindPortal) with no shown trigger/UI/control path in the diff. Also, the system does not show any ongoing portal lifecycle/force application beyond a one-shot velocity change.",
-      "evidence": [
-        "frontend/src/motorSnake3d/systems/EnvironmentSystem.ts",
-        "frontend/src/motorSnake3d/ui/EnvironmentDebugPanel.tsx"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "requirement": "Analog joystick input for 3D control with touch virtual joystick and desktop fallback; abrupt input produces more aggressive twisting; braking causes tail coil/whip impulse.",
-      "reason": "A VirtualJoystick component exists, but it instantiates its own useAnalogInput hook separate from the one used in GameLogic, so touch joystick updates are not wired into the game loop. The movement is also not clearly constrained to sphere-surface traversal. Tail whip is implemented as a random impulse, but the joystick-to-game connection on mobile is not evidenced.",
-      "evidence": [
-        "frontend/src/motorSnake3d/input/VirtualJoystick.tsx",
-        "frontend/src/motorSnake3d/input/useAnalogInput.ts",
-        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-        "frontend/src/motorSnake3d/systems/TailSystem.ts",
-        "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts"
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "requirement": "Enemy/collision framework with 3 archetypes and signature outcomes (freeze dome + freezing + shards projectiles; fold pulse teleport + spark trails; fire ring + baby attachments that slow and can be shaken off).",
-      "reason": "Enemies spawn and collision triggers basic VFX events and a teleport for UFO; baby penguin slow/shake is present. However, freezing behavior and shard projectile spawning are not implemented (only a VFX trigger). Spark trails are not implemented (only a VFX trigger).",
-      "evidence": [
-        "frontend/src/motorSnake3d/systems/EnemySpawnerSystem.ts",
-        "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
-        "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
-        "frontend/src/motorSnake3d/systems/TailSystem.ts"
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "requirement": "Anomaly-based power-up framework with three power-ups and tradeoffs; Mirror reverses view/controls for 2 seconds and makes collisions non-lethal/non-blocking.",
-      "reason": "Anomaly spawning and activation with durations exists, and blackhole/star have partial placeholder effects. Mirror’s key behaviors (control/view reversal and intangibility/collision changes) are not implemented; CollisionSystem notes 'Mirror effect handled in collision system' but no such logic is present. Shooting star does not visibly melt/shorten the snake (no tail interaction shown), and black hole self-suction risk is not tied to 'held too long' (it always applies).",
-      "evidence": [
-        "frontend/src/motorSnake3d/systems/AnomalyPowerUpSystem.ts",
-        "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
-        "frontend/src/motorSnake3d/state/gameState.ts (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "requirement": "Persistent ghost system: after death, ghost appears in later gameplay sessions without reload, speaks required line, influence meter grows, triggers replacement mode with UI and gameplay change.",
-      "reason": "Ghost influence meter and subtitle line exist, and replacement boosts speed. But there is no evidenced death detection/wiring that calls onPlayerDeath; deathCount never increments in shown systems. 'Ghost follows the player in subsequent runs' is not implemented (no ghost entity/behavior). Persistence without page reload is not demonstrated beyond Zustand state; no run/session lifecycle handling is shown.",
-      "evidence": [
-        "frontend/src/motorSnake3d/systems/GhostSystem.ts",
-        "frontend/src/motorSnake3d/ui/GhostOverlayHUD.tsx",
-        "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
-        "frontend/src/motorSnake3d/state/gameState.ts (truncated)"
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "requirement": "Async/event-synced multiplayer scaffolding up to 10 players: backend create/join/list/start match, submit ordered events retrievable via polling; Lobby UI supports create/join, participant list, start match.",
-      "reason": "LobbyPage shows create/join flows and sets maxPlayers=10, and backend/main.mo defines Lobby/Match/PlayerAction types and maps. However, the diff does not show the required backend methods (create/join/list/start/submit/get events) nor any event ordering/polling retrieval API. The PlayPage references useMatchEvents and submitAction, but the implementation is not shown here, so ordered event storage/retrieval cannot be confirmed.",
-      "evidence": [
-        "backend/main.mo (truncated)",
-        "frontend/src/pages/LobbyPage.tsx (truncated)",
-        "frontend/src/pages/PlayPage.tsx (truncated)",
-        "frontend/src/motorSnake3d/multiplayer/MultiplayerBridge.ts"
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "requirement": "VFX + audio cue pipeline scaffold: callable VFX triggers for specified events and adaptive music intensity states ('danger','attack','pre-explosion silence') with graceful muting and gesture-gated unlock.",
-      "reason": "PlayPage triggers VfxBus + AudioDirector.triggerVfxSound, and Environment/Collision systems emit some event strings. But there is no evidence that all required VFX triggers are implemented/rendered (VfxLayer3D/VfxBus implementations not shown). Music intensity state handling is not wired end-to-end: AudioDirector computes states but PlayPage does not pass an intensityState into useAudioContextMusic (it passes intensity number only), so 'danger/attack/pre-explosion silence' mapping is not evidenced in playback behavior.",
-      "evidence": [
-        "frontend/src/motorSnake3d/audio/AudioDirector.ts",
-        "frontend/src/pages/PlayPage.tsx (truncated)",
-        "frontend/src/game/audio/useAudioContextMusic.ts (truncated)",
-        "frontend/src/motorSnake3d/systems/EnvironmentSystem.ts",
-        "frontend/src/motorSnake3d/systems/CollisionSystem.ts"
+        "frontend/src/pages/PlayPage.tsx (truncated): shows import { NeonStartCoverOverlay } ... but render section is truncated",
+        "frontend/src/components/start/NeonStartCoverOverlay.tsx: overlay exists but does not prove it is mounted on /play pre-start"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Marketplace/listings functionality (listings CRUD, listing browsing/selling pages, image URL persistence/validation, listing UI components) appears present/expanded though not requested in the Motor Snake 3D build request.",
-      "reason": "BuildRequest focuses on replacing gameplay with Motor Snake 3D and adding async multiplayer scaffolding; it does not request a listings marketplace or image URL management.",
+      "description": "Global neon theme token and utility changes beyond the cover/hero image integration (e.g., extensive OKLCH palette updates, multiple neon utility classes).",
+      "reason": "BuildRequest focuses on generating/serving a static cover asset and integrating it into Play and Home pages. Broad global theme changes are not explicitly requested.",
       "evidence": [
-        "backend/main.mo (truncated) (Listing types/functions shown)",
-        "frontend-file-summaries.txt (frontend/src/pages/BrowseListingsPage.tsx, ListingDetailsPage.tsx, SellListingPage.tsx, components/listings/*, lib/listingImagesStore.ts, lib/imageUrl.ts)"
+        "frontend/src/index.css: large-scale updates to :root color tokens and many neon utilities"
       ]
     }
   ],
-  "confidence": 0.68,
+  "confidence": 0.62,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/background/NeonBackgroundLayer.tsx",
-    "frontend/src/components/layout/AppLayout.tsx",
-    "frontend/src/game/audio/useAudioContextMusic.ts",
-    "frontend/src/game/ui/ControlsHintOverlay.tsx",
+    "frontend/src/components/start/NeonStartCoverOverlay.tsx",
     "frontend/src/index.css",
-    "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
-    "frontend/src/motorSnake3d/audio/AudioDirector.ts",
-    "frontend/src/motorSnake3d/input/VirtualJoystick.tsx",
-    "frontend/src/motorSnake3d/input/useAnalogInput.ts",
-    "frontend/src/motorSnake3d/multiplayer/MultiplayerBridge.ts",
-    "frontend/src/motorSnake3d/render/SphereWorld.tsx",
-    "frontend/src/motorSnake3d/state/gameState.ts",
-    "frontend/src/motorSnake3d/systems/AnomalyPowerUpSystem.ts",
-    "frontend/src/motorSnake3d/systems/CollisionSystem.ts",
-    "frontend/src/motorSnake3d/systems/EnemySpawnerSystem.ts",
-    "frontend/src/motorSnake3d/systems/EnvironmentSystem.ts",
-    "frontend/src/motorSnake3d/systems/GhostSystem.ts",
-    "frontend/src/motorSnake3d/systems/PlayerMotorSystem.ts",
-    "frontend/src/motorSnake3d/systems/TailSystem.ts",
-    "frontend/src/motorSnake3d/systems/WorldSystem.ts",
-    "frontend/src/motorSnake3d/ui/DebugSpawnPanel.tsx",
-    "frontend/src/motorSnake3d/ui/DebugWorldControls.tsx",
-    "frontend/src/motorSnake3d/ui/EnvironmentDebugPanel.tsx",
-    "frontend/src/motorSnake3d/ui/GhostOverlayHUD.tsx",
-    "frontend/src/motorSnake3d/ui/PowerUpStatusHUD.tsx",
-    "frontend/src/motorSnake3d/vfx/VfxBus.ts",
-    "frontend/src/motorSnake3d/vfx/VfxLayer3D.tsx",
-    "frontend/src/multiplayer/useLobby.ts",
-    "frontend/src/multiplayer/useMatchEvents.ts",
     "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/LobbyPage.tsx",
     "frontend/src/pages/PlayPage.tsx",
-    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

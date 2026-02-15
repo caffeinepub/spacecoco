@@ -82,8 +82,8 @@ export class CollisionSystem {
 
     this.gameState.removeAnomaly(anomaly.id);
 
-    // Trigger VFX
-    this.onVfxTrigger?.(anomaly.type, { position: anomaly.position });
+    // Trigger eat hit VFX
+    this.onVfxTrigger?.('eatHit', { position: anomaly.position });
   }
 
   private checkCoreCollision() {

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,67 +6,73 @@
 
 @layer base {
   :root {
-    /* Apocalyptic Anomaly Theme - Ash/Ember/Acid */
-    --background: oklch(0.15 0.02 270); /* Deep charcoal */
-    --foreground: oklch(0.95 0.01 90); /* Ash white */
+    /* OKLCH neon color system - Enhanced brightness and saturation */
+    --background: oklch(0.12 0.05 250); /* Deep space blue-black */
+    --foreground: oklch(0.98 0.02 180); /* Bright white */
 
-    --card: oklch(0.18 0.03 270);
-    --card-foreground: oklch(0.92 0.01 90);
+    --card: oklch(0.15 0.08 250);
+    --card-foreground: oklch(0.98 0.02 180);
 
-    --popover: oklch(0.16 0.03 270);
-    --popover-foreground: oklch(0.95 0.01 90);
+    --popover: oklch(0.15 0.08 250);
+    --popover-foreground: oklch(0.98 0.02 180);
 
-    --primary: oklch(0.55 0.25 40); /* Ember orange */
-    --primary-foreground: oklch(0.98 0.01 90);
+    --primary: oklch(0.75 0.30 300); /* Bright electric magenta */
+    --primary-foreground: oklch(0.98 0.02 180);
 
-    --secondary: oklch(0.65 0.22 140); /* Acid green */
-    --secondary-foreground: oklch(0.12 0.02 270);
+    --secondary: oklch(0.70 0.28 200); /* Bright cyan */
+    --secondary-foreground: oklch(0.98 0.02 180);
 
-    --muted: oklch(0.25 0.02 270);
-    --muted-foreground: oklch(0.60 0.01 90);
+    --accent: oklch(0.75 0.30 140); /* Bright lime green */
+    --accent-foreground: oklch(0.98 0.02 180);
 
-    --accent: oklch(0.60 0.24 30); /* Molten red-orange */
-    --accent-foreground: oklch(0.98 0.01 90);
+    --muted: oklch(0.25 0.05 250);
+    --muted-foreground: oklch(0.65 0.05 250);
 
-    --destructive: oklch(0.50 0.25 20); /* Blood red */
-    --destructive-foreground: oklch(0.98 0.01 90);
+    --destructive: oklch(0.65 0.28 25); /* Bright red-orange */
+    --destructive-foreground: oklch(0.98 0.02 180);
 
-    --border: oklch(0.30 0.03 270);
-    --input: oklch(0.30 0.03 270);
-    --ring: oklch(0.60 0.24 30);
+    --border: oklch(0.30 0.15 280);
+    --input: oklch(0.30 0.15 280);
+    --ring: oklch(0.75 0.30 300);
+
+    --success: oklch(0.70 0.25 150); /* Bright green */
+    --warning: oklch(0.75 0.28 80); /* Bright yellow */
 
     --radius: 0.5rem;
   }
 
   .dark {
-    /* Same as root for dark-first design */
-    --background: oklch(0.15 0.02 270);
-    --foreground: oklch(0.95 0.01 90);
+    /* Dark mode uses same values for neon theme */
+    --background: oklch(0.12 0.05 250);
+    --foreground: oklch(0.98 0.02 180);
 
-    --card: oklch(0.18 0.03 270);
-    --card-foreground: oklch(0.92 0.01 90);
+    --card: oklch(0.15 0.08 250);
+    --card-foreground: oklch(0.98 0.02 180);
 
-    --popover: oklch(0.16 0.03 270);
-    --popover-foreground: oklch(0.95 0.01 90);
+    --popover: oklch(0.15 0.08 250);
+    --popover-foreground: oklch(0.98 0.02 180);
 
-    --primary: oklch(0.55 0.25 40);
-    --primary-foreground: oklch(0.98 0.01 90);
+    --primary: oklch(0.75 0.30 300);
+    --primary-foreground: oklch(0.98 0.02 180);
 
-    --secondary: oklch(0.65 0.22 140);
-    --secondary-foreground: oklch(0.12 0.02 270);
+    --secondary: oklch(0.70 0.28 200);
+    --secondary-foreground: oklch(0.98 0.02 180);
 
-    --muted: oklch(0.25 0.02 270);
-    --muted-foreground: oklch(0.60 0.01 90);
+    --accent: oklch(0.75 0.30 140);
+    --accent-foreground: oklch(0.98 0.02 180);
 
-    --accent: oklch(0.60 0.24 30);
-    --accent-foreground: oklch(0.98 0.01 90);
+    --muted: oklch(0.25 0.05 250);
+    --muted-foreground: oklch(0.65 0.05 250);
 
-    --destructive: oklch(0.50 0.25 20);
-    --destructive-foreground: oklch(0.98 0.01 90);
+    --destructive: oklch(0.65 0.28 25);
+    --destructive-foreground: oklch(0.98 0.02 180);
 
-    --border: oklch(0.30 0.03 270);
-    --input: oklch(0.30 0.03 270);
-    --ring: oklch(0.60 0.24 30);
+    --border: oklch(0.30 0.15 280);
+    --input: oklch(0.30 0.15 280);
+    --ring: oklch(0.75 0.30 300);
+
+    --success: oklch(0.70 0.25 150);
+    --warning: oklch(0.75 0.28 80);
   }
 }
 
@@ -76,127 +82,142 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Rajdhani', system-ui, -apple-system, sans-serif;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', monospace;
+    font-family: 'Orbitron', system-ui, -apple-system, sans-serif;
   }
 }
 
 @layer utilities {
-  .font-display {
-    font-family: 'Orbitron', monospace;
+  /* Enhanced neon glow utilities */
+  .neon-text-glow {
+    text-shadow: 
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px currentColor,
+      0 0 40px currentColor;
   }
 
+  .neon-box-glow {
+    box-shadow: 
+      0 0 10px currentColor,
+      0 0 20px currentColor,
+      0 0 30px currentColor,
+      inset 0 0 10px currentColor;
+  }
+
+  .neon-border-glow {
+    box-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      inset 0 0 5px currentColor;
+  }
+
+  /* Neon component styles */
+  .neon-card {
+    @apply bg-card/80 backdrop-blur-sm border-2 border-primary/50 neon-border-glow;
+  }
+
+  .neon-button {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 neon-box-glow;
+  }
+
+  .neon-button-outline {
+    @apply border-2 border-primary text-primary hover:bg-primary/20 neon-border-glow;
+  }
+
+  /* Container with custom max-width */
   .container-custom {
     @apply container mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Neon glow effects - Apocalyptic theme */
-  .neon-text-glow {
-    text-shadow: 
-      0 0 10px oklch(0.60 0.24 30 / 0.8),
-      0 0 20px oklch(0.60 0.24 30 / 0.6),
-      0 0 30px oklch(0.60 0.24 30 / 0.4);
+  /* Pulse glow animation - Enhanced */
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      text-shadow: 
+        0 0 10px currentColor,
+        0 0 20px currentColor,
+        0 0 30px currentColor;
+    }
+    50% {
+      opacity: 0.8;
+      text-shadow: 
+        0 0 20px currentColor,
+        0 0 40px currentColor,
+        0 0 60px currentColor,
+        0 0 80px currentColor;
+    }
   }
 
-  .neon-text-glow-secondary {
-    text-shadow: 
-      0 0 10px oklch(0.65 0.22 140 / 0.8),
-      0 0 20px oklch(0.65 0.22 140 / 0.6),
-      0 0 30px oklch(0.65 0.22 140 / 0.4);
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
   }
 
-  .neon-text-glow-red {
-    text-shadow: 
-      0 0 10px oklch(0.50 0.25 20 / 0.8),
-      0 0 20px oklch(0.50 0.25 20 / 0.6),
-      0 0 30px oklch(0.50 0.25 20 / 0.4);
+  /* Color wave animation for eat effect */
+  @keyframes color-wave {
+    0% {
+      background: radial-gradient(circle at center, 
+        oklch(0.75 0.30 300 / 0.8) 0%, 
+        transparent 50%);
+      transform: scale(0);
+    }
+    50% {
+      background: radial-gradient(circle at center, 
+        oklch(0.70 0.28 200 / 0.6) 0%, 
+        oklch(0.75 0.30 140 / 0.4) 30%,
+        transparent 70%);
+      transform: scale(1.5);
+    }
+    100% {
+      background: radial-gradient(circle at center, 
+        oklch(0.65 0.28 25 / 0.3) 0%, 
+        transparent 80%);
+      transform: scale(2);
+      opacity: 0;
+    }
   }
 
-  .neon-button {
-    box-shadow: 
-      0 0 10px oklch(0.60 0.24 30 / 0.5),
-      0 0 20px oklch(0.60 0.24 30 / 0.3),
-      inset 0 0 10px oklch(0.60 0.24 30 / 0.2);
-    transition: all 0.3s ease;
+  .animate-color-wave {
+    animation: color-wave 0.8s ease-out forwards;
   }
 
-  .neon-button:hover {
-    box-shadow: 
-      0 0 15px oklch(0.60 0.24 30 / 0.7),
-      0 0 30px oklch(0.60 0.24 30 / 0.5),
-      inset 0 0 15px oklch(0.60 0.24 30 / 0.3);
+  /* Neon cover drift animation */
+  @keyframes neon-cover-drift {
+    0% {
+      transform: scale(1.05) translate(0, 0);
+    }
+    50% {
+      transform: scale(1.08) translate(-1%, -1%);
+    }
+    100% {
+      transform: scale(1.05) translate(0, 0);
+    }
   }
 
-  .neon-button-outline {
-    border-color: oklch(0.60 0.24 30);
-    box-shadow: 
-      0 0 5px oklch(0.60 0.24 30 / 0.3),
-      inset 0 0 5px oklch(0.60 0.24 30 / 0.1);
-    transition: all 0.3s ease;
+  .animate-neon-cover-drift {
+    animation: neon-cover-drift 20s ease-in-out infinite;
   }
 
-  .neon-button-outline:hover {
-    box-shadow: 
-      0 0 10px oklch(0.60 0.24 30 / 0.5),
-      inset 0 0 10px oklch(0.60 0.24 30 / 0.2);
-  }
-
-  .neon-card {
-    border-color: oklch(0.60 0.24 30 / 0.3);
-    box-shadow: 
-      0 0 10px oklch(0.60 0.24 30 / 0.2),
-      inset 0 0 10px oklch(0.60 0.24 30 / 0.05);
-  }
-
+  /* Icon glow effect */
   .neon-icon-glow {
     box-shadow: 
-      0 0 10px oklch(0.60 0.24 30 / 0.4),
-      0 0 20px oklch(0.60 0.24 30 / 0.2);
+      0 0 15px currentColor,
+      0 0 30px currentColor,
+      inset 0 0 10px currentColor;
   }
 
+  /* Shadow utilities */
   .shadow-neon-strong {
     box-shadow: 
-      0 0 20px oklch(0.60 0.24 30 / 0.6),
-      0 0 40px oklch(0.60 0.24 30 / 0.4),
-      0 0 60px oklch(0.60 0.24 30 / 0.2);
-  }
-
-  .neon-canvas {
-    box-shadow: 
-      0 0 20px oklch(0.60 0.24 30 / 0.4),
-      inset 0 0 20px oklch(0.60 0.24 30 / 0.1);
-  }
-
-  .neon-input {
-    border-color: oklch(0.60 0.24 30 / 0.3);
-    box-shadow: 
-      0 0 5px oklch(0.60 0.24 30 / 0.2),
-      inset 0 0 5px oklch(0.60 0.24 30 / 0.1);
-  }
-
-  .neon-input:focus {
-    border-color: oklch(0.60 0.24 30);
-    box-shadow: 
-      0 0 10px oklch(0.60 0.24 30 / 0.4),
-      inset 0 0 10px oklch(0.60 0.24 30 / 0.2);
-  }
-
-  .neon-tabs {
-    border-color: oklch(0.60 0.24 30 / 0.3);
-  }
-
-  .game-canvas {
-    image-rendering: crisp-edges;
-    image-rendering: pixelated;
+      0 0 20px oklch(0.75 0.30 300 / 0.5),
+      0 0 40px oklch(0.75 0.30 300 / 0.3),
+      0 0 60px oklch(0.75 0.30 300 / 0.2);
   }
 }
 
 /* Static fallback background for WebGL-unsupported environments */
-.static-fallback-bg {
+.static-neon-background {
   background: 
-    radial-gradient(ellipse at 20% 30%, oklch(0.25 0.15 30 / 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 70%, oklch(0.25 0.15 140 / 0.3) 0%, transparent 50%),
-    linear-gradient(180deg, oklch(0.12 0.02 270) 0%, oklch(0.18 0.03 270) 100%);
+    radial-gradient(ellipse at 20% 30%, oklch(0.35 0.20 300 / 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, oklch(0.35 0.20 200 / 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, oklch(0.20 0.10 250) 0%, oklch(0.12 0.05 250) 100%);
 }

@@ -2,7 +2,11 @@ import { useRef, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 
-export function PixelCloudField() {
+interface PixelCloudFieldProps {
+  speedMultiplier?: number;
+}
+
+export function PixelCloudField({ speedMultiplier = 1 }: PixelCloudFieldProps) {
   const groupRef = useRef<THREE.Group>(null);
   
   const texture = useLoader(THREE.TextureLoader, '/assets/generated/pixel-clouds-tile.dim_2048x2048.png');
@@ -24,22 +28,22 @@ export function PixelCloudField() {
       ] as [number, number, number],
       scale: Math.random() * 8 + 6,
       rotation: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.3 + 0.1,
+      speed: (Math.random() * 0.3 + 0.1) * speedMultiplier,
     }));
-  }, []);
+  }, [speedMultiplier]);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
 
     groupRef.current.children.forEach((child, i) => {
       const cloud = clouds[i];
-      child.position.x += cloud.speed * delta;
+      child.position.x += cloud.speed * delta * 10;
       
       if (child.position.x > 50) {
         child.position.x = -50;
       }
       
-      child.rotation.z += delta * 0.05;
+      child.rotation.z += delta * 0.1;
     });
   });
 
