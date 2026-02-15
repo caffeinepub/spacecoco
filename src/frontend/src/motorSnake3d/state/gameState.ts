@@ -17,7 +17,7 @@ export interface TailSegment {
 
 export interface Enemy {
   id: string;
-  type: 'cow' | 'ufo' | 'penguin';
+  type: 'cow' | 'ufo' | 'penguin' | 'crocodile' | 'finalBoss';
   position: THREE.Vector3;
   velocity: THREE.Vector3;
   active: boolean;
@@ -100,6 +100,7 @@ export interface GameState {
   incrementDeathCount: () => void;
   addTailSegment: (segment: TailSegment) => void;
   removeTailSegment: (index: number) => void;
+  incrementScore: (amount: number) => void;
   reset: () => void;
 }
 
@@ -189,6 +190,10 @@ export const useGameState = create<GameState>((set) => ({
   
   removeTailSegment: (index) => set((state) => ({
     tailSegments: state.tailSegments.filter((_, i) => i !== index)
+  })),
+  
+  incrementScore: (amount) => set((state) => ({
+    score: state.score + amount
   })),
   
   reset: () => set({

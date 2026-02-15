@@ -1,36 +1,43 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project now includes creating and integrating a new full-screen animated neon-glow cover image (game start screen) replacing the current cover artwork.",
+  "summary": "3D Snake game: keep existing 3D view/models unless replaced for specific entities; implement requested gameplay mechanics (movement, scoring, collisions, enemy behavior/spawning, UI) and upgrade enemy entities (UFO/cow/crocodile/penguin) to realistic textured/animated 3D models with proper lighting/shadows and performance constraints, using a standard React+TypeScript+Three.js project structure with assets in project folders.",
   "architectural_notes": [
-    "Start screen cover art should be replaced entirely with a new generated image asset.",
-    "Cover image should support full-screen display plus animated motion and neon glow effects (UI/scene-level animation/shader)."
+    "Use standard project structure (React + TypeScript) and Three.js/WebGL for 3D rendering as needed.",
+    "3D assets (e.g., .glb models/textures) should be stored as project assets (e.g., public/assets) rather than embedded as base64 due to size/performance."
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Hyperreal modern-cartoon cinematic neon cover art featuring: colossal neon green/purple snake biting a splitting silver UFO with a screaming green alien inside; foreground stampede of smaller snakes with glowing trails; flying cow with red laser eyes and smoky beams; rotating starfield; sparks/fire/explosive colors; volumetric lighting; depth of field; long shadows (game-cover-neon-snake-ufo.dim_3840x2160.png)",
   "existing_features": [
     {
-      "id": "feature-generate-a-new-hyperreal-modern-cartoon-cinematic-neon-cover-image-matching-the-user-s-provided-scene-description-colossal-neon-green-purple-snake-biting-a-splitting-silver-ufo-with-a-screaming-green-alien-inside-smaller-snakes-stampeding-in-the-foreground-with-glowing-trails-a-flying-cow-on-the-right-shooting-red-laser-beams-with-smoke-rotating-starfield-background-sparks-fire-color-explosions-volumetric-lighting-depth-of-field-long-shadows-save-it-as-a-static-asset-in-the-frontend-public-generated-assets-folder",
-      "title": "Generate a new hyperreal modern-cartoon, cinematic neon cover image matching the user’s provided scene description (colossal neon green/purple snake biting a splitting silver UFO with a screaming green alien inside; smaller snakes stampeding in the foreground with glowing trails; a flying cow on the right shooting red laser beams with smoke; rotating starfield background; sparks/fire/color explosions; volumetric lighting; depth of field; long shadows). Save it as a static asset in the frontend public generated assets folder.",
+      "id": "feature-replace-the-current-primitive-geometry-rendering-for-enemy-entities-ufo-cow-crocodile-penguin-with-realistic-textured-3d-models-loaded-from-local-static-assets-while-keeping-the-existing-three-js-scene-structure-camera-view-intact",
+      "title": "Replace the current primitive geometry rendering for enemy entities (ufo, cow, crocodile, penguin) with realistic textured 3D models loaded from local static assets, while keeping the existing Three.js scene structure/camera/view intact.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-replace-the-current-start-cover-artwork-with-the-new-cover-image-and-present-it-as-a-full-screen-start-overlay-on-the-play-page-the-cover-must-fill-the-viewport-cover-sizing-and-include-a-subtle-animated-neon-glow-motion-treatment-e-g-slow-parallax-drift-zoom-hue-shift-shimmer-and-or-animated-light-sweep-while-keeping-ui-readable-and-clickable",
-      "title": "Replace the current start/cover artwork with the new cover image and present it as a full-screen start overlay on the Play page. The cover must fill the viewport (cover sizing), and include a subtle animated neon glow + motion treatment (e.g., slow parallax drift/zoom, hue-shift shimmer, and/or animated light sweep) while keeping UI readable and clickable.",
+      "id": "feature-implement-per-enemy-visual-styling-and-lightweight-animation-behaviors-for-the-loaded-models-ufo-appears-metallic-gray-with-blue-neon-lights-that-blink-cow-appears-realistic-with-black-eyes-and-a-subtle-tail-swish-idle-crocodile-appears-scaly-green-with-open-mouth-and-white-teeth-penguin-appears-black-white-with-orange-beak-and-a-slow-idle-walk-in-place-when-not-moving",
+      "title": "Implement per-enemy visual styling and lightweight animation behaviors for the loaded models: UFO appears metallic gray with blue neon lights that blink; Cow appears realistic with black eyes and a subtle tail-swish idle; Crocodile appears scaly green with open mouth and white teeth; Penguin appears black/white with orange beak and a slow idle walk-in-place when not moving.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-the-home-page-hero-artwork-to-use-the-new-cover-image-instead-of-the-current-generated-hero-image-keeping-responsive-layout-intact",
-      "title": "Update the Home page hero artwork to use the new cover image instead of the current generated hero image, keeping responsive layout intact.",
+      "id": "feature-ensure-upgraded-enemy-models-have-correct-scale-depth-and-presence-in-the-existing-scene-they-must-not-appear-flat-they-should-have-slight-rotation-idle-motion-that-reads-in-perspective-and-their-size-should-be-consistent-relative-to-the-player-snake-and-world",
+      "title": "Ensure upgraded enemy models have correct scale, depth, and presence in the existing scene: they must not appear flat; they should have slight rotation/idle motion that reads in perspective, and their size should be consistent relative to the player snake and world.",
       "reqIds": [
         "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-adjust-basic-lighting-and-shadows-so-that-the-new-enemy-models-cast-and-receive-shadows-appropriately-where-supported-by-the-existing-renderer-setup-without-degrading-performance-or-altering-the-overall-look-of-the-existing-scene",
+      "title": "Add/adjust basic lighting and shadows so that the new enemy models cast and receive shadows appropriately (where supported by the existing renderer setup), without degrading performance or altering the overall look of the existing scene.",
+      "reqIds": [
+        "REQ-4"
       ],
       "version": 1
     }
@@ -38,12 +45,31 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Generate hyperreal modern-cartoon cinematic neon cover art and integrate it as a full-screen animated, glowing start-screen image replacing the existing cover.",
+      "summary": "Adjust Snake mechanics: arrow-key movement with diagonal when holding two keys; collisions (wall/self) cause game over; enemy contact resets snake size but keeps score; growth on collecting enemy; restart button without losing accumulated score; smooth/no lag; keep existing 3D camera/view and models unchanged where possible.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Scoring system: +100 points per second while playing (constant even if not moving) and collectible-specific points (UFO +1000, cow +2000, crocodile +3000, penguin +5000); persistent score display large at top; score persists across restarts/game-overs as specified.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Enemy/collectible spawning: spawn UFO/cow/crocodile/penguin randomly around the map sequentially and never overlapping; on touch enemy disappears and snake grows slightly; ensure proper interactions with player/enemies per rules.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Upgrade enemy entities visuals: replace simple shapes with realistic 3D models/textures (GLB) and light animations (UFO metallic with blue neon blink; cow realistic with tail swish; crocodile scaly green with open mouth/white teeth; penguin black/white with orange beak and slow idle walk), with shadows, basic lighting, proper scale, slight rotation/perspective (not flat), and good performance (no lag).",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Generate and integrate a full-screen animated neon cover image for the game start screen",
+  "gameProjectType": "3d",
+  "projectName": "Replace enemy primitives with realistic textured 3D models (UFO/Cow/Crocodile/Penguin) without changing the existing 3D game view",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

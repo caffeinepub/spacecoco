@@ -2,9 +2,14 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-generate-a-new-hyperreal-modern-cartoon-cinematic-neon-cover-image-matching-the-user-s-provided-scene-description-colossal-neon-green-purple-snake-biting-a-splitting-silver-ufo-with-a-screaming-green-alien-inside-smaller-snakes-stampeding-in-the-foreground-with-glowing-trails-a-flying-cow-on-the-right-shooting-red-laser-beams-with-smoke-rotating-starfield-background-sparks-fire-color-explosions-volumetric-lighting-depth-of-field-long-shadows-save-it-as-a-static-asset-in-the-frontend-public-generated-assets-folder",
-      "featureTitle": "Generate a new hyperreal modern-cartoon, cinematic neon cover image matching the user’s provided scene description (colossal neon green/purple snake biting a splitting silver UFO with a screaming green alien inside; smaller snakes stampeding in the foreground with glowing trails; a flying cow on the right shooting red laser beams with smoke; rotating starfield background; sparks/fire/color explosions; volumetric lighting; depth of field; long shadows). Save it as a static asset in the frontend public generated assets folder.",
-      "files": [],
+      "featureId": "feature-replace-the-current-primitive-geometry-rendering-for-enemy-entities-ufo-cow-crocodile-penguin-with-realistic-textured-3d-models-loaded-from-local-static-assets-while-keeping-the-existing-three-js-scene-structure-camera-view-intact",
+      "featureTitle": "Replace the current primitive geometry rendering for enemy entities (ufo, cow, crocodile, penguin) with realistic textured 3D models loaded from local static assets, while keeping the existing Three.js scene structure/camera/view intact.",
+      "files": [
+        "frontend/src/motorSnake3d/render/EnemiesLayer3D.tsx",
+        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+        "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
+        "frontend/src/motorSnake3d/render/useEnemyModelCache.ts"
+      ],
       "components": [
         "authorization@4.0.0",
         "core-infrastructure@1.0.2",
@@ -19,12 +24,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-replace-the-current-start-cover-artwork-with-the-new-cover-image-and-present-it-as-a-full-screen-start-overlay-on-the-play-page-the-cover-must-fill-the-viewport-cover-sizing-and-include-a-subtle-animated-neon-glow-motion-treatment-e-g-slow-parallax-drift-zoom-hue-shift-shimmer-and-or-animated-light-sweep-while-keeping-ui-readable-and-clickable",
-      "featureTitle": "Replace the current start/cover artwork with the new cover image and present it as a full-screen start overlay on the Play page. The cover must fill the viewport (cover sizing), and include a subtle animated neon glow + motion treatment (e.g., slow parallax drift/zoom, hue-shift shimmer, and/or animated light sweep) while keeping UI readable and clickable.",
+      "featureId": "feature-implement-per-enemy-visual-styling-and-lightweight-animation-behaviors-for-the-loaded-models-ufo-appears-metallic-gray-with-blue-neon-lights-that-blink-cow-appears-realistic-with-black-eyes-and-a-subtle-tail-swish-idle-crocodile-appears-scaly-green-with-open-mouth-and-white-teeth-penguin-appears-black-white-with-orange-beak-and-a-slow-idle-walk-in-place-when-not-moving",
+      "featureTitle": "Implement per-enemy visual styling and lightweight animation behaviors for the loaded models: UFO appears metallic gray with blue neon lights that blink; Cow appears realistic with black eyes and a subtle tail-swish idle; Crocodile appears scaly green with open mouth and white teeth; Penguin appears black/white with orange beak and a slow idle walk-in-place when not moving.",
       "files": [
-        "frontend/src/components/start/NeonStartCoverOverlay.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/PlayPage.tsx"
+        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+        "frontend/src/motorSnake3d/render/enemyModelRigging.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -40,10 +44,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-home-page-hero-artwork-to-use-the-new-cover-image-instead-of-the-current-generated-hero-image-keeping-responsive-layout-intact",
-      "featureTitle": "Update the Home page hero artwork to use the new cover image instead of the current generated hero image, keeping responsive layout intact.",
+      "featureId": "feature-ensure-upgraded-enemy-models-have-correct-scale-depth-and-presence-in-the-existing-scene-they-must-not-appear-flat-they-should-have-slight-rotation-idle-motion-that-reads-in-perspective-and-their-size-should-be-consistent-relative-to-the-player-snake-and-world",
+      "featureTitle": "Ensure upgraded enemy models have correct scale, depth, and presence in the existing scene: they must not appear flat; they should have slight rotation/idle motion that reads in perspective, and their size should be consistent relative to the player snake and world.",
       "files": [
-        "frontend/src/pages/HomePage.tsx"
+        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+        "frontend/src/motorSnake3d/render/enemyModelCatalog.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -55,6 +60,27 @@
       ],
       "testIds": [
         "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-adjust-basic-lighting-and-shadows-so-that-the-new-enemy-models-cast-and-receive-shadows-appropriately-where-supported-by-the-existing-renderer-setup-without-degrading-performance-or-altering-the-overall-look-of-the-existing-scene",
+      "featureTitle": "Add/adjust basic lighting and shadows so that the new enemy models cast and receive shadows appropriately (where supported by the existing renderer setup), without degrading performance or altering the overall look of the existing scene.",
+      "files": [
+        "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+        "frontend/src/motorSnake3d/render/SphereWorld.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

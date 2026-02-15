@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Add a new full-screen animated neon cover image for the game start screen, and reuse it as the Home page hero artwork.
+**Goal:** Upgrade enemy visuals by replacing primitive shapes with realistic textured 3D models (UFO, Cow, Crocodile, Penguin) while keeping the existing 3D game view/camera intact.
 
 **Planned changes:**
-- Generate a new cinematic neon cover image matching the provided scene description and add it as a static asset at `/assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png`.
-- Replace the current /play pre-start cover/start background with the new image, displayed full-viewport with subtle neon glow + motion animation while keeping the start UI readable and clickable.
-- Update the Home page hero artwork to use the new cover image instead of the current generated hero image, preserving responsive layout.
+- Replace primitive geometry for enemy entities with locally loaded textured 3D models (static frontend assets) without changing the existing Three.js scene/camera setup.
+- Add per-enemy visual styling and lightweight idle animations (UFO blue blinking emissive lights; Cow subtle tail-swish; Crocodile scaly green with open mouth/white teeth; Penguin slow walk-in-place when nearly idle).
+- Tune model scale, depth/lighting response, and subtle rotation/idle motion so enemies read clearly in perspective and remain consistent relative to the snake/world.
+- Add or adjust basic lighting and shadow casting/receiving for enemies (with performance-conscious settings) to better ground models in the scene.
 
-**User-visible outcome:** Before starting the game on `/play`, users see a full-screen animated neon cover overlay behind the start UI, and the Home page hero image is updated to the same new cover art.
+**User-visible outcome:** Enemies spawn as recognizable, realistic-looking 3D models with subtle animations, proper scale/perspective, and improved lighting/shadows—while the overall game view remains the same.

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { NEON_COLORS } from './neonStyle';
 
 interface SphereWorldProps {
   worldMode: 'inside' | 'outside';
@@ -12,6 +13,7 @@ export function SphereWorld({ worldMode, abyssMode, fogIntensity }: SphereWorldP
   const sphereRef = useRef<THREE.Mesh>(null);
   const coreRef = useRef<THREE.Mesh>(null);
   const shadowDecalsRef = useRef<THREE.Group>(null);
+  const directionalLightRef = useRef<THREE.DirectionalLight>(null);
 
   useFrame((state, delta) => {
     const time = state.clock.elapsedTime;
@@ -24,7 +26,7 @@ export function SphereWorld({ worldMode, abyssMode, fogIntensity }: SphereWorldP
       coreRef.current.scale.set(scale, scale, scale);
 
       if (coreRef.current.material instanceof THREE.MeshStandardMaterial) {
-        coreRef.current.material.emissiveIntensity = (abyssMode ? 2 : 1) + pulse * 0.5;
+        coreRef.current.material.emissiveIntensity = (abyssMode ? 3 : 2) + pulse;
       }
     }
 
@@ -32,7 +34,7 @@ export function SphereWorld({ worldMode, abyssMode, fogIntensity }: SphereWorldP
     if (sphereRef.current) {
       const breathe = Math.sin(time * 1.5) * 0.5 + 0.5;
       if (sphereRef.current.material instanceof THREE.MeshStandardMaterial) {
-        sphereRef.current.material.opacity = 0.8 + breathe * 0.1;
+        sphereRef.current.material.opacity = 0.7 + breathe * 0.15;
       }
     }
 
@@ -48,33 +50,52 @@ export function SphereWorld({ worldMode, abyssMode, fogIntensity }: SphereWorldP
 
   return (
     <>
-      {/* Lighting */}
-      <ambientLight intensity={0.3} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ff6600" />
+      {/* Enhanced lighting with shadow support */}
+      <ambientLight intensity={0.3} color="#222222" />
+      
+      {/* Main directional light with shadows */}
+      <directionalLight
+        ref={directionalLightRef}
+        position={[10, 15, 10]}
+        intensity={1.2}
+        color={NEON_COLORS.acidGreen}
+        castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-far={50}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
+        shadow-bias={-0.0001}
+      />
+      
+      {/* Fill lights */}
+      <pointLight position={[-10, -10, -10]} intensity={0.8} color={NEON_COLORS.hotPink} />
+      <pointLight position={[0, 15, 0]} intensity={0.6} color={NEON_COLORS.neonOrange} />
 
-      {/* Fog */}
-      <fog attach="fog" args={['#000000', 10, 50 * (1 + fogIntensity)]} />
+      {/* Fog - black space */}
+      <fog attach="fog" args={['#000000', 15, 60 * (1 + fogIntensity)]} />
 
-      {/* Hollow Sphere with breathing */}
-      <mesh ref={sphereRef}>
+      {/* Hollow Sphere with breathing - receives shadows */}
+      <mesh ref={sphereRef} receiveShadow>
         <sphereGeometry args={[30, 64, 64]} />
         <meshStandardMaterial
-          color={abyssMode ? '#330033' : '#1a1a2e'}
+          color={abyssMode ? '#0a0a0a' : '#000000'}
           side={worldMode === 'inside' ? THREE.BackSide : THREE.FrontSide}
           wireframe={false}
           transparent
-          opacity={0.8}
+          opacity={0.7}
         />
       </mesh>
 
-      {/* Pulsing Red Core */}
-      <mesh ref={coreRef} position={[0, 0, 0]}>
+      {/* Pulsing Core */}
+      <mesh ref={coreRef} position={[0, 0, 0]} castShadow>
         <sphereGeometry args={[2, 32, 32]} />
         <meshStandardMaterial
-          color="#ff0000"
-          emissive="#ff0000"
-          emissiveIntensity={abyssMode ? 2 : 1}
+          color={NEON_COLORS.hotPink}
+          emissive={NEON_COLORS.hotPink}
+          emissiveIntensity={abyssMode ? 3 : 2}
         />
       </mesh>
 
@@ -86,12 +107,12 @@ export function SphereWorld({ worldMode, abyssMode, fogIntensity }: SphereWorldP
           const z = Math.sin(angle) * 25;
           
           return (
-            <mesh key={i} position={[x, 0, z]} rotation={[0, -angle, 0]}>
+            <mesh key={i} position={[x, 0, z]} rotation={[0, -angle, 0]} receiveShadow>
               <planeGeometry args={[3, 3]} />
               <meshBasicMaterial
                 color="#000000"
                 transparent
-                opacity={0.3}
+                opacity={0.4}
                 side={THREE.DoubleSide}
               />
             </mesh>
@@ -99,30 +120,8 @@ export function SphereWorld({ worldMode, abyssMode, fogIntensity }: SphereWorldP
         })}
       </group>
 
-      {/* Abyss Tentacles (simplified) */}
-      {abyssMode && (
-        <>
-          {[...Array(8)].map((_, i) => {
-            const angle = (i / 8) * Math.PI * 2;
-            const x = Math.cos(angle) * 15;
-            const z = Math.sin(angle) * 15;
-            
-            return (
-              <mesh key={i} position={[x, 0, z]}>
-                <cylinderGeometry args={[0.5, 0.5, 20, 8]} />
-                <meshStandardMaterial
-                  color="#00ff88"
-                  emissive="#00ff88"
-                  emissiveIntensity={1}
-                />
-              </mesh>
-            );
-          })}
-        </>
-      )}
-
       {/* Grid helper for reference */}
-      <gridHelper args={[100, 20, '#444444', '#222222']} />
+      <gridHelper args={[100, 20, '#111111', '#050505']} />
     </>
   );
 }

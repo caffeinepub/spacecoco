@@ -3,7 +3,7 @@ import type { GameState, TailSegment } from '../state/gameState';
 
 export class TailSystem {
   private gameState: GameState;
-  private segmentSpacing = 1.5;
+  private segmentSpacing = 1.8;
 
   constructor(gameState: GameState) {
     this.gameState = gameState;
@@ -35,8 +35,10 @@ export class TailSystem {
     const firstSeg = segments[0];
     const toHead = headPos.clone().sub(firstSeg.position);
     
-    if (toHead.length() > this.segmentSpacing) {
-      firstSeg.position.add(toHead.normalize().multiplyScalar(dt * 5));
+    const dist = toHead.length();
+    if (dist > this.segmentSpacing && dist > 0.01) {
+      const moveAmount = Math.min((dist - this.segmentSpacing) * 8 * dt, dist - this.segmentSpacing);
+      firstSeg.position.add(toHead.normalize().multiplyScalar(moveAmount));
     }
 
     // Each segment follows the previous
@@ -45,8 +47,10 @@ export class TailSystem {
       const curr = segments[i];
       const toPrev = prev.position.clone().sub(curr.position);
       
-      if (toPrev.length() > this.segmentSpacing) {
-        curr.position.add(toPrev.normalize().multiplyScalar(dt * 5));
+      const dist = toPrev.length();
+      if (dist > this.segmentSpacing && dist > 0.01) {
+        const moveAmount = Math.min((dist - this.segmentSpacing) * 8 * dt, dist - this.segmentSpacing);
+        curr.position.add(toPrev.normalize().multiplyScalar(moveAmount));
       }
     }
   }

@@ -1,43 +1,54 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:09:49.588Z",
-  "summary": "Diff adds a NeonStartCoverOverlay component that references the requested static image path and provides animated shimmer/glow overlays, and HomePage now uses the new cover image. However, the actual PNG asset is not shown as added, and PlayPage changes are truncated such that integration/conditional full-screen overlay behavior cannot be confirmed from the provided diff summary.",
+  "generatedAt": "2026-02-15T04:02:44.412Z",
+  "summary": "Enemy rendering was updated to load GLB models via a catalog + cache hook, apply per-enemy material tweaks, enable cast/receive shadows, and enable renderer/scene lighting with shadows. However, several per-enemy animation/behavior requirements (cow tail swish, penguin idle walk when nearly stopped, and subtle idle/rotation for all types) are not fully evidenced in the provided diff summary, and the actual static model assets are not shown as added.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Add the generated cover image file at frontend/public/assets/generated/game-cover-neon-snake-ufo.dim_3840x2160.png and reference it via /assets/generated/...",
-      "reason": "The diff summary does not show any new file added under frontend/public/assets/generated, so existence of the required PNG asset cannot be verified.",
+      "requirement": "All required assets are stored as static files in the frontend (e.g., under frontend/public) and loaded at runtime.",
+      "reason": "The code references GLB paths under /assets/models/enemies/*.glb, but the diff summary does not show any model/texture assets being added to the repository (e.g., under frontend/public).",
       "evidence": [
-        "ADDED FILES list only shows frontend/src/components/start/NeonStartCoverOverlay.tsx; no frontend/public/assets/generated/... file listed"
+        "frontend/src/motorSnake3d/render/enemyModelCatalog.ts"
       ]
     },
     {
       "id": "REQ-2",
-      "requirement": "On /play before the game starts, show a full-viewport start overlay using the new cover image with subtle animated neon glow/motion, keeping UI readable and clickable, and ensuring previous cover is no longer visible.",
-      "reason": "NeonStartCoverOverlay is created and imported in PlayPage, but the PlayPage diff is truncated before showing render logic. There is no visible evidence that the overlay is actually rendered conditionally when the game has not started, fills the viewport, or replaces the prior start/cover background.",
+      "requirement": "Cow includes a subtle, continuous tail-swish idle animation (via GLB animation clip or bone/mesh transform) and retains existing hover motion if present.",
+      "reason": "EnemyEntity3D sets up a tail bone reference for cow, but the actual tail-swish transform/animation is not shown in the truncated portion of the file, so implementation cannot be confirmed from the diff summary.",
       "evidence": [
-        "frontend/src/pages/PlayPage.tsx (truncated): shows import { NeonStartCoverOverlay } ... but render section is truncated",
-        "frontend/src/components/start/NeonStartCoverOverlay.tsx: overlay exists but does not prove it is mounted on /play pre-start"
+        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+        "frontend/src/motorSnake3d/render/enemyModelRigging.ts"
       ]
-    }
-  ],
-  "hallucinated_features": [
+    },
     {
-      "description": "Global neon theme token and utility changes beyond the cover/hero image integration (e.g., extensive OKLCH palette updates, multiple neon utility classes).",
-      "reason": "BuildRequest focuses on generating/serving a static cover asset and integrating it into Play and Home pages. Broad global theme changes are not explicitly requested.",
+      "id": "REQ-2",
+      "requirement": "Penguin shows a slow idle walk cycle when its in-game velocity is near zero.",
+      "reason": "The diff shows that, if any GLB animation exists, it plays the first animation clip unconditionally; there is no evidenced logic (in the visible diff) gating penguin walk/idle based on velocity near zero.",
       "evidence": [
-        "frontend/src/index.css: large-scale updates to :root color tokens and many neon utilities"
+        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Enemy models have a subtle rotation/idle motion that is perceptible during gameplay (for each enemy type).",
+      "reason": "The diff clearly implements hover/rotation for the UFO, but the type-specific motion for cow/crocodile/penguin is in the truncated portion of EnemyEntity3D and is not evidenced for all types.",
+      "evidence": [
+        "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx"
       ]
     }
   ],
-  "confidence": 0.62,
+  "hallucinated_features": [],
+  "confidence": 0.58,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/start/NeonStartCoverOverlay.tsx",
-    "frontend/src/index.css",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/PlayPage.tsx",
+    "frontend/src/motorSnake3d/MotorSnakeGameRoot.tsx",
+    "frontend/src/motorSnake3d/render/EnemiesLayer3D.tsx",
+    "frontend/src/motorSnake3d/render/EnemyEntity3D.tsx",
+    "frontend/src/motorSnake3d/render/SphereWorld.tsx",
+    "frontend/src/motorSnake3d/render/enemyModelCatalog.ts",
+    "frontend/src/motorSnake3d/render/enemyModelRigging.ts",
+    "frontend/src/motorSnake3d/render/useEnemyModelCache.ts",
     "project_state.json"
   ]
 }

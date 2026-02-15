@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Rajdhani', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Orbitron', 'system-ui', '-apple-system', 'sans-serif'],
         display: ['Orbitron', 'monospace'],
       },
       borderRadius: {
@@ -56,8 +56,8 @@ export default {
         },
       },
       boxShadow: {
-        'neon': '0 0 10px oklch(0.60 0.24 30 / 0.5), 0 0 20px oklch(0.60 0.24 30 / 0.3)',
-        'neon-strong': '0 0 20px oklch(0.60 0.24 30 / 0.6), 0 0 40px oklch(0.60 0.24 30 / 0.4)',
+        'neon': '0 0 10px oklch(0.75 0.35 145 / 0.5), 0 0 20px oklch(0.75 0.35 145 / 0.3)',
+        'neon-strong': '0 0 20px oklch(0.75 0.35 145 / 0.6), 0 0 40px oklch(0.75 0.35 145 / 0.4)',
       },
       animation: {
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
@@ -65,10 +65,10 @@ export default {
       keyframes: {
         'pulse-glow': {
           '0%, 100%': {
-            textShadow: '0 0 10px oklch(0.60 0.24 30 / 0.8), 0 0 20px oklch(0.60 0.24 30 / 0.6)',
+            textShadow: '0 0 10px oklch(0.75 0.35 145 / 0.8), 0 0 20px oklch(0.75 0.35 145 / 0.6)',
           },
           '50%': {
-            textShadow: '0 0 20px oklch(0.60 0.24 30 / 1), 0 0 40px oklch(0.60 0.24 30 / 0.8)',
+            textShadow: '0 0 20px oklch(0.75 0.35 145 / 1), 0 0 40px oklch(0.75 0.35 145 / 0.8)',
           },
         },
       },

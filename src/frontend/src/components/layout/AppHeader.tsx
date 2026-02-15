@@ -2,7 +2,7 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { LoginButton } from '../auth/LoginButton';
 import { Button } from '@/components/ui/button';
-import { Menu, Gamepad2, Trophy, Palette } from 'lucide-react';
+import { Menu, Gamepad2, Trophy, Palette, Zap } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export function AppHeader() {
@@ -18,6 +18,15 @@ export function AppHeader() {
         <span className="flex items-center gap-2">
           <Gamepad2 className="h-4 w-4" />
           Play
+        </span>
+      </Link>
+      <Link
+        to="/canvas"
+        className={`${mobile ? 'block py-2' : ''} text-foreground hover:text-accent transition-colors font-medium`}
+      >
+        <span className="flex items-center gap-2">
+          <Zap className="h-4 w-4" />
+          Canvas
         </span>
       </Link>
       <Link
